@@ -1,37 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import appLogo from '/favicon.svg'
-import PWABadge from './PWABadge.tsx'
-import './App.css'
+import HomeIcon from '@mui/icons-material/Home';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+import { Outlet } from 'react-router';
+import type { Navigation } from '@toolpad/core';
+import { theme } from './theme/theme.tsx';
 
-function App() {
-  const [count, setCount] = useState(0)
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Home page',
+  },
+  {
+    segment: '',
+    title: 'Home page',
+    icon: <HomeIcon />,
+  },
+];
 
+const BRANDING = {
+  logo: <img className='' src="/logo-color.png" alt="" />,
+  title: ''
+};
+
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={appLogo} className="logo" alt="OpenAgri-UserDashboard logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>OpenAgri-UserDashboard</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <PWABadge />
-    </>
-  )
+    <ReactRouterAppProvider theme={theme} navigation={NAVIGATION} branding={BRANDING}>
+      <Outlet />
+    </ReactRouterAppProvider>
+  );
 }
-
-export default App
