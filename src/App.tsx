@@ -5,10 +5,10 @@ import { theme } from '@theme/theme';
 
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import ThermostatIcon from '@mui/icons-material/Thermostat';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import PestControlIcon from '@mui/icons-material/PestControl';
 import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
+import ThermostatIcon from '@mui/icons-material/Thermostat';
 
 const NAVIGATION: Navigation = [
   {
@@ -17,7 +17,7 @@ const NAVIGATION: Navigation = [
   },
   {
     segment: '',
-    title: 'Home page',
+    title: 'OpenAgri Dashboard',
     icon: <HomeIcon />,
   },
   {
@@ -30,24 +30,24 @@ const NAVIGATION: Navigation = [
     icon: <CalendarMonthIcon />,
   },
   {
-    segment: 'weather-data',
-    title: 'Weather data',
-    icon: <ThermostatIcon />,
-  },
-  {
-    segment: 'pdm',
-    title: 'Pest and disease management',
-    icon: <PestControlIcon />,
-  },
-  {
     segment: 'irrigation',
     title: 'Irrigation management',
     icon: <WaterDropIcon />,
   },
   {
+    segment: 'pest-and-disease',
+    title: 'Pest and disease management',
+    icon: <PestControlIcon />,
+  },
+  {
     segment: 'reporting-service',
     title: 'Reporting service',
     icon: <AssessmentIcon />,
+  },
+  {
+    segment: 'weather-data',
+    title: 'Weather data',
+    icon: <ThermostatIcon />,
   },
 ];
 

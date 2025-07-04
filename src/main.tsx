@@ -4,6 +4,12 @@ import App from './App.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
 import DashLayout from './layouts/dashboard.tsx';
+import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
+import FarmCalendarPage from '@pages/dashboard/Services/FarmCalendar.tsx';
+import IrrigationPage from '@pages/dashboard/Services/Irrigation.tsx';
+import PestAndDiseasePage from '@pages/dashboard/Services/PestAndDisease.tsx';
+import ReportingServicePage from '@pages/dashboard/Services/ReportingService.tsx';
+import WeatherDataPage from '@pages/dashboard/Services/WeatherData.tsx';
 
 const router = createBrowserRouter([
   {
@@ -12,6 +18,32 @@ const router = createBrowserRouter([
       {
         path: '/',
         Component: DashLayout,
+        children: [
+          {
+            path: '',
+            Component: LandingPage
+          },
+          {
+            path: 'farm-calendar',
+            Component: FarmCalendarPage
+          },
+          {
+            path: 'irrigation',
+            Component: IrrigationPage
+          },
+          {
+            path: 'pest-and-disease',
+            Component: PestAndDiseasePage
+          },
+          {
+            path: 'reporting-service',
+            Component: ReportingServicePage
+          },
+          {
+            path: 'weather-data',
+            Component: WeatherDataPage
+          },
+        ]
       },
     ]
   },
