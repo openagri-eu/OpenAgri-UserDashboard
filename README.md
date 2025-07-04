@@ -22,3 +22,11 @@ In the case of the OpenAgri project the React open-source front-end JavaScript l
 This project code is licensed under the EUPL 1.2 license, see the LICENSE file for more details.
 Please note that each service may have different licenses, which can be found their specific source code repository.
 
+# Prerequisites
+To run this web application locally, [Node.js](https://nodejs.org/) needs to be installed on your machine, and was generated using [Vite PWA](https://vite-pwa-org.netlify.app/guide/) with Mode version `22.17.0`. Make sure that your Node version is not older than this.
+
+# Running
+Simply by cloning this repository and navigating into it, first install the node modules using the `npm install` command. After this the web application can be run via the `npm run dev` command. The application will be available at: [http://localhost:5173/](http://localhost:5173/)
+
+# Building for production
+Building the application is also a very simple task, running the `npm run build` command will put all of the static files into the newly generated `dist` folder.
