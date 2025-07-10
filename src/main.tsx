@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
+import Redirect from '@components/shared/Redirect/Redirect.tsx';
+
 import DashLayout from './layouts/dashboard.tsx';
 import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/Services/FarmCalendar.tsx';
@@ -25,7 +27,20 @@ const router = createBrowserRouter([
           },
           {
             path: 'farm-calendar',
-            Component: FarmCalendarPage
+            children: [
+              {
+                index: true, // When the parent route is accessed directly
+                element: <Redirect to='farm-calendar/farm-calendar' />,
+              },
+              {
+                path: 'farm-calendar',
+                Component: FarmCalendarPage
+              },
+              {
+                path: 'reporting-service',
+                Component: ReportingServicePage
+              },
+            ]
           },
           {
             path: 'irrigation',
@@ -34,10 +49,6 @@ const router = createBrowserRouter([
           {
             path: 'pest-and-disease',
             Component: PestAndDiseasePage
-          },
-          {
-            path: 'reporting-service',
-            Component: ReportingServicePage
           },
           {
             path: 'weather-data',

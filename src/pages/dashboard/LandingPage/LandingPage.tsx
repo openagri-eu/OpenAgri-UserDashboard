@@ -26,11 +26,6 @@ const LandingPage = () => {
             f: () => handleNavigate('/pest-and-disease')
         },
         {
-            url: '/weather-data.png', // TODO: change
-            title: 'Reporting service',
-            f: () => handleNavigate('/reporting-service')
-        },
-        {
             url: '/weather-data.png',
             title: 'Weather data',
             f: () => handleNavigate('/weather-data')

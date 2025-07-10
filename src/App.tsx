@@ -28,6 +28,19 @@ const NAVIGATION: Navigation = [
     segment: 'farm-calendar',
     title: 'Farm calendar',
     icon: <CalendarMonthIcon />,
+    children: [
+      {
+        segment: 'farm-calendar',
+        title: 'Farm calendar',
+        icon: <CalendarMonthIcon />,
+      },
+      {
+        
+        segment: 'reporting-service',
+        title: 'Reporting service',
+        icon: <AssessmentIcon />,
+      },
+    ]
   },
   {
     segment: 'irrigation',
@@ -38,11 +51,6 @@ const NAVIGATION: Navigation = [
     segment: 'pest-and-disease',
     title: 'Pest and disease management',
     icon: <PestControlIcon />,
-  },
-  {
-    segment: 'reporting-service',
-    title: 'Reporting service',
-    icon: <AssessmentIcon />,
   },
   {
     segment: 'weather-data',
