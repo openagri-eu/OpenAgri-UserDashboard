@@ -28,5 +28,22 @@ To run this web application locally, [Node.js](https://nodejs.org/) needs to be 
 # Running
 Simply by cloning this repository and navigating into it, first install the node modules using the `npm install` command. After this the web application can be run via the `npm run dev` command. The application will be available at: [http://localhost:5173/](http://localhost:5173/)
 
-# Building for production
+# Installation and Building
+To install dependencies run `npm install`
+
 Building the application is also a very simple task, running the `npm run build` command will put all of the static files into the newly generated `dist` folder.
+
+# Docker
+To application using docker use the following commnad
+
+```
+docker build -t openagri-dashboard .
+```
+
+Run
+
+```
+docker run --rm -it -p 80:80 openagri-dashboard
+```
+
+You can now visit the page [http://127.0.0.1](http://127.0.0.1) to access the WEB Dashboard
