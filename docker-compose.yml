@@ -6,4 +6,6 @@ services:
     image: ghcr.io/openagri-eu/openagri-userdashboard:latest
     # command: /var/www/entrypoint.sh
     ports:
-      - "${SERVICE_PORT}:80"
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
+    environment:
+      SERVICE_PORT: ${SERVICE_PORT}
