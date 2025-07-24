@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    image: ghcr.io/openagri-eu/openagri-userdashboard:latest
+    # command: /var/www/entrypoint.sh
+    ports:
+      - "${APP_PORT}:80"
