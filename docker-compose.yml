@@ -2,7 +2,6 @@ services:
   web:
     build: .
     image: ghcr.io/openagri-eu/openagri-userdashboard:latest
-    # command: /var/www/entrypoint.sh
     ports:
       - "${SERVICE_PORT}:${SERVICE_PORT}"
     environment:
