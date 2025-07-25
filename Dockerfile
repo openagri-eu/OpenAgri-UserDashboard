@@ -21,6 +21,6 @@ FROM nginx:alpine
 RUN apk update && apk add nginx-module-image-filter
 
 # put app on webserver
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/templates/default.conf.template
 COPY nginx/server.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/dist/ /src/www/app/
