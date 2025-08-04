@@ -9,6 +9,8 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import PestControlIcon from '@mui/icons-material/PestControl';
 import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
 import ThermostatIcon from '@mui/icons-material/Thermostat';
+import { useEffect, useState } from 'react';
+import SessionContext, { Session } from '@contexts/SessionContext';
 
 const NAVIGATION: Navigation = [
   {
@@ -35,7 +37,6 @@ const NAVIGATION: Navigation = [
         icon: <CalendarMonthIcon />,
       },
       {
-        
         segment: 'reporting-service',
         title: 'Reporting service',
         icon: <AssessmentIcon />,
@@ -65,9 +66,24 @@ const BRANDING = {
 };
 
 export default function App() {
+  const [session, setSession] = useState<Session | null>(() => {
+    const storedSession = localStorage.getItem("session");
+    return storedSession ? JSON.parse(storedSession) : null;
+  });
+
+  useEffect(() => {
+    if (session) {
+      localStorage.setItem('session', JSON.stringify(session));
+    } else {
+      localStorage.removeItem('session');
+    }
+  }, [session]);
+
   return (
     <ReactRouterAppProvider theme={theme} navigation={NAVIGATION} branding={BRANDING}>
-      <Outlet />
+      <SessionContext.Provider value={{ session, setSession }}>
+        <Outlet />
+      </SessionContext.Provider>
     </ReactRouterAppProvider>
   );
 }
