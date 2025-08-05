@@ -4,11 +4,18 @@ import GenericSnackbar from "../GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
 import { FarmParcel } from "@models/FarmParcel";
 import { useSession } from "@contexts/SessionContext";
+import { Skeleton } from "@mui/material";
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const ParcelSelectionModule = () => {
 
     const [parcels, setParcels] = useState<FarmParcel[]>([]);
     const { session, setSession } = useSession();
+    const [expanded, setExpanded] = useState<boolean>(!session?.farm_parcel);
 
     const { fetchData, loading, response, error } = useFetch<FarmParcel[]>(
         "FarmParcels/?format=json",
@@ -36,6 +43,7 @@ const ParcelSelectionModule = () => {
     }, [response])
 
     const selectFarmParcel = (parcel?: FarmParcel) => {
+        setExpanded(!parcel);
         setSession(prevSession => {
             if (prevSession) {
                 return {
@@ -47,20 +55,47 @@ const ParcelSelectionModule = () => {
         });
     };
 
+    const handleAccordionChange = () => {
+        setExpanded(!expanded);
+    };
+
     return (
         <>
-            {loading && <div>loading</div>}
-            {!session?.farm_parcel && <div>No parcel selected</div>}
-            {session?.farm_parcel && <div>Selected parcel: {session.farm_parcel.identifier}</div>}
-            <div>
-                <div>Parcels:</div>
-                {
-                    parcels.map((p) => {
-                        return <div onClick={() => selectFarmParcel(p)}>{p.identifier}</div>
-                    })
-                }
-                <div onClick={() => selectFarmParcel(undefined)}>Remove selected parcel</div>
-            </div>
+            {loading && <Skeleton variant="rectangular" height={48} />}
+            {
+                !loading && !error &&
+                <Accordion defaultExpanded={!session?.farm_parcel} expanded={expanded} onChange={handleAccordionChange}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1-content"
+                        id="panel1-header"
+                    >
+                        {
+                            session?.farm_parcel &&
+                            <Typography component="span">
+                                Selected parcel: {session.farm_parcel.identifier}
+                            </Typography>
+                        }
+                        {
+                            !session?.farm_parcel &&
+                            <Typography component="span">
+                                No parcel selected
+                            </Typography>
+                        }
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <div>
+                            <div>Parcels:</div>
+                            {
+                                parcels.map((p) => {
+                                    return <div key={p["@id"]} onClick={() => selectFarmParcel(p)}>{p.identifier}</div>
+                                })
+                            }
+                            <div onClick={() => selectFarmParcel(undefined)}>Remove selected parcel</div>
+                        </div>
+                    </AccordionDetails>
+                </Accordion>
+            }
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}
