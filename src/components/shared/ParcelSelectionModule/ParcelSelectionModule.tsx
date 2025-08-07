@@ -68,8 +68,6 @@ const ParcelSelectionModule = () => {
                 <Accordion defaultExpanded={!session?.farm_parcel} expanded={expanded} onChange={handleAccordionChange}>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1-content"
-                        id="panel1-header"
                     >
                         {
                             session?.farm_parcel &&
@@ -86,7 +84,7 @@ const ParcelSelectionModule = () => {
                     </AccordionSummary>
                     <AccordionDetails>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <ParcelSelectionList parcels={parcels} f={selectFarmParcel}></ParcelSelectionList>
+                            <ParcelSelectionList parcels={parcels} selectedParcelId={session?.farm_parcel?.["@id"]} f={selectFarmParcel}></ParcelSelectionList>
                             <div onClick={() => selectFarmParcel(undefined)}>Remove selected parcel</div>
                         </Box>
                     </AccordionDetails>
