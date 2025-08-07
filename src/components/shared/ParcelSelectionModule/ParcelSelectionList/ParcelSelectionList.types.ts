@@ -1,6 +1,6 @@
 import { FarmParcel } from "@models/FarmParcel";
 
-export interface ParcelSelectionEntryProps {
-    parcel: FarmParcel;
+export interface ParcelSelectionListProps {
+    parcels: FarmParcel[];
     f: (parcel?: FarmParcel) => void;
 }

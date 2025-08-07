@@ -4,13 +4,13 @@ import GenericSnackbar from "../GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
 import { FarmParcel } from "@models/FarmParcel";
 import { useSession } from "@contexts/SessionContext";
-import { Skeleton } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ParcelSelectionEntry from "./ParcelSelectionEntry/ParcelSelectionEntry";
+import ParcelSelectionList from "./ParcelSelectionList/ParcelSelectionList";
 
 const ParcelSelectionModule = () => {
 
@@ -62,10 +62,10 @@ const ParcelSelectionModule = () => {
 
     return (
         <>
-            {loading && <Skeleton sx={{ marginBottom: 2 }} variant="rectangular" height={48} />}
+            {loading && <Skeleton variant="rectangular" height={48} />}
             {
                 !loading && !error &&
-                <Accordion sx={{ marginBottom: 2 }} defaultExpanded={!session?.farm_parcel} expanded={expanded} onChange={handleAccordionChange}>
+                <Accordion defaultExpanded={!session?.farm_parcel} expanded={expanded} onChange={handleAccordionChange}>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-controls="panel1-content"
@@ -85,14 +85,10 @@ const ParcelSelectionModule = () => {
                         }
                     </AccordionSummary>
                     <AccordionDetails>
-                        <div>
-                            {
-                                parcels.map((p) => {
-                                    return <ParcelSelectionEntry parcel={p} f={() => selectFarmParcel(p)}></ParcelSelectionEntry>
-                                })
-                            }
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <ParcelSelectionList parcels={parcels} f={selectFarmParcel}></ParcelSelectionList>
                             <div onClick={() => selectFarmParcel(undefined)}>Remove selected parcel</div>
-                        </div>
+                        </Box>
                     </AccordionDetails>
                 </Accordion>
             }
