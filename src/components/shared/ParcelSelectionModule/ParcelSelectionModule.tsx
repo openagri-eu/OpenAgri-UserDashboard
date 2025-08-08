@@ -19,7 +19,7 @@ const ParcelSelectionModule = () => {
     const [expanded, setExpanded] = useState<boolean>(!session?.farm_parcel);
 
     const { fetchData, loading, response, error } = useFetch<FarmParcel[]>(
-        "FarmParcels/?format=json",
+        "farmcalendar/api/v1/FarmParcels/?format=json",
         {
             method: 'GET',
         }
