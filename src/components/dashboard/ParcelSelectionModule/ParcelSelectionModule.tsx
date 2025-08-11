@@ -1,6 +1,6 @@
 import useFetch from "@hooks/useFetch";
 import { useEffect, useState } from "react";
-import GenericSnackbar from "../GenericSnackbar/GenericSnackbar";
+import GenericSnackbar from "../../shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
 import { FarmParcel } from "@models/FarmParcel";
 import { useSession } from "@contexts/SessionContext";
@@ -19,7 +19,7 @@ const ParcelSelectionModule = () => {
     const [expanded, setExpanded] = useState<boolean>(!session?.farm_parcel);
 
     const { fetchData, loading, response, error } = useFetch<FarmParcel[]>(
-        "farmcalendar/api/v1/FarmParcels/?format=json",
+        "proxy/farmcalendar/api/v1/FarmParcels/?format=json",
         {
             method: 'GET',
         }

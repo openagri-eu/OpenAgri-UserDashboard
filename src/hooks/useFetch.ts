@@ -1,4 +1,4 @@
-// import { useSession } from "@contexts";
+import { useSession } from "@contexts/SessionContext";
 import { useState } from "react";
 
 interface FetchOptions {
@@ -15,8 +15,8 @@ const useFetch = <FetchResponse = any>(
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    // const { session } = useSession();
-    // const token = session?.user?.token;
+    const { session } = useSession();
+    const token = session?.user?.token;
 
     const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -29,7 +29,7 @@ const useFetch = <FetchResponse = any>(
                 method,
                 headers: {
                     "Content-Type": "application/json",
-                    // ...(token && { Authorization: `Bearer ${token}` }),
+                    ...(token && { Authorization: `Bearer ${token}` }),
                     ...headers,
                 },
                 body: body && method !== "GET" && method !== "DELETE" ?

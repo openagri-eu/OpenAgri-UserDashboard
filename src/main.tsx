@@ -12,6 +12,8 @@ import IrrigationPage from '@pages/dashboard/Services/Irrigation.tsx';
 import PestAndDiseasePage from '@pages/dashboard/Services/PestAndDisease.tsx';
 import ReportingServicePage from '@pages/dashboard/Services/ReportingService.tsx';
 import WeatherDataPage from '@pages/dashboard/Services/WeatherData.tsx';
+import AuthLayout from '@layouts/auth.tsx';
+import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -54,6 +56,20 @@ const router = createBrowserRouter([
             path: 'weather-data',
             Component: WeatherDataPage
           },
+        ]
+      },
+      {
+        path: '/',
+        Component: AuthLayout,
+        children: [
+          {
+            path: 'sign-in',
+            Component: SignInPage
+          },
+          // {
+          //   path: 'sign-up',
+          //   Component: SignUpPage
+          // }
         ]
       },
     ]

@@ -1,9 +1,9 @@
 import { Outlet } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import ParcelSelectionModule from '@components/shared/ParcelSelectionModule/ParcelSelectionModule';
+import ParcelSelectionModule from '@components/dashboard/ParcelSelectionModule/ParcelSelectionModule';
 import { Box } from '@mui/material';
-import ToolbarActions from '@components/ToolbarActions/ToolbarActions';
+import ToolbarActions from '@components/dashboard/ToolbarActions/ToolbarActions';
 
 export default function DashLayout() {
   return (
