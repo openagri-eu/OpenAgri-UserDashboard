@@ -14,6 +14,7 @@ import ReportingServicePage from '@pages/dashboard/Services/ReportingService.tsx
 import WeatherDataPage from '@pages/dashboard/Services/WeatherData.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
+import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -66,10 +67,10 @@ const router = createBrowserRouter([
             path: 'sign-in',
             Component: SignInPage
           },
-          // {
-          //   path: 'sign-up',
-          //   Component: SignUpPage
-          // }
+          {
+            path: 'sign-up',
+            Component: SignUpPage
+          }
         ]
       },
     ]

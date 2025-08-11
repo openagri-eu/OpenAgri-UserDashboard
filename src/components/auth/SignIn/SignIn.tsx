@@ -69,7 +69,7 @@ const SignIn = () => {
     return (
         <>
             <Box justifyContent={"center"} display={"flex"}>
-                <Box alignItems={"center"} justifyContent={"center"} display={"flex"} flexDirection={"column"} gap={2}>
+                <Box alignItems={"center"} justifyContent={"center"} display={"flex"} flex={1} maxWidth={500} flexDirection={"column"} gap={2}>
                     <img className='' src={logo} alt="" width={"200px"} />
                     <Typography variant="h6">Sign In</Typography>
                     <TextField
