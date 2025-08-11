@@ -7,13 +7,15 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import logo from '/logo-color.png';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { useSession } from "@contexts/SessionContext";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 
 const SignIn = () => {
+    const [searchParams] = useSearchParams();
+
     const [credentials, setCredentials] = useState({ username: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
 
@@ -54,7 +56,7 @@ const SignIn = () => {
     useEffect(() => {
         if (response) {
             setSession({ user: { token: response.access, refresh_token: response.refresh } })
-            navigate("/");
+            navigate(searchParams.get("callbackURL") ?? '/');
         }
     }, [response])
 
