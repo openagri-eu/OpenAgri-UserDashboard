@@ -1,5 +1,6 @@
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
-import GenericSortableTable, { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable";
+import GenericSortableTable from "@components/shared/GenericSortableTable/GenericSortableTable";
+import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { FarmParcel } from "@models/FarmParcel";

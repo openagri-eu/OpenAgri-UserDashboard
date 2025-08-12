@@ -10,6 +10,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from '@mui/material/Paper';
 import { visuallyHidden } from '@mui/utils';
 import { useMemo, useState } from 'react';
+import { EnhancedTableHeadProps, GenericSortableTableProps, Order } from './GenericSortableTable.types';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -21,8 +22,6 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   return 0;
 }
 
-type Order = 'asc' | 'desc';
-
 function getComparator<T>(
   order: Order,
   orderBy: keyof T,
@@ -30,19 +29,6 @@ function getComparator<T>(
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-export interface HeadCell<T> {
-  id: keyof T;
-  label: string;
-  numeric: boolean;
-}
-
-interface EnhancedTableHeadProps<T> {
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
-  order: Order;
-  orderBy: keyof T | null;
-  headCells: readonly HeadCell<T>[];
 }
 
 function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
@@ -79,12 +65,6 @@ function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
       </TableRow>
     </TableHead>
   );
-}
-
-interface GenericSortableTableProps<T> {
-  data: readonly T[];
-  headCells: readonly HeadCell<T>[];
-  onRowClick?: (row: T) => void;
 }
 
 function GenericSortableTable<T extends { id: number | string }>({
