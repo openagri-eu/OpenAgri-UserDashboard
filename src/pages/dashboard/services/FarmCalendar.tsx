@@ -1,9 +1,9 @@
-import { Typography } from "@mui/material";
+import FarmCalendar from "@components/dashboard/services/FarmCalendar";
 
 const FarmCalendarPage = () => {
     return (
         <>
-            <Typography variant="body1">Farm calendar page!</Typography>
+            <FarmCalendar></FarmCalendar>
         </>
     )
 }
