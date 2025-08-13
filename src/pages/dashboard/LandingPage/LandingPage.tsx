@@ -1,6 +1,7 @@
 import ImageButtonGrid from "@components/styled/ImageButtonGrid/ImageButtonGrid";
 import { useNavigate } from 'react-router-dom';
 import { Typography } from "@mui/material";
+import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -33,6 +34,7 @@ const LandingPage = () => {
     ];
     return (
         <>
+            <ParcelSelectionModule></ParcelSelectionModule>
             <Typography variant="body1">Welcome to the OpenAgri dashboard!</Typography>
             <ImageButtonGrid items={images}></ImageButtonGrid>
         </>

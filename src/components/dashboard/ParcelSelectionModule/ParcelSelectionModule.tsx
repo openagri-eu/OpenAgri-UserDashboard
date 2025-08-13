@@ -61,7 +61,7 @@ const ParcelSelectionModule = () => {
     };
 
     return (
-        <>
+        <Box sx={{ marginBottom: 2 }}>
             {loading && <Skeleton variant="rectangular" height={48} />}
             {
                 !loading && !error &&
@@ -96,7 +96,7 @@ const ParcelSelectionModule = () => {
                 open={snackbarState.open}
                 onClose={closeSnackbar}
             />
-        </>
+        </Box>
     )
 };
 

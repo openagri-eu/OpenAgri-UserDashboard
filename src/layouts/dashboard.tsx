@@ -1,8 +1,6 @@
 import { Outlet, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import ParcelSelectionModule from '@components/dashboard/ParcelSelectionModule/ParcelSelectionModule';
-import { Box } from '@mui/material';
 import ToolbarActions from '@components/dashboard/ToolbarActions/ToolbarActions';
 import { useSession } from '@contexts/SessionContext';
 import Redirect from '@components/shared/Redirect/Redirect';
@@ -42,9 +40,6 @@ export default function DashLayout() {
       }}
     >
       <PageContainer>
-        <Box sx={{ marginBottom: 2 }}>
-          <ParcelSelectionModule></ParcelSelectionModule>
-        </Box>
         <Outlet />
       </PageContainer>
     </DashboardLayout>
