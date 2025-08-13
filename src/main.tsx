@@ -15,7 +15,9 @@ import WeatherDataPage from '@pages/dashboard/services/WeatherData.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
 import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
-import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmParcel.tsx';
+import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcel.tsx';
+import FarmParcelsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcels.tsx';
+import FarmsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farms.tsx';
 
 const router = createBrowserRouter([
   {
@@ -33,7 +35,7 @@ const router = createBrowserRouter([
             path: 'farm-calendar',
             children: [
               {
-                index: true, // When the parent route is accessed directly
+                index: true,
                 element: <Redirect to='farm-calendar/farm-calendar' />,
               },
               /** Farm calendar */
@@ -42,8 +44,29 @@ const router = createBrowserRouter([
                 Component: FarmCalendarPage,
               },
               {
-                path: 'farm-parcel/:id',
-                Component: FarmParcelPage
+                path: 'farm-locations',
+                children: [
+                  {
+                    index: true,
+                    element: <Redirect to='farm-calendar/farm-calendar' />,
+                  },
+                  {
+                    path: 'farms',
+                    Component: FarmsPage
+                  },
+                  // {
+                  //   path: 'farm',
+                  //   Component: FarmPage
+                  // },
+                  {
+                    path: 'farm-parcels',
+                    Component: FarmParcelsPage
+                  },
+                  {
+                    path: 'farm-parcel/:id',
+                    Component: FarmParcelPage
+                  },
+                ]
               },
               /** End of Farm calendar */
               {

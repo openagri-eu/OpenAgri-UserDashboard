@@ -11,6 +11,9 @@ import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly c
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import { useEffect, useState } from 'react';
 import SessionContext, { Session } from '@contexts/SessionContext';
+import { Folder } from '@mui/icons-material';
+import FenceIcon from '@mui/icons-material/Fence';
+import MapIcon from '@mui/icons-material/Map';
 
 const NAVIGATION: Navigation = [
   {
@@ -35,6 +38,23 @@ const NAVIGATION: Navigation = [
         segment: 'farm-calendar',
         title: 'Farm calendar',
         icon: <CalendarMonthIcon />,
+      },
+      {
+        segment: 'farm-locations',
+        title: 'Farm locations',
+        icon: <Folder />,
+        children: [
+          {
+            segment: 'farms',
+            title: 'Farms',
+            icon: <FenceIcon />,
+          },
+          {
+            segment: 'farm-parcels',
+            title: 'Farm parcels',
+            icon: <MapIcon />,
+          }
+        ]
       },
       {
         segment: 'reporting-service',
