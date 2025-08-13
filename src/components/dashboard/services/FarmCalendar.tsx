@@ -9,8 +9,7 @@ import { useEffect, useState } from "react";
 
 const FarmCalendar = () => {
 
-    const [parcels, setParcels] = useState<FarmParcel[]>([]);
-    const [parcelData, setParcelData] = useState<ParcelRow[]>([]);
+    const [parcels, setParcels] = useState<ParcelRow[]>([]);
 
     const { fetchData, loading, response, error } = useFetch<FarmParcel[]>(
         "proxy/farmcalendar/api/v1/FarmParcels/?format=json",
@@ -33,8 +32,7 @@ const FarmCalendar = () => {
 
     useEffect(() => {
         if (response) {
-            setParcels(response);
-            const formattedParcels = parcels.map((p) => {
+            const formattedParcels = response.map((p) => {
                 return {
                     id: p["@id"],
                     farm: p.farm["@type"],
@@ -45,7 +43,7 @@ const FarmCalendar = () => {
                     timestamps: `Created: ${p.created_at}\nUpdated: ${p.updated_at}`,
                 }
             })
-            setParcelData(formattedParcels);
+            setParcels(formattedParcels);
         }
     }, [response])
 
@@ -77,7 +75,7 @@ const FarmCalendar = () => {
             {loading && <Skeleton variant="rectangular" height={48} />}
             {
                 !loading && !error &&
-                <GenericSortableTable data={parcelData} headCells={parcelHeadCells} onRowClick={handleRowClick}></GenericSortableTable>
+                <GenericSortableTable data={parcels} headCells={parcelHeadCells} onRowClick={handleRowClick}></GenericSortableTable>
             }
             <GenericSnackbar
                 type={snackbarState.type}
