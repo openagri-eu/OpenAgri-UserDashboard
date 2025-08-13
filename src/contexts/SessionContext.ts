@@ -1,4 +1,4 @@
-import { FarmParcel } from "@models/FarmParcel";
+import { FarmParcelModel } from "@models/FarmParcel";
 import { createContext, useContext } from "react";
 
 export interface Session {
@@ -6,7 +6,7 @@ export interface Session {
         token?: string
         refresh_token?: string
     };
-    farm_parcel?: FarmParcel;
+    farm_parcel?: FarmParcelModel;
 }
 
 interface SessionContextType {

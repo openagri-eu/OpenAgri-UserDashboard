@@ -7,7 +7,7 @@ import Redirect from '@components/shared/Redirect/Redirect.tsx';
 
 import DashLayout from './layouts/dashboard.tsx';
 import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
-import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar.tsx';
+import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
 import IrrigationPage from '@pages/dashboard/services/Irrigation.tsx';
 import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease.tsx';
 import ReportingServicePage from '@pages/dashboard/services/ReportingService.tsx';
@@ -15,6 +15,7 @@ import WeatherDataPage from '@pages/dashboard/services/WeatherData.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
 import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
+import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmParcel.tsx';
 
 const router = createBrowserRouter([
   {
@@ -35,10 +36,16 @@ const router = createBrowserRouter([
                 index: true, // When the parent route is accessed directly
                 element: <Redirect to='farm-calendar/farm-calendar' />,
               },
+              /** Farm calendar */
               {
                 path: 'farm-calendar',
-                Component: FarmCalendarPage
+                Component: FarmCalendarPage,
               },
+              {
+                path: 'farm-parcel/:id',
+                Component: FarmParcelPage
+              },
+              /** End of Farm calendar */
               {
                 path: 'reporting-service',
                 Component: ReportingServicePage

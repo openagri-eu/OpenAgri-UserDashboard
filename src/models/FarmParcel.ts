@@ -1,4 +1,4 @@
-export interface FarmParcel {
+export interface FarmParcelModel {
     '@type': string,
     '@id': string,
     'status': any, // TODO: change, it was a number but it could be a string

@@ -3,15 +3,16 @@ import GenericSortableTable from "@components/shared/GenericSortableTable/Generi
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
-import { FarmParcel } from "@models/FarmParcel";
+import { FarmParcelModel } from "@models/FarmParcel";
 import { Skeleton } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const FarmCalendar = () => {
+const FarmParcels = () => {
 
     const [parcels, setParcels] = useState<ParcelRow[]>([]);
 
-    const { fetchData, loading, response, error } = useFetch<FarmParcel[]>(
+    const { fetchData, loading, response, error } = useFetch<FarmParcelModel[]>(
         "proxy/farmcalendar/api/v1/FarmParcels/?format=json",
         {
             method: 'GET',
@@ -21,7 +22,7 @@ const FarmCalendar = () => {
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
-        fetchData()
+        fetchData();
     }, [])
 
     useEffect(() => {
@@ -66,8 +67,10 @@ const FarmCalendar = () => {
         { id: 'timestamps', numeric: false, label: 'Timestamps' },
     ];
 
+    const navigate = useNavigate();
+
     const handleRowClick = (parcel: ParcelRow) => {
-        console.log("Clicked on parcel:", parcel.identifier);
+        navigate(`/farm-calendar/farm-parcel/${parcel.id.split(":")[3]}`);
     };
 
     return (
@@ -87,4 +90,4 @@ const FarmCalendar = () => {
     )
 }
 
-export default FarmCalendar;
+export default FarmParcels;

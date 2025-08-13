@@ -1,7 +1,7 @@
-import { FarmParcel } from "@models/FarmParcel";
+import { FarmParcelModel } from "@models/FarmParcel";
 
 export interface ParcelSelectionListProps {
-    parcels: FarmParcel[];
+    parcels: FarmParcelModel[];
     selectedParcelId?: string;
-    f: (parcel?: FarmParcel) => void;
+    f: (parcel?: FarmParcelModel) => void;
 }

@@ -2,7 +2,7 @@ import useFetch from "@hooks/useFetch";
 import { useEffect, useState } from "react";
 import GenericSnackbar from "../../shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
-import { FarmParcel } from "@models/FarmParcel";
+import { FarmParcelModel } from "@models/FarmParcel";
 import { useSession } from "@contexts/SessionContext";
 import { Box, Skeleton } from "@mui/material";
 import Accordion from '@mui/material/Accordion';
@@ -14,11 +14,11 @@ import ParcelSelectionList from "./ParcelSelectionList/ParcelSelectionList";
 
 const ParcelSelectionModule = () => {
 
-    const [parcels, setParcels] = useState<FarmParcel[]>([]);
+    const [parcels, setParcels] = useState<FarmParcelModel[]>([]);
     const { session, setSession } = useSession();
     const [expanded, setExpanded] = useState<boolean>(!session?.farm_parcel);
 
-    const { fetchData, loading, response, error } = useFetch<FarmParcel[]>(
+    const { fetchData, loading, response, error } = useFetch<FarmParcelModel[]>(
         "proxy/farmcalendar/api/v1/FarmParcels/?format=json",
         {
             method: 'GET',
@@ -43,7 +43,7 @@ const ParcelSelectionModule = () => {
         }
     }, [response])
 
-    const selectFarmParcel = (parcel?: FarmParcel) => {
+    const selectFarmParcel = (parcel?: FarmParcelModel) => {
         setExpanded(!parcel);
         setSession(prevSession => {
             if (prevSession) {
