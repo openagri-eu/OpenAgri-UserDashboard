@@ -25,7 +25,7 @@ const NAVIGATION: Navigation = [
     title: 'OpenAgri Dashboard',
     icon: <HomeIcon />,
   },
-  { kind: 'divider' },
+  // { kind: 'divider' },
   {
     kind: 'header',
     title: 'Farm calendar',
