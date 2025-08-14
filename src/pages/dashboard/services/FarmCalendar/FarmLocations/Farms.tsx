@@ -1,7 +1,9 @@
+import Farms from "@components/dashboard/services/FarmCalendar/Farms";
+
 const FarmsPage = () => {
     return (
         <>
-            <div>Welcome to the farms page</div>
+            <Farms></Farms>
         </>
     )
 }

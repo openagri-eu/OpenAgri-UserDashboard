@@ -18,6 +18,7 @@ import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
 import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcel.tsx';
 import FarmParcelsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcels.tsx';
 import FarmsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farms.tsx';
+import FarmPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farm.tsx';
 
 const router = createBrowserRouter([
   {
@@ -54,10 +55,10 @@ const router = createBrowserRouter([
                     path: 'farms',
                     Component: FarmsPage
                   },
-                  // {
-                  //   path: 'farm',
-                  //   Component: FarmPage
-                  // },
+                  {
+                    path: 'farm/:id',
+                    Component: FarmPage
+                  },
                   {
                     path: 'farm-parcels',
                     Component: FarmParcelsPage
