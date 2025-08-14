@@ -76,7 +76,7 @@ const Farms = () => {
     const navigate = useNavigate();
 
     const handleRowClick = (farm: FarmRow) => {
-        navigate(`/farm-calendar/farm-locations/farm/${farm.id.split(":")[3]}`);
+        navigate(`../farm/${farm.id.split(":")[3]}`);
     };
 
     return (

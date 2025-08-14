@@ -70,7 +70,7 @@ const FarmParcels = () => {
     const navigate = useNavigate();
 
     const handleRowClick = (parcel: ParcelRow) => {
-        navigate(`/farm-calendar/farm-locations/farm-parcel/${parcel.id.split(":")[3]}`);
+        navigate(`../farm-parcel/${parcel.id.split(":")[3]}`);
     };
 
     return (

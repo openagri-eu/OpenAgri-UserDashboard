@@ -32,50 +32,51 @@ const router = createBrowserRouter([
             path: '',
             Component: LandingPage
           },
+          /** Farm calendar */
           {
             path: 'farm-calendar',
+            // children: [
+            //   {
+            //     index: true,
+            //     element: <Redirect to='farm-calendar/farm-calendar' />,
+            //   },
+            //   /** Farm calendar */
+            //   {
+            //     path: 'farm-calendar',
+            Component: FarmCalendarPage,
+          },
+          {
+            path: 'farm-locations',
             children: [
               {
                 index: true,
                 element: <Redirect to='farm-calendar/farm-calendar' />,
               },
-              /** Farm calendar */
               {
-                path: 'farm-calendar',
-                Component: FarmCalendarPage,
+                path: 'farms',
+                Component: FarmsPage
               },
               {
-                path: 'farm-locations',
-                children: [
-                  {
-                    index: true,
-                    element: <Redirect to='farm-calendar/farm-calendar' />,
-                  },
-                  {
-                    path: 'farms',
-                    Component: FarmsPage
-                  },
-                  {
-                    path: 'farm/:id',
-                    Component: FarmPage
-                  },
-                  {
-                    path: 'farm-parcels',
-                    Component: FarmParcelsPage
-                  },
-                  {
-                    path: 'farm-parcel/:id',
-                    Component: FarmParcelPage
-                  },
-                ]
+                path: 'farm/:id',
+                Component: FarmPage
               },
-              /** End of Farm calendar */
               {
-                path: 'reporting-service',
-                Component: ReportingServicePage
+                path: 'farm-parcels',
+                Component: FarmParcelsPage
+              },
+              {
+                path: 'farm-parcel/:id',
+                Component: FarmParcelPage
               },
             ]
           },
+          /** End of Farm calendar */
+          {
+            path: 'reporting-service',
+            Component: ReportingServicePage
+          },
+          // ]
+          // },
           {
             path: 'irrigation',
             Component: IrrigationPage

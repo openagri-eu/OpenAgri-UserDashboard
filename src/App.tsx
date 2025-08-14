@@ -25,15 +25,16 @@ const NAVIGATION: Navigation = [
     title: 'OpenAgri Dashboard',
     icon: <HomeIcon />,
   },
+  { kind: 'divider' },
   {
     kind: 'header',
-    title: 'Services',
-  },
-  {
-    segment: 'farm-calendar',
     title: 'Farm calendar',
-    icon: <CalendarMonthIcon />,
-    children: [
+  },
+  // {
+  //   segment: 'farm-calendar',
+  //   title: 'Farm calendar',
+  //   icon: <CalendarMonthIcon />,
+  //   children: [
       {
         segment: 'farm-calendar',
         title: 'Farm calendar',
@@ -61,7 +62,11 @@ const NAVIGATION: Navigation = [
         title: 'Reporting service',
         icon: <AssessmentIcon />,
       },
-    ]
+  //   ]
+  // },
+  {
+    kind: 'header',
+    title: 'Irrigation management',
   },
   {
     segment: 'irrigation',
@@ -69,9 +74,17 @@ const NAVIGATION: Navigation = [
     icon: <WaterDropIcon />,
   },
   {
+    kind: 'header',
+    title: 'Pest and disease management',
+  },
+  {
     segment: 'pest-and-disease',
     title: 'Pest and disease management',
     icon: <PestControlIcon />,
+  },
+  {
+    kind: 'header',
+    title: 'Weather data',
   },
   {
     segment: 'weather-data',
