@@ -1,4 +1,4 @@
-import FarmParcel from "@components/dashboard/services/FarmCalendar/FarmParcel";
+import FarmParcel from "@components/dashboard/services/FarmCalendar/FarmLocations/FarmParcel";
 
 const FarmParcelPage = () => {
     

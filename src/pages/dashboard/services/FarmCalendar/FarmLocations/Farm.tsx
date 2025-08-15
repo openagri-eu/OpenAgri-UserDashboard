@@ -1,4 +1,4 @@
-import Farm from "@components/dashboard/services/FarmCalendar/Farm";
+import Farm from "@components/dashboard/services/FarmCalendar/FarmLocations/Farm";
 
 const FarmPage = () => {
     return (
