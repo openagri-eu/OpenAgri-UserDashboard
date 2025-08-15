@@ -20,11 +20,11 @@ const useFetch = <FetchResponse = any>(
 
     const apiUrl = import.meta.env.VITE_API_URL;
 
-    // useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (dynamicBody = null) => {
         setLoading(true)
         setResponse(undefined);
         try {
+            if (dynamicBody) body = dynamicBody
             const fetchOptions: RequestInit = {
                 method,
                 headers: {

@@ -1,10 +1,11 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
+import FarmCalendar from "@components/dashboard/services/FarmCalendar/FarmCalendar";
 
 const FarmCalendarPage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <div>Welcome to the farm calendar page</div>
+            <FarmCalendar></FarmCalendar>
         </>
     )
 }
