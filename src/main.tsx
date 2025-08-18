@@ -19,6 +19,7 @@ import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmLocations
 import FarmParcelsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcels.tsx';
 import FarmsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farms.tsx';
 import FarmPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farm.tsx';
+import TokenRefreshPage from '@pages/auth/TokenRefresh/TokenRefresh.tsx';
 
 const router = createBrowserRouter([
   {
@@ -102,6 +103,10 @@ const router = createBrowserRouter([
           {
             path: 'sign-up',
             Component: SignUpPage
+          },
+          {
+            path: 'session-refresh',
+            Component: TokenRefreshPage
           }
         ]
       },
