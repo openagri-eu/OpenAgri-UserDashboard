@@ -27,25 +27,37 @@ const TokenRefreshPage = () => {
         }
     );
 
+    // Call the fetch function
     useEffect(() => {
         fetchData();
     }, []);
 
+    // Put the token in the session
     useEffect(() => {
-        if (response) {
+        if (response?.access) {
             setSession(prevSession => {
                 if (prevSession) {
                     return {
                         ...prevSession,
-                        token: response.access
+                        user: {
+                            token: response.access,
+                            refresh_token: session?.user.refresh_token
+                        }
                     };
                 }
                 return null;
             });
+        }
+    }, [response]);
+
+    // Navigate away if the session has been changed
+    useEffect(() => {
+        if (response?.access && session?.user.token === response.access) {
             navigate(searchParams.get("callbackURL") ?? '/');
         }
-    }, [response])
+    }, [session]);
 
+    // Navigate back to the sign in page in case of error
     useEffect(() => {
         if (error) {
             const callbackURL = encodeURIComponent(searchParams.get("callbackURL") ?? '/')
