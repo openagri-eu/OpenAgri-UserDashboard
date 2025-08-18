@@ -48,7 +48,7 @@ const TokenRefreshPage = () => {
 
     useEffect(() => {
         if (error) {
-            const callbackURL = searchParams.get("callbackURL") ?? '/'
+            const callbackURL = encodeURIComponent(searchParams.get("callbackURL") ?? '/')
             navigate('/sign-in?callbackURL=' + callbackURL);
         }
     }, [error])
