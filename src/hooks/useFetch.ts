@@ -15,47 +15,91 @@ const useFetch = <FetchResponse = any>(
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const { session } = useSession();
-    const token = session?.user?.token;
-
+    const { session, setSession } = useSession();
     const apiUrl = import.meta.env.VITE_API_URL;
 
     const fetchData = async (dynamicBody = null) => {
-        setLoading(true)
+        setLoading(true);
         setResponse(undefined);
+        setError(null);
+
         try {
-            if (dynamicBody) body = dynamicBody
-            const fetchOptions: RequestInit = {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token && { Authorization: `Bearer ${token}` }),
-                    ...headers,
-                },
-                body: body && method !== "GET" && method !== "DELETE" ?
+            if (dynamicBody) body = dynamicBody;
+            const getFetchOptions = (token: string | undefined) => {
+                const finalBody = body && method !== "GET" && method !== "DELETE" ?
                     body instanceof URLSearchParams ? body.toString() : JSON.stringify(body) :
-                    null,
+                    null;
+
+                return {
+                    method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token && { Authorization: `Bearer ${token}` }),
+                        ...headers,
+                    },
+                    body: finalBody,
+                };
             };
-            const response = await fetch(apiUrl + url, fetchOptions);
+
+            const initialToken = session?.user?.token;
+            let fetchOptions = getFetchOptions(initialToken);
+            let response = await fetch(apiUrl + url, fetchOptions);
+
+            if (response.status === 401) {
+                const refreshToken = session?.user?.refresh_token;
+                if (!refreshToken) {
+                    throw new Error("Session expired. Please log in again.");
+                }
+
+                console.log("Access token expired. Attempting refresh...");
+                const refreshResponse = await fetch(apiUrl + "token/refresh/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh: refreshToken }),
+                });
+
+                if (!refreshResponse.ok) {
+                    throw new Error("Session expired. Please log in again.");
+                }
+
+                const newToken: { access: string; } = await refreshResponse.json();
+
+                setSession(prevSession => {
+                    if (prevSession) {
+                        return {
+                            ...prevSession,
+                            user: {
+                                ...prevSession.user,
+                                token: newToken.access
+                            }
+                        };
+                    }
+                    return null;
+                });
+
+                console.log("Token refreshed successfully. Retrying original request...");
+                fetchOptions = getFetchOptions(newToken.access);
+                response = await fetch(apiUrl + url, fetchOptions);
+            }
 
             if (!response.ok) {
                 const result: any = await response.json();
-                throw new Error(result.detail);
+                throw new Error(result.detail || `HTTP Error: ${response.status}`);
             }
+
             const result: FetchResponse = await response.json();
             setResponse(result);
             setError(null);
         } catch (err) {
             setResponse(undefined);
             setError(err as Error);
+            // Possibly reroute to a different route to retrigger token refresh if weird behavior occurs
         } finally {
-            // setTimeout(() => { // TODO: remove when backend exists
             setLoading(false);
-            // }, 1000);
         }
     };
 
     return { fetchData, response, loading, error };
 };
 
-export default useFetch
+export default useFetch;
