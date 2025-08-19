@@ -3,10 +3,12 @@ import useSnackbar from "@hooks/useSnackbar";
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { alpha, Box, GlobalStyles } from "@mui/material";
+import { alpha, Box, Button, GlobalStyles } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DatesSetArg, EventInput } from '@fullcalendar/core';
 import useFetch from "@hooks/useFetch";
+import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
+import { useNavigate } from "react-router-dom";
 
 const calendarPlugins = [dayGridPlugin, timeGridPlugin];
 const headerToolbarConfig = {
@@ -29,6 +31,7 @@ const CalendarStyles = () => {
                     borderRadius: theme.shape.borderRadius,
                     boxShadow: theme.shadows[3],
                     backgroundColor: theme.palette.background.paper,
+                    minHeight: 720,
                     flex: 1
                 },
                 // General styles for the calendar container
@@ -63,6 +66,7 @@ const CalendarStyles = () => {
 };
 
 const FarmCalendar = () => {
+    const navigate = useNavigate();
 
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
@@ -76,7 +80,7 @@ const FarmCalendar = () => {
         });
     }, []);
 
-    const { fetchData, response, error } = useFetch<any[]>( // TODO: make event model
+    const { fetchData, response, error } = useFetch<FarmCalendarActivityModel[]>(
         `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json&start=${dateRange.start}&end=${dateRange.end}`,
         {
             method: 'GET',
@@ -87,7 +91,6 @@ const FarmCalendar = () => {
 
     useEffect(() => {
         if (dateRange.start && dateRange.end) {
-            console.log(dateRange);
             fetchData();
         }
     }, [dateRange])
@@ -97,13 +100,6 @@ const FarmCalendar = () => {
             showSnackbar('error', 'Error loading activities');
         }
     }, [error])
-
-    useEffect(() => {
-        if (response) {
-            console.log(response);
-
-        }
-    }, [response])
 
     const calendarEvents = useMemo(() => {
         if (!Array.isArray(response)) {
@@ -123,6 +119,9 @@ const FarmCalendar = () => {
 
     return (
         <>
+            <Box sx={{ marginBottom: 2 }}>
+                <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>
+            </Box>
             <CalendarStyles />
             <Box className="fc-card-container">
                 <FullCalendar
@@ -133,6 +132,9 @@ const FarmCalendar = () => {
                     footerToolbar={footerToolbarConfig}
                     datesSet={handleDatesSet}
                     events={calendarEvents}
+                    eventClick={(info) => {
+                        navigate(`edit-activity/${info.event.id.split(":")[3]}`)
+                    }}
                 />
             </Box>
             <GenericSnackbar

@@ -20,6 +20,8 @@ import FarmParcelsPage from '@pages/dashboard/services/FarmCalendar/FarmLocation
 import FarmsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farms.tsx';
 import FarmPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farm.tsx';
 import TokenRefreshPage from '@pages/auth/TokenRefresh/TokenRefresh.tsx';
+import RegisterCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/RegisterActivity.tsx';
+import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity.tsx';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +47,14 @@ const router = createBrowserRouter([
             //   {
             //     path: 'farm-calendar',
             Component: FarmCalendarPage,
+          },
+          {
+            path: 'farm-calendar/register-activity',
+            Component: RegisterCalendarActivityPage
+          },
+          {
+            path: 'farm-calendar/edit-activity/:id',
+            Component: EditCalendarActivityPage
           },
           {
             path: 'farm-locations',
