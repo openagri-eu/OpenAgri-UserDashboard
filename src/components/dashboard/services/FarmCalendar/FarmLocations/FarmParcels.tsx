@@ -61,7 +61,7 @@ const FarmParcels = () => {
     const parcelHeadCells: readonly HeadCell<ParcelRow>[] = [
         { id: 'farm', numeric: false, label: 'Farm' },
         { id: 'identifier', numeric: false, label: 'Identifier' },
-        { id: 'parcelType', numeric: false, label: 'Parcel Type' },
+        { id: 'parcelType', numeric: false, label: 'Parcel type' },
         { id: 'validFromTo', numeric: false, label: 'Valid from - Valid until' },
         { id: 'coordinates', numeric: false, label: 'Coordinates' },
         { id: 'timestamps', numeric: false, label: 'Timestamps' },
