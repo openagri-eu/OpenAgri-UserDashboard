@@ -60,6 +60,10 @@ const CalendarStyles = () => {
                     color: theme.palette.primary.contrastText,
                     borderColor: theme.palette.primary.dark,
                 },
+                '.fc-event:hover': {
+                    backgroundColor: theme.palette.primary.dark,
+                    cursor: 'pointer',
+                },
             })}
         />
     );
