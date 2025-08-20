@@ -9,7 +9,7 @@ interface FetchOptions {
 
 const useFetch = <FetchResponse = any>(
     url: string,
-    { method = undefined, headers = {}, body = null }: FetchOptions = {}
+    { method = 'GET', headers = {}, body = null }: FetchOptions = {}
 ) => {
     const [response, setResponse] = useState<FetchResponse | undefined>();
     const [loading, setLoading] = useState(false);
@@ -18,13 +18,14 @@ const useFetch = <FetchResponse = any>(
     const { session, setSession } = useSession();
     const apiUrl = import.meta.env.VITE_API_URL;
 
-    const fetchData = async (dynamicBody = null) => {
+    const fetchData = async (dynamicBody = {}, dynamicHeader = {}) => {
         setLoading(true);
         setResponse(undefined);
         setError(null);
 
         try {
-            if (dynamicBody) body = dynamicBody;
+            if (Object.keys(dynamicBody).length > 0) body = dynamicBody;
+            if (Object.keys(dynamicHeader).length > 0) headers = dynamicHeader;
             const getFetchOptions = (token: string | undefined) => {
                 const finalBody = body && method !== "GET" && method !== "DELETE" ?
                     body instanceof URLSearchParams ? body.toString() : JSON.stringify(body) :
@@ -51,7 +52,6 @@ const useFetch = <FetchResponse = any>(
                     throw new Error("Session expired. Please log in again.");
                 }
 
-                console.log("Access token expired. Attempting refresh...");
                 const refreshResponse = await fetch(apiUrl + "token/refresh/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -77,7 +77,6 @@ const useFetch = <FetchResponse = any>(
                     return null;
                 });
 
-                console.log("Token refreshed successfully. Retrying original request...");
                 fetchOptions = getFetchOptions(newToken.access);
                 response = await fetch(apiUrl + url, fetchOptions);
             }

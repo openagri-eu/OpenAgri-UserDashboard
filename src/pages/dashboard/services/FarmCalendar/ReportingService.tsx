@@ -1,11 +1,11 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
-import { Typography } from "@mui/material";
+import ReportingService from "@components/dashboard/services/FarmCalendar/ReportingService";
 
 const ReportingServicePage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <Typography variant="body1">Reporting service page!</Typography>
+            <ReportingService></ReportingService>
         </>
     )
 }
