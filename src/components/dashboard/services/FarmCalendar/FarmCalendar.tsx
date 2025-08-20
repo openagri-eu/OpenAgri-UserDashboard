@@ -59,10 +59,10 @@ const CalendarStyles = () => {
                     backgroundColor: theme.palette.primary.main,
                     color: theme.palette.primary.contrastText,
                     borderColor: theme.palette.primary.dark,
-                },
-                '.fc-event:hover': {
-                    backgroundColor: theme.palette.primary.dark,
-                    cursor: 'pointer',
+                    '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                        cursor: 'pointer',
+                    }
                 },
             })}
         />
