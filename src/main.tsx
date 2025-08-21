@@ -11,7 +11,6 @@ import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalenda
 import IrrigationPage from '@pages/dashboard/services/Irrigation.tsx';
 import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease.tsx';
 import ReportingServicePage from '@pages/dashboard/services/FarmCalendar/ReportingService.tsx';
-import WeatherDataPage from '@pages/dashboard/services/WeatherData.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
 import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
@@ -22,6 +21,7 @@ import FarmPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farm.
 import TokenRefreshPage from '@pages/auth/TokenRefresh/TokenRefresh.tsx';
 import RegisterCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/RegisterActivity.tsx';
 import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity.tsx';
+import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.tsx';
 
 const router = createBrowserRouter([
   {

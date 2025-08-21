@@ -1,11 +1,11 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
-import { Typography } from "@mui/material";
+import WeatherData from "@components/dashboard/services/WeatherData/WeatherData";
 
 const WeatherDataPage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <Typography variant="body1">Weather data page!</Typography>
+            <WeatherData></WeatherData>
         </>
     )
 }
