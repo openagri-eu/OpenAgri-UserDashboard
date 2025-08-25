@@ -7,6 +7,7 @@ import useFetch from "@hooks/useFetch";
 import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 import { useNavigate } from "react-router-dom";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
+import dayjs from "dayjs";
 
 const FarmCalendar = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ const FarmCalendar = () => {
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
     const { fetchData, response, error } = useFetch<FarmCalendarActivityModel[]>(
-        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json&start=${dateRange.start}&end=${dateRange.end}`,
+        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json&fromDate=${dayjs(dateRange.start).format('YYYY-MM-DD')}&toDate=${dayjs(dateRange.end).format('YYYY-MM-DD')}`,
         {
             method: 'GET',
         }
