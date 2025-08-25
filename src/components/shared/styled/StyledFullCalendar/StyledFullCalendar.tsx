@@ -51,7 +51,7 @@ const CalendarStyles = () => {
                     color: theme.palette.primary.contrastText,
                 },
                 // Events
-                '.fc-event': {
+                '.fc-daygrid-block-event': {
                     backgroundColor: theme.palette.primary.main,
                     color: theme.palette.primary.contrastText,
                     borderColor: theme.palette.primary.dark,
@@ -65,7 +65,7 @@ const CalendarStyles = () => {
     );
 };
 
-const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange }) => {
+const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange, eventContent }) => {
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
     const handleDatesSet = useCallback((dates: DatesSetArg) => {
@@ -90,6 +90,8 @@ const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventCl
                     datesSet={handleDatesSet}
                     events={events}
                     eventClick={eventClick}
+                    dayMaxEventRows={true}
+                    eventContent={eventContent}
                 />
             </Box>
         </>
