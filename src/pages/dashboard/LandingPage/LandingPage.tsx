@@ -1,4 +1,4 @@
-import ImageButtonGrid from "@components/styled/ImageButtonGrid/ImageButtonGrid";
+import ImageButtonGrid from "@components/shared/styled/ImageButtonGrid/ImageButtonGrid";
 import { useNavigate } from 'react-router-dom';
 import { Typography } from "@mui/material";
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
