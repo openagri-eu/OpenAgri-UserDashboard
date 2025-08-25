@@ -5,6 +5,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 
 import Redirect from '@components/shared/Redirect/Redirect.tsx';
 
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 import DashLayout from './layouts/dashboard.tsx';
 import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
@@ -126,6 +129,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <RouterProvider router={router} />
+    </LocalizationProvider>
   </StrictMode>,
 )
