@@ -23,7 +23,7 @@ This project code is licensed under the EUPL 1.2 license, see the LICENSE file f
 Please note that each service may have different licenses, which can be found their specific source code repository.
 
 # Prerequisites
-To run this web application locally, [Node.js](https://nodejs.org/) needs to be installed on your machine, and was generated using [Vite PWA](https://vite-pwa-org.netlify.app/guide/) with Mode version `22.17.0`. Make sure that your Node version is not older than this.
+To run this web application locally, [Node.js](https://nodejs.org/) needs to be installed on your machine. The application was generated using [Vite PWA](https://vite-pwa-org.netlify.app/guide/) with Node version `22.17.0`. Make sure that your Node version is not older than this.
 
 # Running
 Simply by cloning this repository and navigating into it, first install the node modules using the `npm install` command. After this the web application can be run via the `npm run dev` command. The application will be available at: [http://localhost:5173/](http://localhost:5173/)
