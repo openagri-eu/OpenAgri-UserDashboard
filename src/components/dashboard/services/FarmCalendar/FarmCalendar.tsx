@@ -8,14 +8,18 @@ import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 import { useNavigate } from "react-router-dom";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
 import dayjs from "dayjs";
+import { useSession } from "@contexts/SessionContext";
+import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
 
 const FarmCalendar = () => {
     const navigate = useNavigate();
 
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
+    const { session } = useSession();
+
     const { fetchData, response, error } = useFetch<FarmCalendarActivityModel[]>(
-        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json&fromDate=${dayjs(dateRange.start).format('YYYY-MM-DD')}&toDate=${dayjs(dateRange.end).format('YYYY-MM-DD')}`,
+        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?parcel=${session?.farm_parcel?.["@id"].split(':')[3]}&format=json&fromDate=${dayjs(dateRange.start).format('YYYY-MM-DD')}&toDate=${dayjs(dateRange.end).format('YYYY-MM-DD')}`,
         {
             method: 'GET',
         }
@@ -24,10 +28,11 @@ const FarmCalendar = () => {
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
-        if (dateRange.start && dateRange.end) {
+
+        if (dateRange.start && dateRange.end && session?.farm_parcel) {
             fetchData();
         }
-    }, [dateRange])
+    }, [session?.farm_parcel, dateRange])
 
     useEffect(() => {
         if (error) {
@@ -53,18 +58,22 @@ const FarmCalendar = () => {
 
     return (
         <>
-            <Box sx={{ marginBottom: 2 }}>
-                <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>
-            </Box>
-            <StyledFullCalendar
-                events={calendarEvents}
-                eventClick={
-                    (info) => {
-                        navigate(`edit-activity/${info.event.id.split(":")[3]}`)
-                    }
-                }
-                onDateRangeChange={setDateRange}
-            />
+            <ContentGuard condition={session?.farm_parcel} message="Please select a parcel">
+                <>
+                    <Box sx={{ marginBottom: 2 }}>
+                        <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>
+                    </Box>
+                    <StyledFullCalendar
+                        events={calendarEvents}
+                        eventClick={
+                            (info) => {
+                                navigate(`edit-activity/${info.event.id.split(":")[3]}`)
+                            }
+                        }
+                        onDateRangeChange={setDateRange}
+                    />
+                </>
+            </ContentGuard>
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}
