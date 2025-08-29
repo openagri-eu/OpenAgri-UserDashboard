@@ -4,6 +4,6 @@ export interface StyledFullCalendarProps {
     events: EventSourceInput | undefined;
     eventClick?: ((arg: EventClickArg) => void);
     onDateRangeChange: (dateRange: { start: string; end: string }) => void;
-    eventContent?: CustomContentGenerator<EventContentArg>
-
+    eventContent?: CustomContentGenerator<EventContentArg>;
+    loading?: boolean;
 }

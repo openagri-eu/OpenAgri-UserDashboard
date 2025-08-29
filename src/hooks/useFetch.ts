@@ -5,11 +5,12 @@ interface FetchOptions {
     method?: "GET" | "POST" | "PUT" | "DELETE";
     headers?: Record<string, string>;
     body?: any;
+    responseType?: 'json' | 'blob';
 }
 
 const useFetch = <FetchResponse = any>(
     url: string,
-    { method = 'GET', headers = {}, body = null }: FetchOptions = {}
+    { method = 'GET', headers = {}, body = null, responseType = 'json' }: FetchOptions = {}
 ) => {
     const [response, setResponse] = useState<FetchResponse | undefined>();
     const [loading, setLoading] = useState(false);
@@ -26,18 +27,23 @@ const useFetch = <FetchResponse = any>(
         try {
             if (Object.keys(dynamicBody).length > 0) body = dynamicBody;
             if (Object.keys(dynamicHeader).length > 0) headers = dynamicHeader;
+
             const getFetchOptions = (token: string | undefined) => {
                 const finalBody = body && method !== "GET" && method !== "DELETE" ?
                     body instanceof URLSearchParams ? body.toString() : JSON.stringify(body) :
                     null;
 
+                const finalHeaders: Record<string, string> = { ...headers };
+                if (responseType === 'json') {
+                    finalHeaders["Content-Type"] = "application/json";
+                }
+                if (token) {
+                    finalHeaders["Authorization"] = `Bearer ${token}`;
+                }
+
                 return {
                     method,
-                    headers: {
-                        "Content-Type": "application/json",
-                        ...(token && { Authorization: `Bearer ${token}` }),
-                        ...headers,
-                    },
+                    headers: finalHeaders,
                     body: finalBody,
                 };
             };
@@ -82,12 +88,21 @@ const useFetch = <FetchResponse = any>(
             }
 
             if (!response.ok) {
-                const result: any = await response.json();
-                throw new Error(result.detail || `HTTP Error: ${response.status}`);
-            }
+                try {
+                   const result: any = await response.json();
+                   throw new Error(result.detail || `HTTP Error: ${response.status}`);
+               } catch (jsonError) {
+                   throw new Error(`HTTP Error: ${response.status}`);
+               }
+           }
 
-            const result: FetchResponse = await response.json();
-            setResponse(result);
+            if (responseType === 'blob') {
+                const blobResult = await response.blob();
+                setResponse(blobResult as FetchResponse);
+            } else {
+                const jsonResult: FetchResponse = await response.json();
+                setResponse(jsonResult);
+            }
             setError(null);
         } catch (err) {
             setResponse(undefined);

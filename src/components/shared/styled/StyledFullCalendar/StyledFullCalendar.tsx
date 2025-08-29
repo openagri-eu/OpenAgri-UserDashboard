@@ -1,8 +1,8 @@
 import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
 import { StyledFullCalendarProps } from "./StyledFullCalendar.types";
-import { alpha, Box, GlobalStyles } from "@mui/material";
+import { alpha, Box, GlobalStyles, CircularProgress } from "@mui/material";
 import { useCallback, useState } from "react";
 import { DatesSetArg } from "@fullcalendar/core/index.js";
 
@@ -28,7 +28,8 @@ const CalendarStyles = () => {
                     boxShadow: theme.shadows[3],
                     backgroundColor: theme.palette.background.paper,
                     minHeight: 720,
-                    flex: 1
+                    flex: 1,
+                    position: 'relative',
                 },
                 // General styles for the calendar container
                 '.fc': {
@@ -50,7 +51,7 @@ const CalendarStyles = () => {
                     backgroundColor: theme.palette.primary.dark,
                     color: theme.palette.primary.contrastText,
                 },
-                // Events
+                // Events / TODO: possibly change for dynamic event colors
                 '.fc-daygrid-block-event': {
                     backgroundColor: theme.palette.primary.main,
                     color: theme.palette.primary.contrastText,
@@ -65,7 +66,7 @@ const CalendarStyles = () => {
     );
 };
 
-const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange, eventContent }) => {
+const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange, eventContent, loading = false }) => {
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
     const handleDatesSet = useCallback((dates: DatesSetArg) => {
@@ -81,6 +82,28 @@ const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventCl
         <>
             <CalendarStyles />
             <Box className="fc-card-container">
+                {/* --- START: LOADING OVERLAY --- */}
+                {loading && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.7),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10,
+                            borderRadius: (theme) => theme.shape.borderRadius,
+                        }}
+                    >
+                        <CircularProgress />
+                    </Box>
+                )}
+                {/* --- END: LOADING OVERLAY --- */}
+
                 <FullCalendar
                     height={'100%'}
                     initialView="dayGridMonth"
@@ -89,7 +112,7 @@ const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventCl
                     footerToolbar={footerToolbarConfig}
                     datesSet={handleDatesSet}
                     events={events}
-                    eventClick={eventClick}
+                    eventClick={loading ? undefined : eventClick}
                     dayMaxEventRows={true}
                     eventContent={eventContent}
                 />
