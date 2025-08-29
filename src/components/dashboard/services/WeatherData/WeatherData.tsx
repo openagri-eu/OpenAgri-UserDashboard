@@ -10,7 +10,7 @@ const WeatherData = () => {
     const { session } = useSession();
 
     const { fetchData, loading, response, error } = useFetch<any>(
-        `proxy/weathersrv/api/data/weather/?lat=${session?.farm_parcel?.location.lat}&lon=${session?.farm_parcel?.location.long}`,
+        `proxy/weather_data/api/data/weather/?lat=${session?.farm_parcel?.location.lat}&lon=${session?.farm_parcel?.location.long}`,
         {
             method: 'GET',
         }
