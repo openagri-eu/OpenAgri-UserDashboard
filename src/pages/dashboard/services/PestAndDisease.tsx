@@ -22,7 +22,7 @@ const PestAndDiseasePage = () => {
     const [_, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
 
-    const { fetchData, response, error } = useFetch<GDDModel>( // TODO: handle loading
+    const { fetchData, response, error, loading } = useFetch<GDDModel>(
         `proxy/pdm/api/v1/model/${selectedDisease}/gdd/?parcel_id=${session?.farm_parcel?.["@id"].split(":")[3]}&from_date=${fromDate?.format('YYYY-MM-DD')}&to_date=${toDate?.format('YYYY-MM-DD')}`,
         {
             method: 'GET',
@@ -65,9 +65,6 @@ const PestAndDiseasePage = () => {
                 placement="top"
                 arrow
             >
-                {/* This is the inner content that is actually rendered on the calendar.
-              We let FullCalendar handle the main event block.
-            */}
                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     <em>{timeText}</em>
                     <span> {event.title}</span>
@@ -107,6 +104,7 @@ const PestAndDiseasePage = () => {
                         events={calendarEvents}
                         onDateRangeChange={setDateRange}
                         eventContent={renderEventContent}
+                        loading={loading}
                     />
                 }
             </Box>
