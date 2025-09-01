@@ -1,9 +1,7 @@
-import RegisterCalendarActivity from "@components/dashboard/services/FarmCalendar/FarmCalendarActivities/RegisterActivity";
-
 const RegisterCalendarActivityPage = () => {
     return (
         <>
-            <RegisterCalendarActivity></RegisterCalendarActivity>
+            <div>register activity works</div>
         </>
     )
 }

@@ -1,9 +1,55 @@
-import EditCalendarActivity from "@components/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity";
+import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
+import useFetch from "@hooks/useFetch";
+import useSnackbar from "@hooks/useSnackbar";
+import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
+import { Box, Skeleton, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const EditCalendarActivityPage = () => {
+    const [farm, setFarm] = useState<FarmCalendarActivityModel>();
+
+    const { id } = useParams();
+    const { fetchData, loading, response, error } = useFetch<FarmCalendarActivityModel>(
+        `proxy/farmcalendar/api/v1/FarmCalendarActivities/${id}/?format=json`,
+        {
+            method: 'GET',
+        }
+    );
+
+    const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
+
+    useEffect(() => {
+        fetchData();
+    }, [])
+
+    useEffect(() => {
+        if (error) {
+            showSnackbar('error', 'Error loading activity');
+        }
+    }, [error])
+
+    useEffect(() => {
+        if (response) {
+            setFarm(response);
+        }
+    }, [response])
+
     return (
         <>
-            <EditCalendarActivity></EditCalendarActivity>
+            {loading && <Skeleton variant="rectangular" height={48} />}
+            {
+                !loading && !error &&
+                <Box>
+                    <Typography variant={'h4'}>{farm?.title}</Typography>
+                </Box>
+            }
+            <GenericSnackbar
+                type={snackbarState.type}
+                message={snackbarState.message}
+                open={snackbarState.open}
+                onClose={closeSnackbar}
+            />
         </>
     )
 }
