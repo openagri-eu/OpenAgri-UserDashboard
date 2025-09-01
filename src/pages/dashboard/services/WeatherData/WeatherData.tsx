@@ -13,6 +13,15 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
 import { SvgIcon } from '@mui/material';
 
+import NorthIcon from '@mui/icons-material/North';
+import NorthWestIcon from '@mui/icons-material/NorthWest';
+import WestIcon from '@mui/icons-material/West';
+import SouthWestIcon from '@mui/icons-material/SouthWest';
+import SouthIcon from '@mui/icons-material/South';
+import SouthEastIcon from '@mui/icons-material/SouthEast';
+import EastIcon from '@mui/icons-material/East';
+import NorthEastIcon from '@mui/icons-material/NorthEast';
+
 interface TimeData {
     ambient_temperature?: number;
     ambient_humidity?: number;
@@ -76,15 +85,15 @@ const WeatherDataPage = () => {
     }, [error])
 
     const degreeConvert = (degree: number) => {
-        if (degree > 337.5) return 'N';
-        if (degree > 292.5) return 'NW';
-        if (degree > 247.5) return 'W';
-        if (degree > 202.5) return 'SW';
-        if (degree > 157.5) return 'S';
-        if (degree > 122.5) return 'SE';
-        if (degree > 67.5) return 'E';
-        if (degree > 22.5) return 'NE';
-        return 'N';
+        if (degree > 337.5) return { str: 'N', icon: <NorthIcon /> };
+        if (degree > 292.5) return { str: 'NW', icon: <NorthWestIcon /> };
+        if (degree > 247.5) return { str: 'W', icon: <WestIcon /> };
+        if (degree > 202.5) return { str: 'SW', icon: <SouthWestIcon /> };
+        if (degree > 157.5) return { str: 'S', icon: <SouthIcon /> };
+        if (degree > 122.5) return { str: 'SE', icon: <SouthEastIcon /> };
+        if (degree > 67.5) return { str: 'E', icon: <EastIcon /> };
+        if (degree > 22.5) return { str: 'NE', icon: <NorthEastIcon /> };
+        return { str: 'N', icon: <NorthIcon /> };
     }
 
     return (
@@ -100,6 +109,7 @@ const WeatherDataPage = () => {
                                     <Typography gutterBottom variant="h4">{date}</Typography>
                                     <Box display={'flex'} flexDirection={'column'} gap={2}>
                                         {Object.entries(dailyData).sort().map(([time, timeData]: [string, TimeData]) => {
+                                            const { str, icon } = degreeConvert(timeData.wind_direction ?? 0);
                                             return <Fragment key={`id-time-${date}-${time}`}>
                                                 <Box display={'flex'} flex={1} justifyContent={'space-between'} alignItems={'center'} gap={2}>
                                                     <Box flex={1}>{time}</Box>
@@ -111,8 +121,9 @@ const WeatherDataPage = () => {
                                                         <SvgIcon children={<WaterDropIcon />} />
                                                         {timeData.ambient_humidity}%
                                                     </Box>
-                                                    <Box display={'flex'} alignItems={'center'} flex={1}>
-                                                        <SvgIcon children={<AirIcon />} /> {timeData.wind_speed} km/h {degreeConvert(timeData.wind_direction ?? 0)}
+                                                    <Box display={'flex'} flexDirection={'column'} alignItems={'center'} flex={1}>
+                                                        <Box display={'flex'} alignItems={'center'}><SvgIcon children={<AirIcon />} /> {timeData.wind_speed} km/h</Box>
+                                                        <Box display={'flex'} alignItems={'center'}><SvgIcon children={icon} /> {str}</Box>
                                                     </Box>
                                                 </Box>
                                             </Fragment>
