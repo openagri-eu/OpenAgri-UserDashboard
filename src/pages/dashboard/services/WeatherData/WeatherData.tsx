@@ -109,7 +109,7 @@ const WeatherDataPage = () => {
                             return <Card key={`id-date-${date}`}>
                                 <CardContent>
                                     <Typography gutterBottom variant="h4">{dayjs(date).format('dddd, D/MMM/YYYY')}</Typography>
-                                    <Box display={'flex'} flexDirection={'column'} gap={2}>
+                                    <Box display={'flex'} flexDirection={'column'} gap={2} overflow={'auto'}>
                                         {Object.entries(dailyData).sort().map(([time, timeData]: [string, TimeData]) => {
                                             const { str, icon } = degreeConvert(timeData.wind_direction ?? 0);
                                             return <Fragment key={`id-time-${date}-${time}`}>
