@@ -7,7 +7,7 @@ import { ContentGuardProps } from './ContentGuard.types';
 
 const ContentGuard: React.FC<ContentGuardProps> = ({
     condition,
-    message,
+    message = "Please select a parcel",
     title = "Action required before content can be displayed",
     children,
 }) => {

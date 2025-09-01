@@ -1,4 +1,5 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
+import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
 
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
@@ -100,7 +101,9 @@ const ReportingServicePage = () => {
     }, [errorGenerate, errorReport])
 
     useEffect(() => {
-        fetchDataCompostActivities();
+        if (session?.farm_parcel) {
+            fetchDataCompostActivities();
+        }
     }, [session?.farm_parcel])
 
     const calendarEvents = useMemo(() => {
@@ -125,16 +128,18 @@ const ReportingServicePage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <StyledFullCalendar
-                events={calendarEvents}
-                eventClick={
-                    (info) => {
-                        handleGenerateReport({ reportType: 'compost-report', compostOperationID: info.event.id.split(':')[3] })
+            <ContentGuard condition={session?.farm_parcel}>
+                <StyledFullCalendar
+                    events={calendarEvents}
+                    eventClick={
+                        (info) => {
+                            handleGenerateReport({ reportType: 'compost-report', compostOperationID: info.event.id.split(':')[3] })
+                        }
                     }
-                }
-                onDateRangeChange={setDateRange}
-                loading={loadingReport}
-            />
+                    onDateRangeChange={setDateRange}
+                    loading={loadingReport}
+                />
+            </ContentGuard>
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}

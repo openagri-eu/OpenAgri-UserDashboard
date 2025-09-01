@@ -1,6 +1,6 @@
 export interface ContentGuardProps {
     condition: any;
-    message: string;
+    message?: string;
     title?: string;
     children: React.ReactNode;
 }

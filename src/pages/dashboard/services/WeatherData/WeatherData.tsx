@@ -1,4 +1,5 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
+import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import { useSession } from "@contexts/SessionContext";
 import useFetch from "@hooks/useFetch";
@@ -19,7 +20,9 @@ const WeatherDataPage = () => {
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
-        fetchData();
+        if (session?.farm_parcel) {
+            fetchData();
+        }
     }, [session?.farm_parcel])
 
     useEffect(() => {
@@ -37,8 +40,12 @@ const WeatherDataPage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            {loading && <Skeleton variant="rectangular" height={48} />}
-            {!loading && <div>weather data works</div>}
+            <ContentGuard condition={session?.farm_parcel}>
+                {loading && <Skeleton variant="rectangular" height={48} />}
+                {!loading &&
+                    <div>weather data works</div>
+                }
+            </ContentGuard>
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}

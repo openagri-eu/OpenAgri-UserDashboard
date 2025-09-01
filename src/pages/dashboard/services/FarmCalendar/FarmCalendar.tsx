@@ -58,7 +58,7 @@ const FarmCalendarPage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <ContentGuard condition={session?.farm_parcel} message="Please select a parcel">
+            <ContentGuard condition={session?.farm_parcel}>
                 <>
                     <Box sx={{ marginBottom: 2 }}>
                         <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>

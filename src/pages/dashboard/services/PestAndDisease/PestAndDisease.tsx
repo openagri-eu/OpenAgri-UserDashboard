@@ -1,4 +1,5 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
+import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
 import DateRangeSelect from "@components/shared/DateRangeSelect/DateRangeSelect";
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
@@ -76,38 +77,40 @@ const PestAndDiseasePage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <Box display={'flex'} flexDirection={'column'} gap={2}>
-                <GenericSelect<DiseaseModel, DiseasesResponseModel>
-                    endpoint='proxy/pdm/api/v1/disease/'
-                    label='Diseases'
-                    transformResponse={response => response.diseases}
-                    selectedValue={selectedDisease}
-                    setSelectedValue={setSelectedDisease}
-                    getOptionLabel={item => item.name}
-                    getOptionValue={item => item.id}>
-                </GenericSelect>
-                <DateRangeSelect
-                    fromDate={fromDate}
-                    setFromDate={setFromDate}
-                    toDate={toDate}
-                    setToDate={setToDate}>
-                </DateRangeSelect>
-                <Box><Button
-                    onClick={() => handleDisplayGDD()}
-                    variant="contained"
-                    disabled={!session?.farm_parcel || !selectedDisease || !fromDate || !toDate}
-                >
-                    Display GDD
-                </Button></Box>
-                {calendarEvents && !error &&
-                    <StyledFullCalendar
-                        events={calendarEvents}
-                        onDateRangeChange={setDateRange}
-                        eventContent={renderEventContent}
-                        loading={loading}
-                    />
-                }
-            </Box>
+            <ContentGuard condition={session?.farm_parcel}>
+                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <GenericSelect<DiseaseModel, DiseasesResponseModel>
+                        endpoint='proxy/pdm/api/v1/disease/'
+                        label='Diseases'
+                        transformResponse={response => response.diseases}
+                        selectedValue={selectedDisease}
+                        setSelectedValue={setSelectedDisease}
+                        getOptionLabel={item => item.name}
+                        getOptionValue={item => item.id}>
+                    </GenericSelect>
+                    <DateRangeSelect
+                        fromDate={fromDate}
+                        setFromDate={setFromDate}
+                        toDate={toDate}
+                        setToDate={setToDate}>
+                    </DateRangeSelect>
+                    <Box><Button
+                        onClick={() => handleDisplayGDD()}
+                        variant="contained"
+                        disabled={!session?.farm_parcel || !selectedDisease || !fromDate || !toDate}
+                    >
+                        Display GDD
+                    </Button></Box>
+                    {calendarEvents && !error &&
+                        <StyledFullCalendar
+                            events={calendarEvents}
+                            onDateRangeChange={setDateRange}
+                            eventContent={renderEventContent}
+                            loading={loading}
+                        />
+                    }
+                </Box>
+            </ContentGuard>
         </>
     )
 }
