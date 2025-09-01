@@ -12,7 +12,7 @@ import DashLayout from './layouts/dashboard.tsx';
 import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
 import IrrigationPage from '@pages/dashboard/services/Irrigation.tsx';
-import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease.tsx';
+import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease/PestAndDisease.tsx';
 import ReportingServicePage from '@pages/dashboard/services/FarmCalendar/ReportingService.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';

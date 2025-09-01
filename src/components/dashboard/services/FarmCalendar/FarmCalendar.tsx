@@ -28,7 +28,6 @@ const FarmCalendar = () => {
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
-
         if (dateRange.start && dateRange.end && session?.farm_parcel) {
             fetchData();
         }
