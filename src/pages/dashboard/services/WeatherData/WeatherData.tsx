@@ -22,6 +22,7 @@ import SouthIcon from '@mui/icons-material/South';
 import SouthEastIcon from '@mui/icons-material/SouthEast';
 import EastIcon from '@mui/icons-material/East';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
+import dayjs from "dayjs";
 
 interface TimeData {
     ambient_temperature?: number;
@@ -107,7 +108,7 @@ const WeatherDataPage = () => {
                         {formattedData && Object.entries(formattedData).map(([date, dailyData]: [string, DailyData]) => {
                             return <Card key={`id-date-${date}`}>
                                 <CardContent>
-                                    <Typography gutterBottom variant="h4">{date}</Typography>
+                                    <Typography gutterBottom variant="h4">{dayjs(date).format('dddd, D/MMM/YYYY')}</Typography>
                                     <Box display={'flex'} flexDirection={'column'} gap={2}>
                                         {Object.entries(dailyData).sort().map(([time, timeData]: [string, TimeData]) => {
                                             const { str, icon } = degreeConvert(timeData.wind_direction ?? 0);
@@ -115,7 +116,7 @@ const WeatherDataPage = () => {
                                                 <Box display={'flex'} flex={1} justifyContent={'space-between'} alignItems={'center'} gap={2}>
                                                     <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
                                                         <SvgIcon children={<AccessTimeIcon />} />
-                                                        {time}
+                                                        {dayjs(`${date} ${time}`).format('HH:mm')}
                                                     </Box>
                                                     <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
                                                         <SvgIcon children={<ThermostatIcon />} />
