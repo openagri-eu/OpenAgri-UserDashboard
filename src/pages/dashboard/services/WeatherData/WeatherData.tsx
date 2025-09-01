@@ -8,6 +8,7 @@ import { WeatherForecastModel } from "@models/WeatherForecast";
 import { Box, Card, CardContent, Skeleton, Typography } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
@@ -112,7 +113,10 @@ const WeatherDataPage = () => {
                                             const { str, icon } = degreeConvert(timeData.wind_direction ?? 0);
                                             return <Fragment key={`id-time-${date}-${time}`}>
                                                 <Box display={'flex'} flex={1} justifyContent={'space-between'} alignItems={'center'} gap={2}>
-                                                    <Box flex={1}>{time}</Box>
+                                                    <Box display={'flex'} alignItems={'center'} flex={1}>
+                                                        <SvgIcon children={<AccessTimeIcon />} />
+                                                        {time}
+                                                    </Box>
                                                     <Box display={'flex'} alignItems={'center'} flex={1}>
                                                         <SvgIcon children={<ThermostatIcon />} />
                                                         {timeData.ambient_temperature}°C
