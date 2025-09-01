@@ -113,21 +113,21 @@ const WeatherDataPage = () => {
                                             const { str, icon } = degreeConvert(timeData.wind_direction ?? 0);
                                             return <Fragment key={`id-time-${date}-${time}`}>
                                                 <Box display={'flex'} flex={1} justifyContent={'space-between'} alignItems={'center'} gap={2}>
-                                                    <Box display={'flex'} alignItems={'center'} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
                                                         <SvgIcon children={<AccessTimeIcon />} />
                                                         {time}
                                                     </Box>
-                                                    <Box display={'flex'} alignItems={'center'} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
                                                         <SvgIcon children={<ThermostatIcon />} />
                                                         {timeData.ambient_temperature}°C
                                                     </Box>
-                                                    <Box display={'flex'} alignItems={'center'} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
                                                         <SvgIcon children={<WaterDropIcon />} />
                                                         {timeData.ambient_humidity}%
                                                     </Box>
                                                     <Box display={'flex'} flexDirection={'column'} alignItems={'center'} flex={1}>
-                                                        <Box display={'flex'} alignItems={'center'}><SvgIcon children={<AirIcon />} /> {timeData.wind_speed} km/h</Box>
-                                                        <Box display={'flex'} alignItems={'center'}><SvgIcon children={icon} /> {str}</Box>
+                                                        <Box display={'flex'} alignItems={'center'} gap={1}><SvgIcon children={<AirIcon />} /> {timeData.wind_speed} km/h</Box>
+                                                        <Box display={'flex'} alignItems={'center'} gap={1}><SvgIcon children={icon} /> {str}</Box>
                                                     </Box>
                                                 </Box>
                                             </Fragment>
