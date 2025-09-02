@@ -40,7 +40,9 @@ const SignInPage = () => {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             method: 'POST',
-            body: new URLSearchParams(credentials)
+            body: {
+                ...credentials
+            }
         }
     );
 
