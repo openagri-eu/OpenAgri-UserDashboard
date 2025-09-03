@@ -4,7 +4,7 @@ import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
 import { useSession } from "@contexts/SessionContext";
-import { EventClickArg, EventInput } from "@fullcalendar/core/index.js"; // Import EventClickArg for better typing
+import { EventClickArg, EventInput } from "@fullcalendar/core/index.js";
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
