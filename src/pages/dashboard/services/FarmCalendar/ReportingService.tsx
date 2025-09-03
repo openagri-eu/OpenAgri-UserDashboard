@@ -1,14 +1,17 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
-
+import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
 import { useSession } from "@contexts/SessionContext";
-import { EventInput } from "@fullcalendar/core/index.js";
+import { EventClickArg, EventInput } from "@fullcalendar/core/index.js"; // Import EventClickArg for better typing
+import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { CompostOperationModel } from "@models/CompostOperation";
+import { Button } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
 interface ReportHelper {
     reportType: string;
@@ -24,6 +27,7 @@ const ReportingServicePage = () => {
     const [reportUUID, setReportUUID] = useState<string>('');
     const [_, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
+    const [activeEventInfo, setActiveEventInfo] = useState<EventClickArg | null>(null);
 
     const { fetchData: fetchDataCompostActivities, response: responseCompostActivities } = useFetch<CompostOperationModel[]>(
         `proxy/farmcalendar/api/v1/CompostOperations/?format=json&parcel=${session?.farm_parcel?.["@id"].split(':')[3]}`,
@@ -49,6 +53,8 @@ const ReportingServicePage = () => {
 
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
+    const { dialogProps, showDialog } = useDialog();
+
     /** Calls */
     useEffect(() => {
         if (reportHelper.reportType) {
@@ -64,7 +70,6 @@ const ReportingServicePage = () => {
             }, 1500);
         }
     }, [reportUUID])
-
 
     /** Reacting to the responses */
     useEffect(() => {
@@ -125,6 +130,12 @@ const ReportingServicePage = () => {
     const handleGenerateReport = (reportHelper: ReportHelper) => {
         setReportHelper(reportHelper);
     };
+
+    const handleCloseDialog = () => {
+        dialogProps.onClose();
+        setActiveEventInfo(null);
+    };
+
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
@@ -133,13 +144,33 @@ const ReportingServicePage = () => {
                     events={calendarEvents}
                     eventClick={
                         (info) => {
-                            handleGenerateReport({ reportType: 'compost-report', compostOperationID: info.event.id.split(':')[3] })
+                            setActiveEventInfo(info);
+                            showDialog({
+                                title: `Report actions for ${info.event.title}`,
+                                variant: 'empty',
+                                children: <></>
+                            });
                         }
                     }
                     onDateRangeChange={setDateRange}
-                    loading={loadingReport}
                 />
             </ContentGuard>
+
+            <GenericDialog {...dialogProps} onClose={handleCloseDialog}>
+                {activeEventInfo && (
+                    <Button
+                        variant="contained"
+                        startIcon={<InsertDriveFileIcon />}
+                        loadingPosition="start"
+                        onClick={
+                            () => handleGenerateReport({ reportType: 'compost-report', compostOperationID: activeEventInfo.event.id.split(':')[3] })
+                        }
+                        loading={loadingReport}
+                    >
+                        Generate report
+                    </Button>
+                )}
+            </GenericDialog>
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}
