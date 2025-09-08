@@ -5,7 +5,7 @@ import { theme } from '@theme/theme';
 
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import WaterDropIcon from '@mui/icons-material/WaterDrop';
+// import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import PestControlIcon from '@mui/icons-material/PestControl';
 import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
 import ThermostatIcon from '@mui/icons-material/Thermostat';
@@ -14,6 +14,9 @@ import SessionContext, { Session } from '@contexts/SessionContext';
 import { Folder } from '@mui/icons-material';
 import FenceIcon from '@mui/icons-material/Fence';
 import MapIcon from '@mui/icons-material/Map';
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
+import TimelineIcon from '@mui/icons-material/Timeline';
+
 
 const NAVIGATION: Navigation = [
   {
@@ -35,33 +38,33 @@ const NAVIGATION: Navigation = [
   //   title: 'Farm calendar',
   //   icon: <CalendarMonthIcon />,
   //   children: [
+  {
+    segment: 'farm-calendar',
+    title: 'Farm calendar',
+    icon: <CalendarMonthIcon />,
+  },
+  {
+    segment: 'farm-locations',
+    title: 'Farm locations',
+    icon: <Folder />,
+    children: [
       {
-        segment: 'farm-calendar',
-        title: 'Farm calendar',
-        icon: <CalendarMonthIcon />,
+        segment: 'farms',
+        title: 'Farms',
+        icon: <FenceIcon />,
       },
       {
-        segment: 'farm-locations',
-        title: 'Farm locations',
-        icon: <Folder />,
-        children: [
-          {
-            segment: 'farms',
-            title: 'Farms',
-            icon: <FenceIcon />,
-          },
-          {
-            segment: 'farm-parcels',
-            title: 'Farm parcels',
-            icon: <MapIcon />,
-          }
-        ]
-      },
-      {
-        segment: 'reporting-service',
-        title: 'Reporting service',
-        icon: <AssessmentIcon />,
-      },
+        segment: 'farm-parcels',
+        title: 'Farm parcels',
+        icon: <MapIcon />,
+      }
+    ]
+  },
+  {
+    segment: 'reporting-service',
+    title: 'Reporting service',
+    icon: <AssessmentIcon />,
+  },
   //   ]
   // },
   {
@@ -69,9 +72,14 @@ const NAVIGATION: Navigation = [
     title: 'Irrigation management',
   },
   {
-    segment: 'irrigation',
-    title: 'Irrigation management',
-    icon: <WaterDropIcon />,
+    segment: 'wkt-input',
+    title: 'WKT input',
+    icon: <AddLocationAltIcon />,
+  },
+  {
+    segment: 'eto-calculator',
+    title: 'ETo Calculator',
+    icon: <TimelineIcon />,
   },
   {
     kind: 'header',

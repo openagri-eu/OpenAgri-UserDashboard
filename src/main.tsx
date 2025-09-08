@@ -11,7 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import DashLayout from './layouts/dashboard.tsx';
 import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
-import IrrigationPage from '@pages/dashboard/services/Irrigation/Irrigation.tsx';
+import WKTInputPage from '@pages/dashboard/services/Irrigation/WKTInput.tsx';
 import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease/PestAndDisease.tsx';
 import ReportingServicePage from '@pages/dashboard/services/FarmCalendar/ReportingService.tsx';
 import AuthLayout from '@layouts/auth.tsx';
@@ -25,6 +25,7 @@ import TokenRefreshPage from '@pages/auth/TokenRefresh/TokenRefresh.tsx';
 import RegisterCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/RegisterActivity.tsx';
 import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity.tsx';
 import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.tsx';
+import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 
 const router = createBrowserRouter([
   {
@@ -92,8 +93,12 @@ const router = createBrowserRouter([
           // ]
           // },
           {
-            path: 'irrigation',
-            Component: IrrigationPage
+            path: 'wkt-input',
+            Component: WKTInputPage
+          },
+          {
+            path: 'eto-calculator',
+            Component: EToCalculatorPage
           },
           {
             path: 'pest-and-disease',
