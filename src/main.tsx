@@ -26,6 +26,8 @@ import RegisterCalendarActivityPage from '@pages/dashboard/services/FarmCalendar
 import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity.tsx';
 import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.tsx';
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
+import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
+import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
 
 const router = createBrowserRouter([
   {
@@ -99,6 +101,14 @@ const router = createBrowserRouter([
           {
             path: 'eto-calculator',
             Component: EToCalculatorPage
+          },
+          {
+            path: 'upload-dataset',
+            Component: UploadDatasetPage
+          },
+          {
+            path: 'soil-moisture-analysis',
+            Component: SoilMoistureAnalysisPage
           },
           {
             path: 'pest-and-disease',

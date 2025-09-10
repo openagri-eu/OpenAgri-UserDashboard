@@ -16,6 +16,8 @@ import FenceIcon from '@mui/icons-material/Fence';
 import MapIcon from '@mui/icons-material/Map';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 
 const NAVIGATION: Navigation = [
@@ -28,7 +30,6 @@ const NAVIGATION: Navigation = [
     title: 'OpenAgri Dashboard',
     icon: <HomeIcon />,
   },
-  // { kind: 'divider' },
   {
     kind: 'header',
     title: 'Farm calendar',
@@ -80,6 +81,17 @@ const NAVIGATION: Navigation = [
     segment: 'eto-calculator',
     title: 'ETo Calculator',
     icon: <TimelineIcon />,
+  },
+  { kind: 'divider' },
+  {
+    segment: 'upload-dataset',
+    title: 'Upload Dataset',
+    icon: <NoteAddIcon />,
+  },
+  {
+    segment: 'soil-moisture-analysis',
+    title: 'Soil Moisture Analysis',
+    icon: <AnalyticsIcon />,
   },
   {
     kind: 'header',
