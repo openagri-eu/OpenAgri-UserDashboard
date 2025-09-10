@@ -1,10 +1,10 @@
 import DateRangeSelect from "@components/shared/DateRangeSelect/DateRangeSelect";
-import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
+// import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { EToCalculation } from "@models/EToCalculation";
-import { Location, LocationResponse } from "@models/Location";
+// import { Location, LocationResponse } from "@models/Location";
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
@@ -13,10 +13,14 @@ import { LineChart } from "@mui/x-charts";
 
 import CalculateIcon from '@mui/icons-material/Calculate';
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
+import { useSession } from "@contexts/SessionContext";
 
 
 const EToCalculatorPage = () => {
-    const [selectedLocation, setSelectedLocation] = useState<string>('');
+
+    const { session } = useSession();
+
+    // const [selectedLocation, setSelectedLocation] = useState<string>('');
     const [fromDate, setFromDate] = useState<Dayjs | null>(dayjs().subtract(14, 'days'));
     const [toDate, setToDate] = useState<Dayjs | null>(dayjs());
     const [calculations, setSetCalculations] = useState<EToCalculation | undefined>(undefined);
@@ -26,13 +30,10 @@ const EToCalculatorPage = () => {
 
 
     const { fetchData, response, error, loading } = useFetch<EToCalculation>(
-        `proxy/irrigation/api/v1/eto/get-calculations/${selectedLocation}/from/${fromDate?.format('YYYY-MM-DD')}/to/${toDate?.format('YYYY-MM-DD')}/?response_format=JSON-LD/`,
+        `proxy/irrigation/api/v1/eto/calculate-gk/?parcel_id=${session?.farm_parcel?.["@id"].split(":")[3]}&from_date=${fromDate?.format('YYYY-MM-DD')}&to_date=${toDate?.format('YYYY-MM-DD')}&formatting=JSON`,
+        // `proxy/irrigation/api/v1/eto/get-calculations/${selectedLocation}/from/${fromDate?.format('YYYY-MM-DD')}/to/${toDate?.format('YYYY-MM-DD')}/?response_format=JSON-LD/`,
         {
             method: 'GET',
-            // body: {
-            //     'from_date': fromDate?.format('YYYY-MM-DD'),
-            //     'to_date': toDate?.format('YYYY-MM-DD')
-            // }
         }
     );
 
@@ -56,14 +57,14 @@ const EToCalculatorPage = () => {
     }, [error])
 
     useEffect(() => {
-        if (Array.isArray(calculations) && calculations.length > 0) {
-            const chartData = calculations?.["@graph"].map((calc) => ({
-                x: new Date(calc.resultTime),
-                y: calc.hasSimpleResult,
+        if (Array.isArray(calculations?.calculations) && calculations.calculations.length > 0) {
+            const chartData = calculations.calculations.map((calc) => ({
+                x: new Date(calc.date),
+                y: calc.value,
             }));
             setChartData(chartData);
         }
-    }, [calculations])
+    }, [calculations])  
 
     return (
         <>
@@ -74,7 +75,7 @@ const EToCalculatorPage = () => {
                         <Typography variant="body1">
                             Select a location and a time frame to view its ETo calculation.
                         </Typography>
-                        <GenericSelect<Location, LocationResponse>
+                        {/* <GenericSelect<Location, LocationResponse>
                             endpoint='proxy/irrigation/api/v1/location/'
                             label='Locations'
                             transformResponse={response => response.locations}
@@ -82,7 +83,7 @@ const EToCalculatorPage = () => {
                             setSelectedValue={setSelectedLocation}
                             getOptionLabel={item => `(${item.longitude}, ${item.latitude})`}
                             getOptionValue={item => item.id}>
-                        </GenericSelect>
+                        </GenericSelect> */}
                         <DateRangeSelect
                             fromDate={fromDate}
                             setFromDate={setFromDate}
@@ -94,12 +95,13 @@ const EToCalculatorPage = () => {
                             loading={loading}
                             loadingPosition="start"
                             onClick={handleSubmit}
-                            disabled={!selectedLocation || !fromDate || !toDate}
+                            // disabled={!selectedLocation || !fromDate || !toDate}
+                            disabled={!fromDate || !toDate}
                             variant="contained">
                             Get calculations
                         </Button>
                         <Box>
-                            {calculations && Array.isArray(calculations["@graph"]) &&
+                            {chartData && Array.isArray(chartData) &&
                                 <LineChart
                                     xAxis={[
                                         {
