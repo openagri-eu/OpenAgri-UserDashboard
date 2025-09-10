@@ -17,7 +17,7 @@ const useFetch = <FetchResponse = any>(
     const [error, setError] = useState<Error | null>(null);
 
     const { session, setSession } = useSession();
-    const apiUrl = import.meta.env.VITE_API_URL;
+    const apiUrl = window.env?.VITE_API_URL;
 
     const fetchData = async (dynamicBody = {}, dynamicHeader = {}) => {
         setLoading(true);
