@@ -19,6 +19,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import CompostIcon from '@mui/icons-material/Compost';
+import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
 
 
 const NAVIGATION: Navigation = [
@@ -71,6 +72,11 @@ const NAVIGATION: Navigation = [
         segment: 'compost-operations',
         title: 'Compost operations',
         icon: <CompostIcon />,
+      },
+      {
+        segment: 'farm-animals',
+        title: 'Farm animals',
+        icon: <CrueltyFreeIcon />,
       },
       {
         segment: 'irrigation-operations',

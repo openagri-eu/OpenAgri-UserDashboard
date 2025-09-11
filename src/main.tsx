@@ -29,6 +29,7 @@ import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculato
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
 import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
+import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
 
 const router = createBrowserRouter([
   {
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
               {
                 path: 'compost-operations',
                 Component: CompostOperationsReportPage
+              },
+              {
+                path: 'farm-animals',
+                Component: FarmAnimalsReportPage
               },
               {
                 path: 'irrigation-operations',
