@@ -25,6 +25,16 @@ export default defineConfig({
       globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
       cleanupOutdatedCaches: true,
       clientsClaim: true,
+      // also make sure it's not pre-cached
+      globIgnores: ['**/env-config.js'],
+      // NEVER cache the runtime env file
+      runtimeCaching: [
+        {
+          urlPattern: /\/env-config\.js$/,
+          handler: 'NetworkOnly', // or 'NetworkFirst' with low cache
+        },
+      ],
+
     },
 
     devOptions: {
