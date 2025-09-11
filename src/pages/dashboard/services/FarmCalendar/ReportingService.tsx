@@ -9,13 +9,17 @@ import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { CompostOperationModel } from "@models/CompostOperation";
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DateRangeSelect from "@components/shared/DateRangeSelect/DateRangeSelect";
+import dayjs, { Dayjs } from "dayjs";
 
 interface ReportHelper {
     reportType: string;
     compostOperationID: string;
+    fromDate?: string;
+    toDate?: string;
 }
 
 const ReportingServicePage = () => {
@@ -25,7 +29,10 @@ const ReportingServicePage = () => {
     const [reportHelper, setReportHelper] = useState<ReportHelper>({ reportType: '', compostOperationID: '' });
     const [loadingReport, setLoadingReport] = useState<boolean>(false);
     const [reportUUID, setReportUUID] = useState<string>('');
-    const [_, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
+    const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
+
+    const [fromDate, setFromDate] = useState<Dayjs | null>(null);
+    const [toDate, setToDate] = useState<Dayjs | null>(null);
 
     const [activeEventInfo, setActiveEventInfo] = useState<EventClickArg | null>(null);
 
@@ -37,7 +44,9 @@ const ReportingServicePage = () => {
     );
 
     const { fetchData: fetchDataGenerate, response: responseGenerate, error: errorGenerate } = useFetch<{ uuid: string }>(
-        `proxy/reporting/api/v1/openagri-report/${reportHelper.reportType}/?operation_id=${reportHelper.compostOperationID}`,
+        `proxy/reporting/api/v1/openagri-report/${reportHelper.reportType}/?operation_id=${reportHelper.compostOperationID}`
+        + `${reportHelper.fromDate ? '&from_date=' + reportHelper.fromDate : ''}`
+        + `${reportHelper.toDate ? '&to_date=' + reportHelper.toDate : ''}`,
         {
             method: 'POST',
         }
@@ -109,7 +118,7 @@ const ReportingServicePage = () => {
         if (session?.farm_parcel) {
             fetchDataCompostActivities();
         }
-    }, [session?.farm_parcel])
+    }, [session?.farm_parcel, dateRange])
 
     const calendarEvents = useMemo(() => {
         if (!Array.isArray(responseCompostActivities)) {
@@ -140,35 +149,58 @@ const ReportingServicePage = () => {
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
             <ContentGuard condition={session?.farm_parcel}>
-                <StyledFullCalendar
-                    events={calendarEvents}
-                    eventClick={
-                        (info) => {
-                            setActiveEventInfo(info);
-                            showDialog({
-                                title: `Report actions for ${info.event.title}`,
-                                variant: 'empty',
-                                children: <></>
-                            });
+                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <StyledFullCalendar
+                        events={calendarEvents}
+                        eventClick={
+                            (info) => {
+                                setActiveEventInfo(info);
+                                setFromDate(dayjs(info.event.start))
+                                setToDate(dayjs(info.event.end))
+                                showDialog({
+                                    title: `Report actions for ${info.event.title}`,
+                                    variant: 'empty',
+                                    children: <></>
+                                });
+                            }
                         }
-                    }
-                    onDateRangeChange={setDateRange}
-                />
-            </ContentGuard>
+                        onDateRangeChange={setDateRange}
+                    />
+                </Box>
+            </ContentGuard >
 
             <GenericDialog {...dialogProps} onClose={handleCloseDialog}>
                 {activeEventInfo && (
-                    <Button
-                        variant="contained"
-                        startIcon={<InsertDriveFileIcon />}
-                        loadingPosition="start"
-                        onClick={
-                            () => handleGenerateReport({ reportType: 'compost-report', compostOperationID: activeEventInfo.event.id.split(':')[3] })
-                        }
-                        loading={loadingReport}
-                    >
-                        Generate report
-                    </Button>
+                    <>
+                        <Box display={'flex'} flexDirection={'column'} gap={2}>
+                            <Typography variant="body1">
+                                Freely fine tune date range
+                            </Typography>
+                            <DateRangeSelect
+                                fromDate={fromDate}
+                                setFromDate={setFromDate}
+                                toDate={toDate}
+                                setToDate={setToDate}>
+                            </DateRangeSelect>
+                            <Button
+                                variant="contained"
+                                startIcon={<InsertDriveFileIcon />}
+                                loadingPosition="start"
+                                onClick={
+                                    () => handleGenerateReport(
+                                        {
+                                            reportType: 'compost-report',
+                                            compostOperationID: activeEventInfo.event.id.split(':')[3],
+                                            fromDate: fromDate?.format('YYYY-MM-DD'),
+                                            toDate: toDate?.format('YYYY-MM-DD')
+                                        })
+                                }
+                                loading={loadingReport}
+                            >
+                                Generate report
+                            </Button>
+                        </Box>
+                    </>
                 )}
             </GenericDialog>
             <GenericSnackbar
