@@ -142,6 +142,8 @@ const ReportingServicePage = () => {
 
     const handleCloseDialog = () => {
         dialogProps.onClose();
+        setFromDate(null)
+        setToDate(null)
         setActiveEventInfo(null);
     };
 
