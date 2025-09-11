@@ -18,6 +18,7 @@ import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
+import CompostIcon from '@mui/icons-material/Compost';
 
 
 const NAVIGATION: Navigation = [
@@ -65,6 +66,13 @@ const NAVIGATION: Navigation = [
     segment: 'reporting-service',
     title: 'Reporting service',
     icon: <AssessmentIcon />,
+    children: [
+      {
+        segment: 'compost-operations',
+        title: 'Compost operations',
+        icon: <CompostIcon />,
+      },
+    ]
   },
   //   ]
   // },
@@ -82,7 +90,6 @@ const NAVIGATION: Navigation = [
     title: 'ETo Calculator',
     icon: <TimelineIcon />,
   },
-  { kind: 'divider' },
   {
     segment: 'upload-dataset',
     title: 'Upload Dataset',

@@ -13,7 +13,7 @@ import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
 import WKTInputPage from '@pages/dashboard/services/Irrigation/WKTInput.tsx';
 import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease/PestAndDisease.tsx';
-import ReportingServicePage from '@pages/dashboard/services/FarmCalendar/ReportingService.tsx';
+import CompostOperationsPage from '@pages/dashboard/services/FarmCalendar/ReportingService/CompostOperations.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
 import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
@@ -67,7 +67,7 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <Redirect to='farm-calendar/farm-calendar' />,
+                element: <Redirect to='farm-locations/farms' />,
               },
               {
                 path: 'farms',
@@ -90,7 +90,16 @@ const router = createBrowserRouter([
           /** End of Farm calendar */
           {
             path: 'reporting-service',
-            Component: ReportingServicePage
+            children: [
+              {
+                index: true,
+                element: <Redirect to='reporting-service/compost-operations' />,
+              },
+              {
+                path: 'compost-operations',
+                Component: CompostOperationsPage
+              },
+            ]
           },
           // ]
           // },
