@@ -8,6 +8,8 @@ interface FetchOptions {
     responseType?: 'json' | 'blob';
 }
 
+const DEV = import.meta.env.DEV;
+
 const useFetch = <FetchResponse = any>(
     url: string,
     { method = 'GET', headers = {}, body = null, responseType = 'json' }: FetchOptions = {}
@@ -17,7 +19,7 @@ const useFetch = <FetchResponse = any>(
     const [error, setError] = useState<Error | null>(null);
 
     const { session, setSession } = useSession();
-    const apiUrl = window.env?.VITE_API_URL;
+    const apiUrl = DEV ? import.meta.env.VITE_API_URL : window.env?.VITE_API_URL;
 
     const fetchData = async (dynamicBody = {}, dynamicHeader = {}) => {
         setLoading(true);
@@ -89,12 +91,12 @@ const useFetch = <FetchResponse = any>(
 
             if (!response.ok) {
                 try {
-                   const result: any = await response.json();
-                   throw new Error(result.detail || `HTTP Error: ${response.status}`);
-               } catch (jsonError) {
-                   throw new Error(`HTTP Error: ${response.status}`);
-               }
-           }
+                    const result: any = await response.json();
+                    throw new Error(result.detail || `HTTP Error: ${response.status}`);
+                } catch (jsonError) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+            }
 
             if (responseType === 'blob') {
                 const blobResult = await response.blob();
