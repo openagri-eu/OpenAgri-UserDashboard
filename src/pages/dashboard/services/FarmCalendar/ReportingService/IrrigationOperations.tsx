@@ -8,11 +8,11 @@ import { EventClickArg, EventInput } from "@fullcalendar/core/index.js";
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
-import { CompostOperationModel } from "@models/CompostOperation";
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import dayjs, { Dayjs } from "dayjs";
+import { IrrigationOperationModel } from "@models/IrrigationOperation";
 
 interface ReportHelper {
     reportType: string;
@@ -35,7 +35,7 @@ const IrrigationOperationsPage = () => {
 
     const [activeEventInfo, setActiveEventInfo] = useState<EventClickArg | null>(null);
 
-    const { fetchData: fetchDataCompostActivities, response: responseCompostActivities } = useFetch<CompostOperationModel[]>(
+    const { fetchData: fetchDataCompostActivities, response: responseCompostActivities } = useFetch<IrrigationOperationModel[]>(
         `proxy/farmcalendar/api/v1/IrrigationOperations/?format=json&parcel=${session?.farm_parcel?.["@id"].split(':')[3]}`,
         {
             method: 'GET',
@@ -170,7 +170,6 @@ const IrrigationOperationsPage = () => {
                         selectable={true}
                         select={
                             (info) => {
-                                console.log(info);
                                 setActiveEventInfo(null);
                                 setFromDate(dayjs(info.start));
                                 setToDate(dayjs(info.end));
