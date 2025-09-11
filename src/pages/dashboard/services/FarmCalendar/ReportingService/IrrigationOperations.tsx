@@ -44,7 +44,7 @@ const IrrigationOperationsReportPage = () => {
 
     const { fetchData: fetchDataGenerate, response: responseGenerate, error: errorGenerate } = useFetch<{ uuid: string }>(
         `proxy/reporting/api/v1/openagri-report/${reportHelper.reportType}/?`
-        + `${reportHelper.irrigationOperationID ? 'operation_id=' + reportHelper.irrigationOperationID : ''}`
+        + `${reportHelper.irrigationOperationID ? 'irrigation_id=' + reportHelper.irrigationOperationID : ''}`
         + `${reportHelper.fromDate ? 'from_date=' + reportHelper.fromDate : ''}`
         + `${reportHelper.toDate ? '&to_date=' + reportHelper.toDate : ''}`,
         {
