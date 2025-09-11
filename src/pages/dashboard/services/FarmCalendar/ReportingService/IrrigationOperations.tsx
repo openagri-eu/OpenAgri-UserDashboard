@@ -35,7 +35,7 @@ const IrrigationOperationsReportPage = () => {
 
     const [activeEventInfo, setActiveEventInfo] = useState<EventClickArg | null>(null);
 
-    const { fetchData: fetchDataCompostActivities, response: responseCompostActivities } = useFetch<IrrigationOperationModel[]>(
+    const { fetchData: fetchDataIrrigationActivities, response: responseIrrigationActivities } = useFetch<IrrigationOperationModel[]>(
         `proxy/farmcalendar/api/v1/IrrigationOperations/?format=json&parcel=${session?.farm_parcel?.["@id"].split(':')[3]}`,
         {
             method: 'GET',
@@ -116,15 +116,15 @@ const IrrigationOperationsReportPage = () => {
 
     useEffect(() => {
         if (session?.farm_parcel) {
-            fetchDataCompostActivities();
+            fetchDataIrrigationActivities();
         }
     }, [session?.farm_parcel, dateRange])
 
     const calendarEvents = useMemo(() => {
-        if (!Array.isArray(responseCompostActivities)) {
+        if (!Array.isArray(responseIrrigationActivities)) {
             return [];
         }
-        return responseCompostActivities.map((event): EventInput => ({
+        return responseIrrigationActivities.map((event): EventInput => ({
             id: event['@id'],
             title: event.title,
             start: event.hasStartDatetime,
@@ -134,7 +134,7 @@ const IrrigationOperationsReportPage = () => {
                 activityType: event.activityType,
             }
         }));
-    }, [responseCompostActivities]);
+    }, [responseIrrigationActivities]);
 
     const handleGenerateReport = (reportHelper: ReportHelper) => {
         setReportHelper(reportHelper);
