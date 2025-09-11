@@ -13,7 +13,7 @@ import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
 import WKTInputPage from '@pages/dashboard/services/Irrigation/WKTInput.tsx';
 import PestAndDiseasePage from '@pages/dashboard/services/PestAndDisease/PestAndDisease.tsx';
-import CompostOperationsPage from '@pages/dashboard/services/FarmCalendar/ReportingService/CompostOperations.tsx';
+import CompostOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/CompostOperations.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
 import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
@@ -28,7 +28,7 @@ import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.t
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
 import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
-import IrrigationOperationsPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
+import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 
 const router = createBrowserRouter([
   {
@@ -98,11 +98,11 @@ const router = createBrowserRouter([
               },
               {
                 path: 'compost-operations',
-                Component: CompostOperationsPage
+                Component: CompostOperationsReportPage
               },
               {
                 path: 'irrigation-operations',
-                Component: IrrigationOperationsPage
+                Component: IrrigationOperationsReportPage
               },
             ]
           },

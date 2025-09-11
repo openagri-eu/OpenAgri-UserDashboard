@@ -21,7 +21,7 @@ interface ReportHelper {
     toDate?: string;
 }
 
-const IrrigationOperationsPage = () => {
+const IrrigationOperationsReportPage = () => {
 
     const { session } = useSession();
 
@@ -219,4 +219,4 @@ const IrrigationOperationsPage = () => {
     )
 }
 
-export default IrrigationOperationsPage;
+export default IrrigationOperationsReportPage;

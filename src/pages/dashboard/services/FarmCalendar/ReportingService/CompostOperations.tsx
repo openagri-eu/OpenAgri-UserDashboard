@@ -22,7 +22,7 @@ interface ReportHelper {
     toDate?: string;
 }
 
-const CompostOperationsPage = () => {
+const CompostOperationsReportPage = () => {
 
     const { session } = useSession();
 
@@ -214,4 +214,4 @@ const CompostOperationsPage = () => {
     )
 }
 
-export default CompostOperationsPage;
+export default CompostOperationsReportPage;
