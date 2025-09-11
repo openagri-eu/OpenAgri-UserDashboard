@@ -185,7 +185,6 @@ const ReportingServicePage = () => {
                             <Button
                                 variant="contained"
                                 startIcon={<InsertDriveFileIcon />}
-                                loadingPosition="start"
                                 onClick={
                                     () => handleGenerateReport(
                                         {
