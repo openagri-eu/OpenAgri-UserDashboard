@@ -16,7 +16,7 @@ import { IrrigationOperationModel } from "@models/IrrigationOperation";
 
 interface ReportHelper {
     reportType: string;
-    compostOperationID?: string;
+    irrigationOperationID?: string;
     fromDate?: string;
     toDate?: string;
 }
@@ -25,7 +25,7 @@ const IrrigationOperationsReportPage = () => {
 
     const { session } = useSession();
 
-    const [reportHelper, setReportHelper] = useState<ReportHelper>({ reportType: '', compostOperationID: '' });
+    const [reportHelper, setReportHelper] = useState<ReportHelper>({ reportType: '', irrigationOperationID: '' });
     const [loadingReport, setLoadingReport] = useState<boolean>(false);
     const [reportUUID, setReportUUID] = useState<string>('');
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
@@ -44,7 +44,7 @@ const IrrigationOperationsReportPage = () => {
 
     const { fetchData: fetchDataGenerate, response: responseGenerate, error: errorGenerate } = useFetch<{ uuid: string }>(
         `proxy/reporting/api/v1/openagri-report/${reportHelper.reportType}/?`
-        + `${reportHelper.compostOperationID ? 'operation_id=' + reportHelper.compostOperationID : ''}`
+        + `${reportHelper.irrigationOperationID ? 'operation_id=' + reportHelper.irrigationOperationID : ''}`
         + `${reportHelper.fromDate ? 'from_date=' + reportHelper.fromDate : ''}`
         + `${reportHelper.toDate ? '&to_date=' + reportHelper.toDate : ''}`,
         {
@@ -197,7 +197,7 @@ const IrrigationOperationsReportPage = () => {
                                 () => handleGenerateReport(
                                     {
                                         reportType: 'irrigation-report',
-                                        compostOperationID: activeEventInfo?.event.id.split(':')[3],
+                                        irrigationOperationID: activeEventInfo?.event.id.split(':')[3],
                                         fromDate: fromDate?.format('YYYY-MM-DD'),
                                         toDate: toDate?.format('YYYY-MM-DD')
                                     })
