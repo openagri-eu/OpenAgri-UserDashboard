@@ -36,6 +36,7 @@ const CalendarStyles = () => {
                 '.fc': {
                     '--fc-border-color': theme.palette.divider,
                     '--fc-today-bg-color': alpha(theme.palette.secondary.main, 0.2),
+                    '--fc-highlight-color': alpha(theme.palette.primary.light, 0.2),
                     color: theme.palette.text.primary,
                 },
                 // Styles for all buttons in the header
