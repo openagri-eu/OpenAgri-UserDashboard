@@ -67,7 +67,17 @@ const CalendarStyles = () => {
     );
 };
 
-const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange, eventContent, loading = false, selectable = false }) => {
+const StyledFullCalendar: React.FC<StyledFullCalendarProps> = (
+    {
+        events,
+        eventClick,
+        onDateRangeChange,
+        eventContent,
+        loading = false,
+        selectable = false,
+        select = undefined
+    }
+) => {
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
     const handleDatesSet = useCallback((dates: DatesSetArg) => {
@@ -117,6 +127,7 @@ const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventCl
                     dayMaxEventRows={true}
                     eventContent={eventContent}
                     selectable={selectable}
+                    select={select}
                 />
             </Box>
         </>

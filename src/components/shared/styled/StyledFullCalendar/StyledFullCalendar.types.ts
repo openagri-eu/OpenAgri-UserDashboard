@@ -1,4 +1,4 @@
-import { CustomContentGenerator, EventClickArg, EventContentArg, EventSourceInput } from "@fullcalendar/core/index.js";
+import { CustomContentGenerator, DateSelectArg, EventClickArg, EventContentArg, EventSourceInput, } from "@fullcalendar/core/index.js";
 
 export interface StyledFullCalendarProps {
     events: EventSourceInput | undefined;
@@ -7,4 +7,5 @@ export interface StyledFullCalendarProps {
     eventContent?: CustomContentGenerator<EventContentArg>;
     loading?: boolean;
     selectable?: boolean
+    select?: ((arg: DateSelectArg) => void)
 }
