@@ -5,7 +5,7 @@ import { theme } from '@theme/theme';
 
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-// import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import PestControlIcon from '@mui/icons-material/PestControl';
 import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
 import ThermostatIcon from '@mui/icons-material/Thermostat';
@@ -71,6 +71,11 @@ const NAVIGATION: Navigation = [
         segment: 'compost-operations',
         title: 'Compost operations',
         icon: <CompostIcon />,
+      },
+      {
+        segment: 'irrigation-operations',
+        title: 'Irrigation operations',
+        icon: <WaterDropIcon />,
       },
     ]
   },
