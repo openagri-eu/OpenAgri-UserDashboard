@@ -83,6 +83,7 @@ const WeatherDataPage = () => {
     useEffect(() => {
         if (error) {
             showSnackbar('error', 'Error loading weather');
+            setFormattedData(null);
         }
     }, [error])
 
