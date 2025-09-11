@@ -1,12 +1,13 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import { StyledFullCalendarProps } from "./StyledFullCalendar.types";
 import { alpha, Box, GlobalStyles, CircularProgress } from "@mui/material";
 import { useCallback, useState } from "react";
 import { DatesSetArg } from "@fullcalendar/core/index.js";
 
-const calendarPlugins = [dayGridPlugin, timeGridPlugin];
+const calendarPlugins = [dayGridPlugin, timeGridPlugin, interactionPlugin];
 const headerToolbarConfig = {
     left: '',
     center: 'title',
@@ -66,7 +67,7 @@ const CalendarStyles = () => {
     );
 };
 
-const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange, eventContent, loading = false }) => {
+const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventClick, onDateRangeChange, eventContent, loading = false, selectable = false }) => {
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
     const handleDatesSet = useCallback((dates: DatesSetArg) => {
@@ -115,6 +116,7 @@ const StyledFullCalendar: React.FC<StyledFullCalendarProps> = ({ events, eventCl
                     eventClick={loading ? undefined : eventClick}
                     dayMaxEventRows={true}
                     eventContent={eventContent}
+                    selectable={selectable}
                 />
             </Box>
         </>

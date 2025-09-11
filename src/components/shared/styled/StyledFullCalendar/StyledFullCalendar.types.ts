@@ -6,4 +6,5 @@ export interface StyledFullCalendarProps {
     onDateRangeChange: (dateRange: { start: string; end: string }) => void;
     eventContent?: CustomContentGenerator<EventContentArg>;
     loading?: boolean;
+    selectable?: boolean
 }
