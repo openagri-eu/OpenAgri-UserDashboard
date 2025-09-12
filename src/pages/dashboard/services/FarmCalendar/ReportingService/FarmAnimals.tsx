@@ -55,7 +55,7 @@ const FarmAnimalsReportPage = () => {
     );
 
     const { fetchData: fetchDataReport, response: responseReport, error: errorReport } = useFetch<any[]>(
-        `proxy/reporting/api/v1/openagri-report/${reportUUID}/`,
+        `proxy/reporting/api/v1/openagri-report/${reportUUID}/?parcel_id=${session?.farm_parcel?.["@id"].split(':')[3]}`,
         {
             method: 'GET',
             responseType: 'blob'

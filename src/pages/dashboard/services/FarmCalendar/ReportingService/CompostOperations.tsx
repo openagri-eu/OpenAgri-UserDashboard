@@ -44,7 +44,8 @@ const CompostOperationsReportPage = () => {
     );
 
     const { fetchData: fetchDataGenerate, response: responseGenerate, error: errorGenerate } = useFetch<{ uuid: string }>(
-        `proxy/reporting/api/v1/openagri-report/${reportHelper.reportType}/?operation_id=${reportHelper.compostOperationID}`
+        `proxy/reporting/api/v1/openagri-report/${reportHelper.reportType}/?parcel_id=${session?.farm_parcel?.["@id"].split(':')[3]}`
+        + `&operation_id=${reportHelper.compostOperationID}`
         + `${reportHelper.fromDate ? '&from_date=' + reportHelper.fromDate : ''}`
         + `${reportHelper.toDate ? '&to_date=' + reportHelper.toDate : ''}`,
         {
