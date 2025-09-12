@@ -1,6 +1,6 @@
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import useFetch from "@hooks/useFetch";
-import { SoilMoistureResponse } from "@models/SoilMoisture";
+import { SoilMoistureResponseJSON } from "@models/SoilMoisture";
 import { Box, Card, CardContent, Skeleton, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts";
 import { colors } from "@theme/colors";
@@ -9,8 +9,8 @@ import { useEffect, useState } from "react";
 const SoilMoistureAnalysisPage = () => {
     const [selectedDataset, setSelectedDataset] = useState<string>('');
 
-    const { fetchData, loading, response } = useFetch<SoilMoistureResponse>(
-        `proxy/irrigation/api/v1/dataset/${selectedDataset}/analysis/`,
+    const { fetchData, loading, response } = useFetch<SoilMoistureResponseJSON>(
+        `proxy/irrigation/api/v1/dataset/${selectedDataset}/analysis/?formatting=JSON`,
         {
             method: 'GET'
         }
@@ -48,26 +48,28 @@ const SoilMoistureAnalysisPage = () => {
                     </Box>
                     <Box width={'100%'}>
                         {loading && <Skeleton variant="rectangular" width={'100%'} height={300} />}
-                        {response && <BarChart
-                            hideLegend={true}
-                            xAxis={[
-                                {
-                                    id: 'barCategories',
-                                    data: response["@graph"][0].stressAnalysis.hasStressLevels[0].map(level => level.atDepth.hasNumericValue),
-                                    label: 'Stress Depth',
-                                    scaleType: 'band'
-                                },
-                            ]}
-                            series={[
-                                {
-                                    data: response["@graph"][0].stressAnalysis.hasStressLevels[0].map(level => level.numericValue),
-                                    label: 'Depth Value',
-                                },
-                            ]}
-                            colors={[colors.primary.main]}
-                            sx={{ width: '100%' }}
-                            height={300}
-                        />}
+                        {response
+                            && <BarChart
+                                hideLegend={true}
+                                xAxis={[
+                                    {
+                                        id: 'barCategories',
+                                        data: response.high_dose_irrigation_events_dates,
+                                        label: 'Stress Depth',
+                                        scaleType: 'band'
+                                    },
+                                ]}
+                                series={[
+                                    {
+                                        data: Array(response.high_dose_irrigation_events_dates.length).fill(1),
+                                        label: '',
+                                    },
+                                ]}
+                                colors={[colors.primary.main]}
+                                sx={{ width: '100%' }}
+                                height={300}
+                            />
+                        }
                     </Box>
                 </CardContent>
             </Card>
