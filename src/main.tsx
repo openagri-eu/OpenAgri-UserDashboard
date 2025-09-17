@@ -30,6 +30,7 @@ import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDatase
 import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
+import DiseasesPage from '@pages/dashboard/services/PestAndDisease/Diseases.tsx';
 
 const router = createBrowserRouter([
   {
@@ -128,6 +129,10 @@ const router = createBrowserRouter([
           {
             path: 'soil-moisture-analysis',
             Component: SoilMoistureAnalysisPage
+          },
+          {
+            path: 'diseases',
+            Component: DiseasesPage
           },
           {
             path: 'pest-and-disease',

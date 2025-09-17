@@ -20,6 +20,7 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import CompostIcon from '@mui/icons-material/Compost';
 import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
+import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 
 
 const NAVIGATION: Navigation = [
@@ -114,6 +115,11 @@ const NAVIGATION: Navigation = [
   {
     kind: 'header',
     title: 'Pest and disease management',
+  },
+  {
+    segment: 'diseases',
+    title: 'Diseases',
+    icon: <CoronavirusIcon />,
   },
   {
     segment: 'pest-and-disease',
