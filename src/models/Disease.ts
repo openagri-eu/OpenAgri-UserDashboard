@@ -4,7 +4,7 @@ export interface DiseaseModel {
     eppo_code: string,
     base_gdd: number,
     description: string,
-    gdd_points: { id: string, start: number, end: number, desciptor: string }[]
+    gdd_points: { id: number, start: number, end: number, descriptor: string }[]
 }
 
 export interface DiseasesResponseModel {
