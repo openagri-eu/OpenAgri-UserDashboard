@@ -5,4 +5,5 @@ export interface DateRangeSelectProps {
     setFromDate: React.Dispatch<React.SetStateAction<Dayjs | null>>;
     toDate: Dayjs | null;
     setToDate: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+    maxDate?: Dayjs 
 }

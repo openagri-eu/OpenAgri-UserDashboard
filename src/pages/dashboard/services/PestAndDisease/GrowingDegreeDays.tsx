@@ -12,12 +12,12 @@ import { Box, Button, Tooltip, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { useMemo, useState } from "react";
 
-const PestAndDiseasePage = () => {
+const GrowingDegreeDaysPage = () => {
 
     const { session } = useSession()
 
-    const [fromDate, setFromDate] = useState<Dayjs | null>(dayjs().subtract(14, 'days'));
-    const [toDate, setToDate] = useState<Dayjs | null>(dayjs());
+    const [fromDate, setFromDate] = useState<Dayjs | null>(dayjs().subtract(16, 'days'));
+    const [toDate, setToDate] = useState<Dayjs | null>(dayjs().subtract(2, 'days'));
     const [selectedDisease, setSelectedDisease] = useState<string>('');
 
     const [_, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
@@ -92,7 +92,8 @@ const PestAndDiseasePage = () => {
                         fromDate={fromDate}
                         setFromDate={setFromDate}
                         toDate={toDate}
-                        setToDate={setToDate}>
+                        setToDate={setToDate}
+                        maxDate={dayjs().subtract(2, 'days')}>
                     </DateRangeSelect>
                     <Box><Button
                         onClick={() => handleDisplayGDD()}
@@ -115,4 +116,4 @@ const PestAndDiseasePage = () => {
     )
 }
 
-export default PestAndDiseasePage;
+export default GrowingDegreeDaysPage;

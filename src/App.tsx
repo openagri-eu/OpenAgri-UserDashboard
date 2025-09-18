@@ -6,7 +6,7 @@ import { theme } from '@theme/theme';
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
-import PestControlIcon from '@mui/icons-material/PestControl';
+// import PestControlIcon from '@mui/icons-material/PestControl';
 import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import { useEffect, useState } from 'react';
@@ -21,7 +21,7 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import CompostIcon from '@mui/icons-material/Compost';
 import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
 import CoronavirusIcon from '@mui/icons-material/Coronavirus';
-
+import GrassIcon from '@mui/icons-material/Grass';
 
 const NAVIGATION: Navigation = [
   {
@@ -122,9 +122,9 @@ const NAVIGATION: Navigation = [
     icon: <CoronavirusIcon />,
   },
   {
-    segment: 'pest-and-disease',
-    title: 'Pest and disease management',
-    icon: <PestControlIcon />,
+    segment: 'gdd',
+    title: 'Growing degree days',
+    icon: <GrassIcon />,
   },
   {
     kind: 'header',

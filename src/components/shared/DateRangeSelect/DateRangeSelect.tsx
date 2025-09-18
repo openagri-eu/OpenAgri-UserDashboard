@@ -3,7 +3,7 @@ import { Dayjs } from 'dayjs';
 import { DateRangeSelectProps } from './DateRangeSelect.types';
 import { Box } from '@mui/material';
 
-const DateRangeSelect: React.FC<DateRangeSelectProps> = ({ fromDate, setFromDate, toDate, setToDate }) => {
+const DateRangeSelect: React.FC<DateRangeSelectProps> = ({ fromDate, setFromDate, toDate, setToDate, maxDate }) => {
 
     const handleSetFromDateChange = (newValue: Dayjs | null) => {
         if (newValue?.isAfter(toDate)) {
@@ -34,6 +34,7 @@ const DateRangeSelect: React.FC<DateRangeSelectProps> = ({ fromDate, setFromDate
                     sx={{ width: '100%' }}
                     label="To"
                     value={toDate}
+                    maxDate={maxDate}
                     onChange={handleSetToDateChange}
                 />
             </Box>
