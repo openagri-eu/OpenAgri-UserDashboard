@@ -4,6 +4,7 @@ import { SoilMoistureResponseJSON } from "@models/SoilMoisture";
 import { Box, Card, CardContent, Skeleton, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts";
 import { colors } from "@theme/colors";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
 const SoilMoistureAnalysisPage = () => {
@@ -54,8 +55,10 @@ const SoilMoistureAnalysisPage = () => {
                                 xAxis={[
                                     {
                                         id: 'barCategories',
-                                        data: response.high_dose_irrigation_events_dates,
-                                        label: 'Stress Depth',
+                                        data: response.high_dose_irrigation_events_dates.map(d => {
+                                            return dayjs(d).format('dddd, D/MMM/YYYY')
+                                        }),
+                                        label: 'High dose irrigation dates',
                                         scaleType: 'band'
                                     },
                                 ]}
