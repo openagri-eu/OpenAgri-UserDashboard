@@ -113,15 +113,29 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     const lastGddPoint = formData.gdd_points[formData.gdd_points.length - 1];
     const isAddDisabled = !lastGddPoint || isNaN(lastGddPoint.end);
 
+    const isFormInvalid =
+        !formData.name?.trim() ||
+        !formData.description?.trim() ||
+        !formData.eppo_code?.trim() ||
+        isNaN(formData.base_gdd) ||
+        formData.gdd_points.some(gddp => {
+            const isEndValueError = !isNaN(gddp.start) && !isNaN(gddp.end) && gddp.end <= gddp.start;
+            return isNaN(gddp.start) || gddp.start < 0 || isNaN(gddp.end) || isEndValueError || !gddp.descriptor?.trim();
+        });
+
     return (
         <>
-            <Box component="form" noValidate autoComplete="off">
-                <TextField fullWidth margin="normal" label="Disease Name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
-                <TextField fullWidth margin="normal" label="Disease Description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
-                <TextField fullWidth margin="normal" label="EPPO Code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
-                <TextField fullWidth margin="normal" label="Base GDD" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
+            <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Stack direction={'column'} spacing={2} >
+                    <TextField fullWidth margin="normal" label="Disease Name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
+                    <TextField fullWidth margin="normal" label="Disease Description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                        <TextField fullWidth margin="normal" label="EPPO Code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
+                        <TextField fullWidth margin="normal" label="Base GDD" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
+                    </Stack>
+                </Stack>
 
-                <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>GDD Points</Typography>
+                <Typography variant="h6">GDD Points</Typography>
 
                 {formData.gdd_points.map((gddp, index) => {
                     const isLastPoint = index === formData.gdd_points.length - 1;
@@ -129,11 +143,11 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                     const isEndValueError = !isNaN(gddp.start) && !isNaN(gddp.end) && gddp.end <= gddp.start;
 
                     return (
-                        <Card key={gddp.id} sx={{ mb: 2, backgroundColor: '#f9f9f9' }}>
+                        <Card key={gddp.id} sx={{ backgroundColor: '#f9f9f9' }}>
                             <CardContent>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <Box sx={{ display: 'flex', gap: 2 }}>
-                                        <TextField label="From" name="start" type="number" value={isNaN(gddp.start) ? '' : gddp.start} onChange={(e) => handleGddPointChange(index, e)} disabled={index > 0 || formData.gdd_points.length > 1} error={isNaN(gddp.start)} />
+                                        <TextField label="From" name="start" type="number" value={isNaN(gddp.start) ? '' : gddp.start} onChange={(e) => handleGddPointChange(index, e)} disabled={index > 0 || formData.gdd_points.length > 1} error={isNaN(gddp.start) || gddp.start < 0} />
                                         <TextField label="To" name="end" type="number" value={isNaN(gddp.end) ? '' : gddp.end} onChange={(e) => handleGddPointChange(index, e)} disabled={!isLastPoint} error={isNaN(gddp.end) || isEndValueError} />
                                     </Box>
                                     <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
@@ -159,6 +173,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                         startIcon={<SaveIcon />}
                         loading={loading}
                         loadingPosition="start"
+                        disabled={isFormInvalid}
                         onClick={handleAction}
                     >
                         {disease ? 'Save Changes' : 'Add Disease'}

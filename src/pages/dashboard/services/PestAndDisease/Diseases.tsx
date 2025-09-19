@@ -106,7 +106,7 @@ const DiseasesPage = () => {
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography component="span">Add new disease</Typography>
                     </AccordionSummary>
-                    <AccordionDetails>
+                    <AccordionDetails sx={{ maxHeight: 480, overflowY: 'scroll'}}>
                         <DiseaseCRUDActions onAction={onAddNewDisease}></DiseaseCRUDActions>
                     </AccordionDetails>
                 </Accordion>
