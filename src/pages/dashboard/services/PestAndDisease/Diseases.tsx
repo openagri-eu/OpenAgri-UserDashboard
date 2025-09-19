@@ -5,12 +5,15 @@ import DiseaseCRUDActions from "@components/services/DiseaseCRUDActions/DiseaseC
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import { DiseaseModel, DiseasesResponseModel } from "@models/Disease";
-import { Box, Skeleton } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const DiseasesPage = () => {
     const [diseases, setDiseases] = useState<DiseaseRow[]>([]);
     const [selectedDisease, setSelectedDisease] = useState<DiseaseModel | undefined>(undefined);
+
+    const [expanded, setExpanded] = useState<boolean>(false);
 
     const { fetchData: getFetchData, response: getResponse, error: getError, loading: getLoading } = useFetch<DiseasesResponseModel>(
         `proxy/pdm/api/v1/disease/`,
@@ -82,9 +85,31 @@ const DiseasesPage = () => {
         setSelectedDisease(undefined);
     };
 
+    const handleAccordionChange = () => {
+        setExpanded(!expanded);
+    };
+
+    const onAddNewDisease = () => {
+        getFetchData();
+        setExpanded(false);
+    };
+
+    const onEditDisease = () => {
+        getFetchData();
+        handleCloseDialog();
+    };
+
     return (
         <>
             <Box display={'flex'} flexDirection={'column'} gap={2}>
+                <Accordion expanded={expanded} onChange={handleAccordionChange}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography component="span">Add new disease</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <DiseaseCRUDActions onAction={onAddNewDisease}></DiseaseCRUDActions>
+                    </AccordionDetails>
+                </Accordion>
                 {getLoading && <Skeleton variant="rectangular" height={48} />}
                 {
                     !getLoading && !getError &&
@@ -92,7 +117,7 @@ const DiseasesPage = () => {
                 }
             </Box>
             <GenericDialog {...dialogProps} onClose={handleCloseDialog}>
-                <DiseaseCRUDActions disease={selectedDisease}></DiseaseCRUDActions>
+                <DiseaseCRUDActions disease={selectedDisease} onAction={onEditDisease}></DiseaseCRUDActions>
             </GenericDialog>
         </>
     )

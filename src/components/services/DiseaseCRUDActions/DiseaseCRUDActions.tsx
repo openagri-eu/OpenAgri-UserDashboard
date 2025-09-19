@@ -5,6 +5,9 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { useState, useEffect } from "react";
 import { DiseaseActionsCRUDProps } from "./DiseaseCRUDActions.types";
 import { DiseaseModel } from "@models/Disease";
+import useFetch from "@hooks/useFetch";
+import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
+import useSnackbar from "@hooks/useSnackbar";
 
 const createEmptyDisease = () => ({
     id: '',
@@ -44,6 +47,29 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
         setFormData({ ...formData, gdd_points: [...formData.gdd_points, newPoint] });
     };
 
+    const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
+
+    const { fetchData, response, error, loading } = useFetch<any>(
+        `proxy/pdm/api/v1/disease/`,
+        {
+            method: disease ? 'PUT' : 'POST',
+            body: formData
+        }
+    );
+
+    useEffect(() => {
+        if (response) {
+            onAction && onAction();
+            showSnackbar('success', disease ? "Disease edited successfully" : "Disease added successfully");
+        }
+    }, [response]);
+
+    useEffect(() => {
+        if (error) {
+            showSnackbar('error', "An error occurred");
+        }
+    }, [error]);
+
     const handleRemoveGddPoint = () => {
         if (!formData?.gdd_points || formData.gdd_points.length <= 1) return;
         const updatedGddPoints = formData.gdd_points.slice(0, -1);
@@ -75,10 +101,9 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
         setFormData({ ...formData, gdd_points: updatedGddPoints });
     };
 
-    // The handler now prints the form data to the console
     const handleAction = () => {
         console.log("Form Data:", formData);
-        onAction && onAction();
+        fetchData();
     };
 
     if (!formData) {
@@ -89,54 +114,64 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     const isAddDisabled = !lastGddPoint || isNaN(lastGddPoint.end);
 
     return (
-        <Box component="form" noValidate autoComplete="off">
-            <TextField fullWidth margin="normal" label="Disease Name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
-            <TextField fullWidth margin="normal" label="Disease Description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
-            <TextField fullWidth margin="normal" label="EPPO Code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
-            <TextField fullWidth margin="normal" label="Base GDD" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
+        <>
+            <Box component="form" noValidate autoComplete="off">
+                <TextField fullWidth margin="normal" label="Disease Name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
+                <TextField fullWidth margin="normal" label="Disease Description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
+                <TextField fullWidth margin="normal" label="EPPO Code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
+                <TextField fullWidth margin="normal" label="Base GDD" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
 
-            <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>GDD Points</Typography>
+                <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>GDD Points</Typography>
 
-            {formData.gdd_points.map((gddp, index) => {
-                const isLastPoint = index === formData.gdd_points.length - 1;
-                const shouldShowRemoveButton = isLastPoint && formData.gdd_points.length > 1;
-                const isEndValueError = !isNaN(gddp.start) && !isNaN(gddp.end) && gddp.end <= gddp.start;
+                {formData.gdd_points.map((gddp, index) => {
+                    const isLastPoint = index === formData.gdd_points.length - 1;
+                    const shouldShowRemoveButton = isLastPoint && formData.gdd_points.length > 1;
+                    const isEndValueError = !isNaN(gddp.start) && !isNaN(gddp.end) && gddp.end <= gddp.start;
 
-                return (
-                    <Card key={gddp.id} sx={{ mb: 2, backgroundColor: '#f9f9f9' }}>
-                        <CardContent>
-                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                <Box sx={{ display: 'flex', gap: 2 }}>
-                                    <TextField label="From" name="start" type="number" value={isNaN(gddp.start) ? '' : gddp.start} onChange={(e) => handleGddPointChange(index, e)} disabled={index > 0 || formData.gdd_points.length > 1} error={isNaN(gddp.start)} />
-                                    <TextField label="To" name="end" type="number" value={isNaN(gddp.end) ? '' : gddp.end} onChange={(e) => handleGddPointChange(index, e)} disabled={!isLastPoint} error={isNaN(gddp.end) || isEndValueError} />
-                                </Box>
-                                <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
-                                    <TextField fullWidth label="Descriptor" name="descriptor" value={gddp.descriptor ?? ''} onChange={(e) => handleGddPointChange(index, e)} sx={{ flexGrow: 1 }} error={!gddp.descriptor?.trim()} />
-                                    {shouldShowRemoveButton && (<IconButton aria-label="remove" onClick={handleRemoveGddPoint}><RemoveCircleOutlineIcon /></IconButton>)}
+                    return (
+                        <Card key={gddp.id} sx={{ mb: 2, backgroundColor: '#f9f9f9' }}>
+                            <CardContent>
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <TextField label="From" name="start" type="number" value={isNaN(gddp.start) ? '' : gddp.start} onChange={(e) => handleGddPointChange(index, e)} disabled={index > 0 || formData.gdd_points.length > 1} error={isNaN(gddp.start)} />
+                                        <TextField label="To" name="end" type="number" value={isNaN(gddp.end) ? '' : gddp.end} onChange={(e) => handleGddPointChange(index, e)} disabled={!isLastPoint} error={isNaN(gddp.end) || isEndValueError} />
+                                    </Box>
+                                    <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
+                                        <TextField fullWidth label="Descriptor" name="descriptor" value={gddp.descriptor ?? ''} onChange={(e) => handleGddPointChange(index, e)} sx={{ flexGrow: 1 }} error={!gddp.descriptor?.trim()} />
+                                        {shouldShowRemoveButton && (<IconButton aria-label="remove" onClick={handleRemoveGddPoint}><RemoveCircleOutlineIcon /></IconButton>)}
+                                    </Stack>
                                 </Stack>
-                            </Stack>
-                        </CardContent>
-                    </Card>
-                );
-            })}
+                            </CardContent>
+                        </Card>
+                    );
+                })}
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddGddPoint} disabled={isAddDisabled}>
-                    Add GDD Point
-                </Button>
-            </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddGddPoint} disabled={isAddDisabled}>
+                        Add GDD Point
+                    </Button>
+                </Box>
 
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<SaveIcon />}
-                    onClick={handleAction}
-                >
-                    {disease ? 'Save Changes' : 'Add Disease'}
-                </Button>
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<SaveIcon />}
+                        loading={loading}
+                        loadingPosition="start"
+                        onClick={handleAction}
+                    >
+                        {disease ? 'Save Changes' : 'Add Disease'}
+                    </Button>
+                </Box>
             </Box>
-        </Box>
+            <GenericSnackbar
+                type={snackbarState.type}
+                message={snackbarState.message}
+                open={snackbarState.open}
+                onClose={closeSnackbar}
+            />
+        </>
     );
 };
 
