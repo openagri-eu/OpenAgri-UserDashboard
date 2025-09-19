@@ -1,6 +1,7 @@
-import { Box, Button, Card, CardContent, IconButton, TextField, Typography, Stack } from "@mui/material";
+import { Box, Button, Card, CardContent, IconButton, TextField, Typography, Stack, Divider } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { useState, useEffect } from "react";
 import { DiseaseActionsCRUDProps } from "./DiseaseCRUDActions.types";
@@ -8,6 +9,8 @@ import { DiseaseModel } from "@models/Disease";
 import useFetch from "@hooks/useFetch";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
+import useDialog from "@hooks/useDialog";
+import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 
 const createEmptyDisease = () => ({
     id: '',
@@ -47,12 +50,26 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
         setFormData({ ...formData, gdd_points: [...formData.gdd_points, newPoint] });
     };
 
+    const { dialogProps, showDialog } = useDialog();
+
+    const handleCloseDialog = () => {
+        dialogProps.onClose();
+    };
+
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     const { fetchData, response, error, loading } = useFetch<any>(
         `proxy/pdm/api/v1/disease/`,
         {
             method: disease ? 'PUT' : 'POST',
+            body: formData
+        }
+    );
+
+    const { fetchData: deleteFetchData, response: deleteResponse, error: deleteError } = useFetch<any>( // TODO: add loading and add loading handling in generic yes-no dialog
+        `proxy/pdm/api/v1/disease/${disease?.id}/`,
+        {
+            method: 'DELETE',
             body: formData
         }
     );
@@ -69,6 +86,19 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
             showSnackbar('error', "An error occurred");
         }
     }, [error]);
+
+    useEffect(() => {
+        if (deleteResponse) {
+            onAction && onAction();
+            showSnackbar('success', "Successfully deleted disease");
+        }
+    }, [deleteResponse]);
+
+    useEffect(() => {
+        if (deleteError) {
+            showSnackbar('error', "An error occurred while deleting the disease");
+        }
+    }, [deleteError]);
 
     const handleRemoveGddPoint = () => {
         if (!formData?.gdd_points || formData.gdd_points.length <= 1) return;
@@ -104,6 +134,11 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     const handleAction = () => {
         console.log("Form Data:", formData);
         fetchData();
+    };
+
+    const handleDelete = () => {
+        console.log("Form Data:", formData);
+        deleteFetchData();
     };
 
     if (!formData) {
@@ -165,21 +200,56 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                         Add GDD Point
                     </Button>
                 </Box>
-
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<SaveIcon />}
-                        loading={loading}
-                        loadingPosition="start"
-                        disabled={isFormInvalid}
-                        onClick={handleAction}
-                    >
-                        {disease ? 'Save Changes' : 'Add Disease'}
-                    </Button>
-                </Box>
+                <Divider />
+                {disease &&
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            loading={loading}
+                            loadingPosition="start"
+                            disabled={isFormInvalid}
+                            onClick={() => {
+                                showDialog({
+                                    title: `Are you sure you want to delete this disease?`,
+                                    variant: 'yes-no',
+                                    children: <></>
+                                });
+                            }}
+                        >
+                            Delete disease
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<SaveIcon />}
+                            loading={loading}
+                            loadingPosition="start"
+                            disabled={isFormInvalid}
+                            onClick={handleAction}
+                        >
+                            Save Changes
+                        </Button>
+                    </Box>
+                }
+                {!disease &&
+                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-start' }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            loading={loading}
+                            loadingPosition="start"
+                            disabled={isFormInvalid}
+                            onClick={handleAction}
+                        >
+                            Add disease
+                        </Button>
+                    </Box>
+                }
             </Box>
+            <GenericDialog {...dialogProps} onClose={handleCloseDialog} onYes={handleDelete} />
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}
