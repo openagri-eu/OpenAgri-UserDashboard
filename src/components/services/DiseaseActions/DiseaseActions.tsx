@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Typography } from "@mui/material"
-import { DiseaseDetailsProps } from "./DiseaseDetails.types"
+import { DiseaseActionsProps } from "./DiseaseActions.types"
 
-const DiseaseDetails: React.FC<DiseaseDetailsProps> = ({ disease }) => {
+const DiseaseActions: React.FC<DiseaseActionsProps> = ({ disease }) => {
     return (
         <Box display={'flex'} flexDirection={'column'} gap={2}>
             <Typography variant="body1">
@@ -27,4 +27,4 @@ const DiseaseDetails: React.FC<DiseaseDetailsProps> = ({ disease }) => {
     )
 }
 
-export default DiseaseDetails
+export default DiseaseActions

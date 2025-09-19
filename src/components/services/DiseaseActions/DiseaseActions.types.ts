@@ -1,5 +1,5 @@
 import { DiseaseModel } from "@models/Disease";
 
-export interface DiseaseDetailsProps {
+export interface DiseaseActionsProps {
     disease?: DiseaseModel;
 }
