@@ -1,7 +1,7 @@
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import GenericSortableTable from "@components/shared/GenericSortableTable/GenericSortableTable";
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
-import DiseaseCRUDActions from "@components/services/DiseaseCRUDActions/DiseaseCRUDActions";
+import DiseaseCRUDActions from "@components/dashboard/services/DiseaseCRUDActions/DiseaseCRUDActions";
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import { DiseaseModel, DiseasesResponseModel } from "@models/Disease";
