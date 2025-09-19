@@ -125,7 +125,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
 
     return (
         <>
-            <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                 <Stack direction={'column'} spacing={2} >
                     <TextField fullWidth margin="normal" label="Disease Name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
                     <TextField fullWidth margin="normal" label="Disease Description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
