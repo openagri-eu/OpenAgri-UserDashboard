@@ -1,7 +1,7 @@
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import GenericSortableTable from "@components/shared/GenericSortableTable/GenericSortableTable";
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
-import DiseaseActions from "@components/services/DiseaseActions/DiseaseActions";
+import DiseaseCRUDActions from "@components/services/DiseaseCRUDActions/DiseaseCRUDActions";
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import { DiseaseModel, DiseasesResponseModel } from "@models/Disease";
@@ -92,7 +92,7 @@ const DiseasesPage = () => {
                 }
             </Box>
             <GenericDialog {...dialogProps} onClose={handleCloseDialog}>
-                <DiseaseActions disease={selectedDisease}></DiseaseActions>
+                <DiseaseCRUDActions disease={selectedDisease}></DiseaseCRUDActions>
             </GenericDialog>
         </>
     )
