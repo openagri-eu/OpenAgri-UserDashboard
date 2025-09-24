@@ -38,8 +38,6 @@ const FarmParcelsPage = () => {
                     farm: p.farm["@type"],
                     identifier: p.identifier,
                     parcelType: p["@type"],
-                    validFromTo: `From: ${p.validFrom}\nUntil: ${p.validTo}`,
-                    coordinates: `${p.location.lat}\n${p.location.long}`,
                     timestamps: `Created: ${p.created_at}\nUpdated: ${p.updated_at}`,
                 }
             })
@@ -52,8 +50,6 @@ const FarmParcelsPage = () => {
         farm: string;
         identifier: string;
         parcelType: string;
-        validFromTo: string;
-        coordinates: string;
         timestamps: string;
     }
 
@@ -61,8 +57,6 @@ const FarmParcelsPage = () => {
         { id: 'farm', numeric: false, label: 'Farm' },
         { id: 'identifier', numeric: false, label: 'Identifier' },
         { id: 'parcelType', numeric: false, label: 'Parcel type' },
-        { id: 'validFromTo', numeric: false, label: 'Valid from - Valid until' },
-        { id: 'coordinates', numeric: false, label: 'Coordinates' },
         { id: 'timestamps', numeric: false, label: 'Timestamps' },
     ];
 
