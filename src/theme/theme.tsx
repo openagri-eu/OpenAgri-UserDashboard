@@ -6,10 +6,10 @@ import './typography'
 const themeOptions: ThemeOptions = {
     palette: {
         mode: 'light',
-        // background: {
-        //     default: '#fffdf5',
-        //     paper: '#fffbeb'
-        // },
+        background: {
+            default: '#fffdf5',
+            paper: '#fffbeb'
+        },
         primary: {
             main: colors.primary.main,
         },
