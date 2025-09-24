@@ -23,6 +23,7 @@ import SouthEastIcon from '@mui/icons-material/SouthEast';
 import EastIcon from '@mui/icons-material/East';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import dayjs from "dayjs";
+import ImageButtonGrid from "@components/shared/styled/ImageButtonGrid";
 
 interface TimeData {
     ambient_temperature?: number;
@@ -141,6 +142,7 @@ const WeatherDataPage = () => {
                     </Box>
                 }
             </ContentGuard>
+            <ImageButtonGrid />
             <GenericSnackbar
                 type={snackbarState.type}
                 message={snackbarState.message}
