@@ -5,6 +5,7 @@ import ToolbarActions from '@components/dashboard/ToolbarActions/ToolbarActions'
 import { useSession } from '@contexts/SessionContext';
 import Redirect from '@components/shared/Redirect/Redirect';
 import { jwtDecode } from 'jwt-decode';
+import Footer from '@components/shared/Footer';
 
 export default function DashLayout() {
   const { session } = useSession()
@@ -19,7 +20,7 @@ export default function DashLayout() {
     try {
       // Decode the token to get its payload
       const decodedToken = jwtDecode(session.user.token);
-      
+
       // Check if the token has expired
       if ((decodedToken.exp ?? 0) < Date.now() / 1000) {
         return <Redirect to={'/session-refresh' + callbackURL} />;
@@ -39,6 +40,7 @@ export default function DashLayout() {
       <PageContainer>
         <Outlet />
       </PageContainer>
+      <Footer />
     </DashboardLayout>
   );
 }

@@ -14,7 +14,7 @@ const Footer = () => {
             sx={{
                 backgroundColor: theme.palette.primary.main,
                 color: theme.palette.primary.contrastText,
-                py: { xs: 4, sm: 6 },
+                py: { xs: 2, sm: 3 },
                 mt: 'auto',
             }}
         >
