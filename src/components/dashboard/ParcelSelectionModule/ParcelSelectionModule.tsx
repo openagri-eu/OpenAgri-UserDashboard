@@ -79,7 +79,7 @@ const ParcelSelectionModule = () => {
                         {
                             !session?.farm_parcel &&
                             <Typography component="span">
-                                No parcel selected
+                                No parcel selected. You can select a parcel by opening this menu and clicking on a parcel
                             </Typography>
                         }
                     </AccordionSummary>
