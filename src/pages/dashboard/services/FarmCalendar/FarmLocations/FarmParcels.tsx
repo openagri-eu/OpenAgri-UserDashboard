@@ -36,6 +36,7 @@ const FarmParcelsPage = () => {
                 return {
                     id: p["@id"],
                     farm: p.farm["@type"],
+                    toponym: p.hasToponym,
                     identifier: p.identifier,
                     parcelType: p["@type"],
                     timestamps: `Created: ${p.created_at}\nUpdated: ${p.updated_at}`,
@@ -48,6 +49,7 @@ const FarmParcelsPage = () => {
     interface ParcelRow {
         id: string;
         farm: string;
+        toponym: string;
         identifier: string;
         parcelType: string;
         timestamps: string;
@@ -55,6 +57,7 @@ const FarmParcelsPage = () => {
 
     const parcelHeadCells: readonly HeadCell<ParcelRow>[] = [
         { id: 'farm', numeric: false, label: 'Farm' },
+        { id: 'toponym', numeric: false, label: 'Toponym' },
         { id: 'identifier', numeric: false, label: 'Identifier' },
         { id: 'parcelType', numeric: false, label: 'Parcel type' },
         { id: 'timestamps', numeric: false, label: 'Timestamps' },
