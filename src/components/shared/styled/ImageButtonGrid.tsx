@@ -81,7 +81,7 @@ const ImageButtonGrid: React.FC = () => {
           variant="contained"
         >
           <IconImage src={item.url} alt={`${item.title} icon`} />
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
             {item.title}
           </Typography>
         </StyledButton>
