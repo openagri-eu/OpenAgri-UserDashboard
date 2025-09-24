@@ -133,7 +133,8 @@ function GenericSortableTable<T extends { id: number | string }>({
                     onClick={() => onRowClick && onRowClick(row)}
                   >
                     {headCells.map((cell, cellIndex) => {
-                      const cellValue = row[cell.id] as React.ReactNode;
+                      const originalValue = row[cell.id] as React.ReactNode;
+                      const cellValue = originalValue == null ? 'N/A' : originalValue;
                       if (cellIndex === 0) {
                         return (
                           <TableCell
