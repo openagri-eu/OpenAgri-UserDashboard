@@ -20,7 +20,7 @@ const DateRangeSelect: React.FC<DateRangeSelectProps> = ({ fromDate, setFromDate
     }
 
     return (
-        <Box display={'flex'} gap={2}>
+        <Box display={'flex'} flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
             <Box flex={1}>
                 <DatePicker
                     sx={{ width: '100%' }}
