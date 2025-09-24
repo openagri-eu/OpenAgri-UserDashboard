@@ -68,7 +68,7 @@ const FarmsPage = () => {
         { id: 'contactPerson', numeric: false, label: 'Contact person' },
         { id: 'telephone', numeric: false, label: 'Telephone' },
         { id: 'vatId', numeric: false, label: 'VAT ID' },
-        { id: 'adminUnit', numeric: false, label: 'Admin unit (L1 + L2)' },
+        { id: 'adminUnit', numeric: false, label: 'Region / Subregion' },
         { id: 'address', numeric: false, label: 'Address' },
     ];
 
