@@ -109,7 +109,7 @@ function GenericSortableTable<T extends { id: number | string }>({
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <TableContainer sx={{ maxHeight: 500 }}>
+        <TableContainer sx={{ maxHeight: 500, overflowX: { xs: 'scroll', md: 'auto' }}}>
           <Table
             stickyHeader
             sx={{ minWidth: 750 }}
