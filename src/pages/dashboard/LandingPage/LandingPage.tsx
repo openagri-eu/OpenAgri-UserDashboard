@@ -1,10 +1,23 @@
 import ImageButtonGrid from "@components/shared/styled/ImageButtonGrid/ImageButtonGrid";
-import { useNavigate } from 'react-router-dom';
-import { Typography } from "@mui/material";
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
+import { DashboardContextType } from "@layouts/dashboard";
+import { useEffect } from "react";
 
 const LandingPage = () => {
     const navigate = useNavigate();
+
+    const { setPageTitle, setBreadcrumbs } = useOutletContext<DashboardContextType>();
+
+    useEffect(() => {
+        setPageTitle('Welcome to the OpenAgri dashboard');
+        setBreadcrumbs([]);
+
+        return () => {
+            setPageTitle(undefined);
+            setBreadcrumbs(undefined);
+        };
+    }, [setPageTitle, setBreadcrumbs]);
 
     const handleNavigate = (to: string) => {
         navigate(to);
@@ -35,7 +48,6 @@ const LandingPage = () => {
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
-            <Typography variant="body1">Welcome to the OpenAgri dashboard!</Typography>
             <ImageButtonGrid items={images}></ImageButtonGrid>
         </>
     )

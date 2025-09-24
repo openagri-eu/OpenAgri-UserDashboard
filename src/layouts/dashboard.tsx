@@ -1,11 +1,17 @@
 import { Outlet, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
+import { Breadcrumb, PageContainer } from '@toolpad/core/PageContainer';
 import ToolbarActions from '@components/dashboard/ToolbarActions/ToolbarActions';
 import { useSession } from '@contexts/SessionContext';
 import Redirect from '@components/shared/Redirect/Redirect';
 import { jwtDecode } from 'jwt-decode';
 import Footer from '@components/shared/Footer';
+import { useState } from 'react';
+
+export type DashboardContextType = {
+  setPageTitle: (title: string | undefined) => void;
+  setBreadcrumbs: (breadcrumbs: Breadcrumb[] | undefined) => void;
+};
 
 export default function DashLayout() {
   const { session } = useSession()
@@ -31,14 +37,17 @@ export default function DashLayout() {
     }
   }
 
+  const [pageTitle, setPageTitle] = useState<string | undefined>(undefined);
+  const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[] | undefined>(undefined);
+
   return (
     <DashboardLayout
       slots={{
         toolbarActions: ToolbarActions
       }}
     >
-      <PageContainer>
-        <Outlet />
+      <PageContainer title={pageTitle} breadcrumbs={breadcrumbs}>
+        <Outlet context={{ setPageTitle, setBreadcrumbs }} />
       </PageContainer>
       <Footer />
     </DashboardLayout>
