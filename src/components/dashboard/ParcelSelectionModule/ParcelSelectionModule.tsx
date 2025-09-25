@@ -11,7 +11,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ParcelSelectionList from "./ParcelSelectionList/ParcelSelectionList";
-import DeleteIcon from '@mui/icons-material/Delete';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const ParcelSelectionModule = () => {
 
@@ -90,10 +90,10 @@ const ParcelSelectionModule = () => {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    startIcon={<DeleteIcon />}
+                                    startIcon={<ClearIcon />}
                                     onClick={() => selectFarmParcel(undefined)}
                                 >
-                                    Remove selected parcel
+                                    Clear selected parcel
                                 </Button>
                             </Box>
                         </Box>
