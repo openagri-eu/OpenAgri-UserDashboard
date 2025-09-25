@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, IconButton, TextField, Typography, Stack, Divider } from "@mui/material";
+import { Box, Button, Card, CardContent, IconButton, TextField, Typography, Stack, Divider, useTheme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,6 +29,8 @@ const createEmptyDisease = () => ({
 });
 
 const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onAction }) => {
+    const theme = useTheme();
+
     const [formData, setFormData] = useState<DiseaseModel | undefined>();
 
     useEffect(() => {
@@ -178,7 +180,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                     const isEndValueError = !isNaN(gddp.start) && !isNaN(gddp.end) && gddp.end <= gddp.start;
 
                     return (
-                        <Card key={gddp.id} sx={{ backgroundColor: '#f9f9f9' }}>
+                        <Card key={gddp.id} sx={{ backgroundColor: theme.palette.background.default }}>
                             <CardContent>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <Box sx={{ display: 'flex', gap: 2 }}>
