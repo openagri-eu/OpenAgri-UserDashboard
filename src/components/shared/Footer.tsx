@@ -14,11 +14,11 @@ const Footer = () => {
             sx={{
                 backgroundColor: theme.palette.primary.main,
                 color: theme.palette.primary.contrastText,
-                py: { xs: 2, sm: 3 },
+                py: 2,
                 mt: 'auto',
             }}
         >
-            <Container maxWidth="lg">
+            <Container maxWidth="xl">
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', rowGap: 4 }}>
 
                     <Box sx={{ width: { xs: '100%', md: '50%' }, pr: { md: 2 } }}>
@@ -26,7 +26,7 @@ const Footer = () => {
                             <img
                                 src={logo}
                                 alt="OpenAgri Logo"
-                                style={{ width: '200px', height: 'auto' }}
+                                style={{ width: '168px', height: 'auto' }}
                             />
                             <Typography variant="h6" component="p" sx={{ fontWeight: 'bold' }}>
                                 OpenAgri — Where Inclusive Innovation Meets Agriculture!
@@ -39,7 +39,7 @@ const Footer = () => {
                             <img
                                 src={flag}
                                 alt="European Union Flag"
-                                style={{ width: '200px', height: 'auto', flexShrink: 0 }}
+                                style={{ width: '168px', height: 'auto', flexShrink: 0 }}
                             />
                             <Typography variant="body2">
                                 OpenAgri has received funding from the EU’s Horizon Europe research and innovation
