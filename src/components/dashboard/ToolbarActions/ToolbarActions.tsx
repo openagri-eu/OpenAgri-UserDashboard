@@ -1,7 +1,7 @@
 import { IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popover, Tooltip } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from "react-router-dom";
 import { useSession } from "@contexts/SessionContext";
@@ -47,7 +47,7 @@ const ToolbarActions = () => {
             <Tooltip title="Settings" enterDelay={1000}>
                 <div>
                     <IconButton type="button" aria-label="settings" onClick={toggleMenu}>
-                        <MoreVertIcon />
+                        <PersonIcon />
                     </IconButton>
                 </div>
             </Tooltip>
