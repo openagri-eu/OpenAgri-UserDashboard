@@ -3,21 +3,28 @@ import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar"
 import { useSession } from "@contexts/SessionContext";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
-import { useEffect } from "react";
+import { UAVFlightForecastModel } from "@models/UAVFlightForecast";
+import { Skeleton } from "@mui/material";
+import { useEffect, useState } from "react";
 
-const UAVFlights = () => {
+const UAVFlightsForecast = () => {
     const { session } = useSession();
 
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
+    const [loadingFormat, setLoadingFormat] = useState<boolean>(false);
 
-    const { fetchData: uavFetchData, response: uavResponse, error: uavError } = useFetch<any[]>(
-        `proxy/weather_data/api/data/flight-forecast5/?lat=${session?.farm_parcel?.location.lat}&lon=${session?.farm_parcel?.location.long}`,
+    const [agriMachines, setAgriMachines] = useState<string[]>([]);
+
+
+    const { fetchData: uavFetchData, loading: uavLoading, response: uavResponse, error: uavError } = useFetch<UAVFlightForecastModel[]>(
+        `proxy/weather_data/api/data/flight-forecast5/?lat=${session?.farm_parcel?.location.lat}&lon=${session?.farm_parcel?.location.long}`
+        + `${agriMachines.map((am) => { return '&uavmodels=' + am })}`,
         {
             method: 'GET',
         }
     );
 
-    const { fetchData: agriMachinceFetchData, response: agriMachinesResponse, error: agriMachinesError } = useFetch<any[]>(
+    const { fetchData: agriMachineFetchData, loading: agriMachinesLoading, response: agriMachinesResponse, error: agriMachinesError } = useFetch<any[]>(
         `proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json`,
         {
             method: 'GET',
@@ -26,20 +33,33 @@ const UAVFlights = () => {
 
     useEffect(() => {
         if (session?.farm_parcel) {
-            uavFetchData();
-            agriMachinceFetchData();
+            agriMachineFetchData();
         }
     }, [session?.farm_parcel])
 
     useEffect(() => {
+        setLoadingFormat(true);
         console.log(uavResponse);
-
+        setLoadingFormat(false);
     }, [uavResponse])
 
     useEffect(() => {
-        console.log(agriMachinesResponse);
+        if (agriMachinesResponse) {
+            const agriMachinesArray = agriMachinesResponse.flatMap((am) => {
+                return am.model
+            })
+            setAgriMachines(agriMachinesArray)
+        }
 
     }, [agriMachinesResponse])
+
+    useEffect(() => {
+        if (agriMachines.length) {
+            console.log(agriMachines);
+            uavFetchData();
+        }
+
+    }, [agriMachines])
 
     useEffect(() => {
         if (agriMachinesError) {
@@ -53,10 +73,10 @@ const UAVFlights = () => {
         }
     }, [uavError])
 
-
     return (
         <>
             <ContentGuard condition={session?.farm_parcel}>
+                {(uavLoading || agriMachinesLoading || loadingFormat) && <Skeleton variant="rectangular" height={48} />}
                 UAV flights works
             </ContentGuard>
             <GenericSnackbar
@@ -69,4 +89,4 @@ const UAVFlights = () => {
     )
 }
 
-export default UAVFlights;
+export default UAVFlightsForecast;

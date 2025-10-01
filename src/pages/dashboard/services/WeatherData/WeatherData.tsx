@@ -5,7 +5,7 @@ import { useState } from "react";
 import ImageButtonGrid from "@components/shared/styled/ImageButtonGrid";
 import WeatherForecast from "@components/dashboard/services/WeatherForecast/WeatherForecast";
 import SprayForecast from "@components/dashboard/services/SprayForecast/SprayForecast";
-import UAVFlights from "@components/dashboard/services/UAVFlights/UAVFlights";
+import UAVFlightsForecast from "@components/dashboard/services/UAVFlightsForecast/UAVFlightsForecast";
 
 
 function TabPanel({ children, value, index }: { children: React.ReactNode; value: number; index: number }) {
@@ -33,7 +33,7 @@ const WeatherDataPage = () => {
             <Tabs value={tab} onChange={handleTabChange} variant="fullWidth">
                 <Tab label="Weather forecast" />
                 <Tab label="Spray forecast" />
-                <Tab label="UAV flights" />
+                <Tab label="UAV flights forecast" />
             </Tabs>
             <TabPanel value={tab} index={0}>
                 <WeatherForecast />
@@ -42,7 +42,7 @@ const WeatherDataPage = () => {
                 <SprayForecast />
             </TabPanel>
             <TabPanel value={tab} index={2}>
-                <UAVFlights />
+                <UAVFlightsForecast />
             </TabPanel>
             <ImageButtonGrid />
         </>
