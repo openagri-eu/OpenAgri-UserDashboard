@@ -5,6 +5,7 @@ import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { Skeleton } from "@mui/material";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -38,8 +39,8 @@ const FarmParcelsPage = () => {
                     farm: p.farm["@type"],
                     toponym: p.hasToponym,
                     identifier: p.identifier,
-                    parcelType: p["@type"],
-                    timestamps: `Created: ${p.created_at}\nUpdated: ${p.updated_at}`,
+                    parcelType: p.category,
+                    timestamps: `Created: ${dayjs(p.created_at)}\nUpdated: ${dayjs(p.updated_at)}`,
                 }
             })
             setParcels(formattedParcels);
