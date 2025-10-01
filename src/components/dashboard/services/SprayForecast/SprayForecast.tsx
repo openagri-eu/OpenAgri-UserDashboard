@@ -70,14 +70,17 @@ const SprayForecast = () => {
                 const { timestamp, spray_conditions, detailed_status } = currentItem;
                 const [date, timeWithZ] = timestamp.split('T');
                 const time = timeWithZ.replace('Z', '');
+
                 if (!accumulator[date]) { accumulator[date] = {}; }
                 if (!accumulator[date][time]) { accumulator[date][time] = {}; }
+
                 accumulator[date][time].spray_conditions = spray_conditions;
                 accumulator[date][time].detailed_status = detailed_status;
+                
+                setLoadingFormat(false);
                 return accumulator;
             }, {});
             setFormattedData(processedData);
-            setLoadingFormat(false);
         }
     }, [sprayResponse]);
 
