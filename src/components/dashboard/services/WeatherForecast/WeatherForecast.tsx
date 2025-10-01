@@ -67,7 +67,6 @@ const WeatherForecast = () => {
     }, [forecastError])
 
     useEffect(() => {
-        console.log(forecastResponse);
         if (forecastResponse && Array.isArray(forecastResponse)) {
             setLoadingFormat(true);
             const processedData = forecastResponse.reduce<FormattedWeatherData>((accumulator, currentItem) => {
