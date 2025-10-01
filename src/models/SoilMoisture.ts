@@ -1,4 +1,4 @@
-export interface SoilMoistureRequest {
+export interface DatasetRow {
     dataset_id: string;
     date: string;
     soil_moisture_10: number;

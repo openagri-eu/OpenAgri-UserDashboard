@@ -5,12 +5,12 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import PublishIcon from '@mui/icons-material/Publish';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import useFetch from "@hooks/useFetch";
-import { SoilMoistureRequest } from "@models/SoilMoisture";
+import { DatasetRow } from "@models/SoilMoisture";
 import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 
 const UploadDatasetPage = () => {
-    const [jsonData, setJsonData] = useState<SoilMoistureRequest[]>([]);
+    const [jsonData, setJsonData] = useState<DatasetRow[]>([]);
 
     const { fetchData, loading, response, error } = useFetch<any>(
         "proxy/irrigation/api/v1/dataset/",
@@ -59,7 +59,7 @@ const UploadDatasetPage = () => {
                         rain: +values[7] || 0,
                         temperature: +values[8] || 0,
                         humidity: +values[9] || 0,
-                    } as SoilMoistureRequest;
+                    } as DatasetRow;
                 });
 
                 setJsonData(parsedData);
