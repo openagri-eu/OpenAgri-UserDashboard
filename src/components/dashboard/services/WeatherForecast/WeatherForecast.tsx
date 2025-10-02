@@ -8,6 +8,8 @@ import { Box, Card, CardContent, Skeleton, Typography } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import SunnyIcon from '@mui/icons-material/Sunny';
+import CloudySnowingIcon from '@mui/icons-material/CloudySnowing';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
@@ -98,6 +100,12 @@ const WeatherForecast = () => {
         return { str: 'N', icon: <NorthIcon /> };
     }
 
+    const precipitationConvert = (precipitation: number) => {
+        const percentage = precipitation * 100;
+        if (precipitation > 0) return { percentage: percentage, icon: <CloudySnowingIcon /> };
+        return { percentage: percentage, icon: <SunnyIcon /> };
+    }
+
     return (
         <>
             <ContentGuard condition={session?.farm_parcel}>
@@ -110,24 +118,31 @@ const WeatherForecast = () => {
                                     <Typography gutterBottom variant="h4">{dayjs(date).format('dddd, D/MMM/YYYY')}</Typography>
                                     <Box display={'flex'} flexDirection={'column'} gap={2} overflow={'auto'}>
                                         {Object.entries(dailyData).sort().map(([time, timeData]: [string, TimeData]) => {
-                                            const { str, icon } = degreeConvert(timeData.wind_direction ?? 0);
+                                            const { str: strWind, icon: iconWind } = degreeConvert(timeData.wind_direction ?? 0);
+                                            const { percentage, icon: iconPrec } = precipitationConvert(timeData.precipitation ?? 0);
                                             return <Fragment key={`id-time-${date}-${time}`}>
                                                 <Box display={'flex'} flex={1} justifyContent={'space-between'} alignItems={'center'} gap={2}>
-                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1} minWidth={72}>
                                                         <SvgIcon children={<AccessTimeIcon />} />
                                                         {dayjs(`${date} ${time}`).format('HH:mm')}
                                                     </Box>
-                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1} minWidth={100}>
                                                         <SvgIcon children={<ThermostatIcon />} />
                                                         {timeData.ambient_temperature}°C
                                                     </Box>
-                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} flex={0.5} minWidth={72}>
                                                         <SvgIcon children={<WaterDropIcon />} />
                                                         {timeData.ambient_humidity}%
                                                     </Box>
-                                                    <Box display={'flex'} flexDirection={'column'} alignItems={'center'} flex={1}>
+                                                    <Box display={'flex'} alignItems={'center'} gap={1} justifyContent={'center'} flex={1} minWidth={72}>
+                                                        <Box display={'flex'} flexDirection={'column'}  alignItems={'center'}>
+                                                            <SvgIcon children={iconPrec} />
+                                                            {percentage ? percentage + "%": <></>}
+                                                        </Box>
+                                                    </Box>
+                                                    <Box display={'flex'} flexDirection={'column'} alignItems={'center'} flex={1} minWidth={144}>
                                                         <Box display={'flex'} alignItems={'center'} gap={1}><SvgIcon children={<AirIcon />} /> {timeData.wind_speed} km/h</Box>
-                                                        <Box display={'flex'} alignItems={'center'} gap={1}><SvgIcon children={icon} /> {str}</Box>
+                                                        <Box display={'flex'} alignItems={'center'} gap={1}><SvgIcon children={iconWind} /> {strWind}</Box>
                                                     </Box>
                                                 </Box>
                                             </Fragment>
