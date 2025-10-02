@@ -19,30 +19,39 @@ const useFetch = <FetchResponse = any>(
     const { session, setSession } = useSession();
     const apiUrl = window.env?.VITE_API_URL ? window.env?.VITE_API_URL : import.meta.env.VITE_API_URL;
 
-    const fetchData = async (dynamicBody = {}, dynamicHeader = {}) => {
+    const fetchData = async (dynamicOptions: Partial<FetchOptions> = {}) => {
         setLoading(true);
         setResponse(undefined);
         setError(null);
 
+        const currentOptions = { method, headers, body, responseType, ...dynamicOptions };
+
         try {
-            if (Object.keys(dynamicBody).length > 0) body = dynamicBody;
-            if (Object.keys(dynamicHeader).length > 0) headers = dynamicHeader;
-
             const getFetchOptions = (token: string | undefined) => {
-                const finalBody = body && method !== "GET" && method !== "DELETE" ?
-                    body instanceof URLSearchParams ? body.toString() : JSON.stringify(body) :
-                    null;
+                let finalBody: BodyInit | null = null;
+                
+                if (currentOptions.body && currentOptions.method !== "GET" && currentOptions.method !== "DELETE") {
+                    if (currentOptions.body instanceof FormData) {
+                        finalBody = currentOptions.body;
+                    } else if (currentOptions.body instanceof URLSearchParams) {
+                        finalBody = currentOptions.body.toString();
+                    } else {
+                        finalBody = JSON.stringify(currentOptions.body);
+                    }
+                }
 
-                const finalHeaders: Record<string, string> = { ...headers };
-                if (responseType === 'json') {
+                const finalHeaders: Record<string, string> = { ...currentOptions.headers };
+
+                if (currentOptions.responseType === 'json' && !(currentOptions.body instanceof FormData)) {
                     finalHeaders["Content-Type"] = "application/json";
                 }
+
                 if (token) {
                     finalHeaders["Authorization"] = `Bearer ${token}`;
                 }
 
                 return {
-                    method,
+                    method: currentOptions.method,
                     headers: finalHeaders,
                     body: finalBody,
                 };
@@ -96,18 +105,19 @@ const useFetch = <FetchResponse = any>(
                 }
             }
 
-            if (responseType === 'blob') {
+            if (currentOptions.responseType === 'blob') {
                 const blobResult = await response.blob();
                 setResponse(blobResult as FetchResponse);
-            } else {
+            } else if (response.status !== 204) { // Handle No Content response
                 const jsonResult: FetchResponse = await response.json();
                 setResponse(jsonResult);
+            } else {
+                setResponse(undefined);
             }
             setError(null);
         } catch (err) {
             setResponse(undefined);
             setError(err as Error);
-            // Possibly reroute to a different route to retrigger token refresh if weird behavior occurs
         } finally {
             setLoading(false);
         }
