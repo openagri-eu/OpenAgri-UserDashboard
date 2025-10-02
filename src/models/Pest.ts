@@ -1,4 +1,4 @@
-export interface DiseaseModel {
+export interface PestModel {
     id: string
     name: string
     eppo_code: string,
@@ -7,6 +7,6 @@ export interface DiseaseModel {
     gdd_points: { id: number, start: number, end: number, descriptor: string }[]
 }
 
-export interface DiseasesResponseModel {
-    diseases: DiseaseModel[]
+export interface PestsResponseModel {
+    diseases: PestModel[] // TODO: change when it's changed on backend
 }

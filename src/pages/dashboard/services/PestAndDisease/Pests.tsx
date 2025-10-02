@@ -1,21 +1,21 @@
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import GenericSortableTable from "@components/shared/GenericSortableTable/GenericSortableTable";
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
-import DiseaseCRUDActions from "@components/dashboard/services/DiseaseCRUDActions/DiseaseCRUDActions";
+import PestCRUDActions from "@components/dashboard/services/PestCRUDActions/PestCRUDActions";
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
-import { DiseaseModel, DiseasesResponseModel } from "@models/Disease";
+import { PestModel, PestsResponseModel } from "@models/Pest";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const DiseasesPage = () => {
-    const [diseases, setDiseases] = useState<DiseaseRow[]>([]);
-    const [selectedDisease, setSelectedDisease] = useState<DiseaseModel | undefined>(undefined);
+const PestsPage = () => {
+    const [pests, setPests] = useState<PestRow[]>([]);
+    const [selectedPest, setSelectedPest] = useState<PestModel | undefined>(undefined);
 
     const [expanded, setExpanded] = useState<boolean>(false);
 
-    const { fetchData: getFetchData, response: getResponse, error: getError, loading: getLoading } = useFetch<DiseasesResponseModel>(
+    const { fetchData: getFetchData, response: getResponse, error: getError, loading: getLoading } = useFetch<PestsResponseModel>(
         `proxy/pdm/api/v1/disease/`,
         {
             method: 'GET',
@@ -30,7 +30,7 @@ const DiseasesPage = () => {
 
     useEffect(() => {
         if (getResponse) {
-            const formattedDiseases = getResponse.diseases.map((d) => {
+            const formattedPests = getResponse.diseases.map((d) => {
                 return {
                     id: d.id,
                     name: d.name,
@@ -40,11 +40,11 @@ const DiseasesPage = () => {
                     gddPoints: d.gdd_points
                 }
             })
-            setDiseases(formattedDiseases);
+            setPests(formattedPests);
         }
     }, [getResponse])
 
-    interface DiseaseRow {
+    interface PestRow {
         id: string;
         name: string;
         description: string;
@@ -58,23 +58,23 @@ const DiseasesPage = () => {
         }[]
     }
 
-    const diseasesHeadCells: readonly HeadCell<DiseaseRow>[] = [
+    const pestsHeadCells: readonly HeadCell<PestRow>[] = [
         { id: 'name', numeric: false, label: 'Name' },
         { id: 'eppoCode', numeric: false, label: 'EPPO code' },
         { id: 'baseGDD', numeric: false, label: 'Base GDD' },
     ];
 
-    const handleRowClick = (disease: DiseaseRow) => {
-        setSelectedDisease({
-            id: disease.id,
-            name: disease.name,
-            base_gdd: disease.baseGDD,
-            eppo_code: disease.eppoCode,
-            description: disease.description,
-            gdd_points: disease.gddPoints
+    const handleRowClick = (pest: PestRow) => {
+        setSelectedPest({
+            id: pest.id,
+            name: pest.name,
+            base_gdd: pest.baseGDD,
+            eppo_code: pest.eppoCode,
+            description: pest.description,
+            gdd_points: pest.gddPoints
         });
         showDialog({
-            title: `Details for ${disease.name}`,
+            title: `Details for ${pest.name}`,
             variant: 'empty',
             children: <></>
         });
@@ -82,19 +82,19 @@ const DiseasesPage = () => {
 
     const handleCloseDialog = () => {
         dialogProps.onClose();
-        setSelectedDisease(undefined);
+        setSelectedPest(undefined);
     };
 
     const handleAccordionChange = () => {
         setExpanded(!expanded);
     };
 
-    const onAddNewDisease = () => {
+    const onAddNewPest = () => {
         getFetchData();
         setExpanded(false);
     };
 
-    const onEditDisease = () => {
+    const onEditPest = () => {
         getFetchData();
         handleCloseDialog();
     };
@@ -104,23 +104,23 @@ const DiseasesPage = () => {
             <Box display={'flex'} flexDirection={'column'} gap={2}>
                 <Accordion expanded={expanded} onChange={handleAccordionChange}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography component="span">Add new disease</Typography>
+                        <Typography component="span">Add new pest</Typography>
                     </AccordionSummary>
                     <AccordionDetails sx={{ maxHeight: 480, overflowY: 'scroll'}}>
-                        <DiseaseCRUDActions onAction={onAddNewDisease}></DiseaseCRUDActions>
+                        <PestCRUDActions onAction={onAddNewPest}></PestCRUDActions>
                     </AccordionDetails>
                 </Accordion>
                 {getLoading && <Skeleton variant="rectangular" height={48} />}
                 {
                     !getLoading && !getError &&
-                    <GenericSortableTable data={diseases} headCells={diseasesHeadCells} onRowClick={handleRowClick}></GenericSortableTable>
+                    <GenericSortableTable data={pests} headCells={pestsHeadCells} onRowClick={handleRowClick}></GenericSortableTable>
                 }
             </Box>
             <GenericDialog {...dialogProps} onClose={handleCloseDialog}>
-                <DiseaseCRUDActions disease={selectedDisease} onAction={onEditDisease}></DiseaseCRUDActions>
+                <PestCRUDActions pest={selectedPest} onAction={onEditPest}></PestCRUDActions>
             </GenericDialog>
         </>
     )
 }
 
-export default DiseasesPage;
+export default PestsPage;

@@ -4,15 +4,15 @@ import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { useState, useEffect } from "react";
-import { DiseaseActionsCRUDProps } from "./DiseaseCRUDActions.types";
-import { DiseaseModel } from "@models/Disease";
+import { PestCRUDActionsProps } from "./PestCRUDActions.types";
+import { PestModel } from "@models/Pest";
 import useFetch from "@hooks/useFetch";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
 import useDialog from "@hooks/useDialog";
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 
-const createEmptyDisease = () => ({
+const createEmptyPest = () => ({
     id: '',
     name: '',
     description: '',
@@ -28,21 +28,21 @@ const createEmptyDisease = () => ({
     ]
 });
 
-const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onAction }) => {
+const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => {
     const theme = useTheme();
 
-    const [formData, setFormData] = useState<DiseaseModel | undefined>();
+    const [formData, setFormData] = useState<PestModel | undefined>();
 
     useEffect(() => {
-        setFormData(disease || createEmptyDisease());
-    }, [disease]);
+        setFormData(pest || createEmptyPest());
+    }, [pest]);
 
     const handleAddGddPoint = () => {
         if (!formData?.gdd_points) return;
         const lastPoint = formData.gdd_points[formData.gdd_points.length - 1];
         if (isNaN(lastPoint.end)) return;
 
-        const newPoint: DiseaseModel['gdd_points'][0] = {
+        const newPoint: PestModel['gdd_points'][0] = {
             id: Date.now(),
             start: lastPoint.end,
             end: NaN,
@@ -63,13 +63,13 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     const { fetchData, response, error, loading } = useFetch<any>(
         `proxy/pdm/api/v1/disease/`,
         {
-            method: disease ? 'PUT' : 'POST',
+            method: pest ? 'PUT' : 'POST',
             body: formData
         }
     );
 
     const { fetchData: deleteFetchData, response: deleteResponse, error: deleteError } = useFetch<any>( // TODO: add loading and add loading handling in generic yes-no dialog
-        `proxy/pdm/api/v1/disease/${disease?.id}/`,
+        `proxy/pdm/api/v1/disease/${pest?.id}/`,
         {
             method: 'DELETE',
             body: formData
@@ -79,7 +79,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     useEffect(() => {
         if (response) {
             onAction && onAction();
-            showSnackbar('success', disease ? "Disease edited successfully" : "Disease added successfully");
+            showSnackbar('success', pest ? "Pest edited successfully" : "Pest added successfully");
         }
     }, [response]);
 
@@ -92,13 +92,13 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     useEffect(() => {
         if (deleteResponse) {
             onAction && onAction();
-            showSnackbar('success', "Successfully deleted disease");
+            showSnackbar('success', "Successfully deleted pest");
         }
     }, [deleteResponse]);
 
     useEffect(() => {
         if (deleteError) {
-            showSnackbar('error', "An error occurred while deleting the disease");
+            showSnackbar('error', "An error occurred while deleting the pest");
         }
     }, [deleteError]);
 
@@ -164,15 +164,15 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
         <>
             <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                 <Stack direction={'column'} spacing={2} >
-                    <TextField fullWidth margin="normal" label="Disease Name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
-                    <TextField fullWidth margin="normal" label="Disease Description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
+                    <TextField fullWidth margin="normal" label="Pest name" name="name" value={formData.name ?? ''} onChange={handleChange} error={!formData.name?.trim()} />
+                    <TextField fullWidth margin="normal" label="Pest description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="EPPO Code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
+                        <TextField fullWidth margin="normal" label="EPPO code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
                         <TextField fullWidth margin="normal" label="Base GDD" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
                     </Stack>
                 </Stack>
 
-                <Typography variant="h6">GDD Points</Typography>
+                <Typography variant="h6">GDD points</Typography>
 
                 {formData.gdd_points.map((gddp, index) => {
                     const isLastPoint = index === formData.gdd_points.length - 1;
@@ -203,7 +203,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                     </Button>
                 </Box>
                 <Divider />
-                {disease &&
+                {pest &&
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                         <Button
                             variant="contained"
@@ -214,13 +214,13 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                             disabled={isFormInvalid}
                             onClick={() => {
                                 showDialog({
-                                    title: `Are you sure you want to delete this disease?`,
+                                    title: `Are you sure you want to delete this pest?`,
                                     variant: 'yes-no',
                                     children: <></>
                                 });
                             }}
                         >
-                            Delete disease
+                            Delete pest
                         </Button>
                         <Button
                             variant="contained"
@@ -235,7 +235,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                         </Button>
                     </Box>
                 }
-                {!disease &&
+                {!pest &&
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-start' }}>
                         <Button
                             variant="contained"
@@ -246,7 +246,7 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
                             disabled={isFormInvalid}
                             onClick={handleAction}
                         >
-                            Add disease
+                            Add pest
                         </Button>
                     </Box>
                 }
@@ -262,4 +262,4 @@ const DiseaseCRUDActions: React.FC<DiseaseActionsCRUDProps> = ({ disease, onActi
     );
 };
 
-export default DiseaseCRUDActions;
+export default PestCRUDActions;
