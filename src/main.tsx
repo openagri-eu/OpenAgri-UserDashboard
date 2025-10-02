@@ -31,6 +31,7 @@ import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilM
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
+import DiseasesPage from '@pages/dashboard/services/PestAndDisease/Diseases.tsx';
 
 const router = createBrowserRouter([
   {
@@ -137,6 +138,10 @@ const router = createBrowserRouter([
           {
             path: 'gdd',
             Component: GrowingDegreeDaysPage
+          },
+          {
+            path: 'diseases',
+            Component: DiseasesPage
           },
           {
             path: 'weather-data',

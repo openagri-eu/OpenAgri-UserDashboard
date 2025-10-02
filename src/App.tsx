@@ -11,7 +11,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly c
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import { useEffect, useState } from 'react';
 import SessionContext, { Session } from '@contexts/SessionContext';
-import { Folder } from '@mui/icons-material';
+import { Coronavirus, Folder } from '@mui/icons-material';
 import FenceIcon from '@mui/icons-material/Fence';
 import MapIcon from '@mui/icons-material/Map';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
@@ -125,6 +125,11 @@ const NAVIGATION: Navigation = [
     segment: 'gdd',
     title: 'Growing degree days',
     icon: <GrassIcon />,
+  },
+  {
+    segment: 'diseases',
+    title: 'Diseases',
+    icon: <Coronavirus />,
   },
   {
     kind: 'header',

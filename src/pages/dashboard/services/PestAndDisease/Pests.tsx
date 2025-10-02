@@ -30,14 +30,14 @@ const PestsPage = () => {
 
     useEffect(() => {
         if (getResponse) {
-            const formattedPests = getResponse.diseases.map((d) => {
+            const formattedPests = getResponse.diseases.map((p) => {
                 return {
-                    id: d.id,
-                    name: d.name,
-                    description: d.description,
-                    eppoCode: d.eppo_code,
-                    baseGDD: d.base_gdd,
-                    gddPoints: d.gdd_points
+                    id: p.id,
+                    name: p.name,
+                    description: p.description,
+                    eppoCode: p.eppo_code,
+                    baseGDD: p.base_gdd,
+                    gddPoints: p.gdd_points
                 }
             })
             setPests(formattedPests);
