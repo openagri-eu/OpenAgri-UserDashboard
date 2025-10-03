@@ -5,6 +5,10 @@ export interface FarmCalendarActivityModel {
         '@id': string;
         '@type': string;
     };
+    hasAgriParcel: {
+        '@id': string;
+        '@type': string;
+    }
     details: string;
     hasEndDatetime: string;
     hasStartDatetime: string;
