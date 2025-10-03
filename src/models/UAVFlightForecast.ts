@@ -1,6 +1,8 @@
+export type UAVStatus = 'NOT OK' | 'MARGINAL' | 'OK';
+
 export interface UAVFlightForecastModel {
     weather_source: string;
-    status: string;
+    status: UAVStatus;
     timestamp: string;
     uav_model: string;
     location: {
