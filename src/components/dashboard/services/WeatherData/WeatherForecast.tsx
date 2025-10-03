@@ -137,7 +137,7 @@ const WeatherForecast = () => {
                                                     <Box display={'flex'} alignItems={'center'} gap={1} justifyContent={'center'} flex={1} minWidth={72}>
                                                         <Box display={'flex'} flexDirection={'column'}  alignItems={'center'}>
                                                             <SvgIcon children={iconPrec} />
-                                                            {percentage ? percentage + "%": <></>}
+                                                            {percentage ? percentage.toFixed(0) + "%": <></>}
                                                         </Box>
                                                     </Box>
                                                     <Box display={'flex'} flexDirection={'column'} alignItems={'center'} flex={1} minWidth={144}>
