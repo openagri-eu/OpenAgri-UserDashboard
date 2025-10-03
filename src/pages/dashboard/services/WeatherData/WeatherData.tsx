@@ -3,9 +3,9 @@ import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 
 import ImageButtonGrid from "@components/shared/styled/ImageButtonGrid";
-import WeatherForecast from "@components/dashboard/services/WeatherForecast/WeatherForecast";
-import SprayForecast from "@components/dashboard/services/SprayForecast/SprayForecast";
-import UAVFlightsForecast from "@components/dashboard/services/UAVFlightsForecast/UAVFlightsForecast";
+import WeatherForecast from "@components/dashboard/services/WeatherData/WeatherForecast";
+import SprayForecast from "@components/dashboard/services/WeatherData/SprayForecast";
+import UAVFlightsForecast from "@components/dashboard/services/WeatherData/UAVFlightsForecast";
 
 
 function TabPanel({ children, value, index }: { children: React.ReactNode; value: number; index: number }) {
