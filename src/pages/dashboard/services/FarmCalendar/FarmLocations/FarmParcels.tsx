@@ -3,6 +3,7 @@ import GenericSortableTable from "@components/shared/GenericSortableTable/Generi
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
+import { FarmModel } from "@models/Farm";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { Skeleton } from "@mui/material";
 import dayjs from "dayjs";
@@ -19,24 +20,32 @@ const FarmParcelsPage = () => {
         }
     );
 
+    const { fetchData: farmsFetchData, loading: farmsLoading, response: farmsResponse, error: farmsError } = useFetch<FarmModel[]>(
+        "proxy/farmcalendar/api/v1/Farm/?format=json",
+        {
+            method: 'GET',
+        }
+    );
+
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
         fetchData();
+        farmsFetchData();
     }, [])
 
     useEffect(() => {
-        if (error) {
+        if (error || farmsError) {
             showSnackbar('error', 'Error loading parcel list');
         }
-    }, [error])
+    }, [error, farmsError])
 
     useEffect(() => {
-        if (response) {
+        if (response && farmsResponse) {
             const formattedParcels = response.map((p) => {
                 return {
                     id: p["@id"],
-                    farm: p.farm["@type"],
+                    farm: farmsResponse.find((f: FarmModel) => { return f["@id"] === p.farm["@id"] })?.name ?? 'N/A',
                     toponym: p.hasToponym,
                     identifier: p.identifier,
                     parcelType: p.category,
@@ -45,7 +54,7 @@ const FarmParcelsPage = () => {
             })
             setParcels(formattedParcels);
         }
-    }, [response])
+    }, [response, farmsResponse])
 
     interface ParcelRow {
         id: string;
@@ -71,9 +80,9 @@ const FarmParcelsPage = () => {
     };
     return (
         <>
-            {loading && <Skeleton variant="rectangular" height={48} />}
+            {loading || farmsLoading && <Skeleton variant="rectangular" height={48} />}
             {
-                !loading && !error &&
+                !(loading || farmsLoading) && !error &&
                 <GenericSortableTable data={parcels} headCells={parcelHeadCells} onRowClick={handleRowClick}></GenericSortableTable>
             }
             <GenericSnackbar

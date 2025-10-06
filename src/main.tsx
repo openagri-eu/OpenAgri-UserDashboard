@@ -32,6 +32,7 @@ import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalend
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
 import DiseasesPage from '@pages/dashboard/services/PestAndDisease/Diseases.tsx';
+import RiskIndexPage from '@pages/dashboard/services/PestAndDisease/RiskIndex.tsx';
 
 const router = createBrowserRouter([
   {
@@ -142,6 +143,10 @@ const router = createBrowserRouter([
           {
             path: 'diseases',
             Component: DiseasesPage
+          },
+          {
+            path: 'risk-index',
+            Component: RiskIndexPage
           },
           {
             path: 'weather-data',
