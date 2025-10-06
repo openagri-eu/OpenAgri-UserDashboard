@@ -11,7 +11,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly c
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import { useEffect, useState } from 'react';
 import SessionContext, { Session } from '@contexts/SessionContext';
-import { Coronavirus, Folder } from '@mui/icons-material';
+import { Folder } from '@mui/icons-material';
 import FenceIcon from '@mui/icons-material/Fence';
 import MapIcon from '@mui/icons-material/Map';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
@@ -20,7 +20,8 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import CompostIcon from '@mui/icons-material/Compost';
 import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
-// import CoronavirusIcon from '@mui/icons-material/Coronavirus';
+import ReportIcon from '@mui/icons-material/Report';
+import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 import GrassIcon from '@mui/icons-material/Grass';
 
 const NAVIGATION: Navigation = [
@@ -129,7 +130,12 @@ const NAVIGATION: Navigation = [
   {
     segment: 'diseases',
     title: 'Diseases',
-    icon: <Coronavirus />,
+    icon: <CoronavirusIcon />,
+  },
+  {
+    segment: 'risk-index',
+    title: 'Risk index',
+    icon: <ReportIcon />,
   },
   {
     kind: 'header',
