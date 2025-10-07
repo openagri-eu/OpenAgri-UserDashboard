@@ -63,7 +63,15 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
     const { fetchData, response, error, loading } = useFetch<any>(
         `proxy/pdm/api/v1/disease/`,
         {
-            method: pest ? 'PUT' : 'POST',
+            method: 'POST',
+            body: formData
+        }
+    );
+
+    const { fetchData: patchFetchData, response: patchResponse, error: patchError } = useFetch<any>(
+        `proxy/pdm/api/v1/disease/${pest?.id}/`,
+        {
+            method: 'PATCH',
             body: formData
         }
     );
@@ -79,15 +87,22 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
     useEffect(() => {
         if (response) {
             onAction && onAction();
-            showSnackbar('success', pest ? "Pest edited successfully" : "Pest added successfully");
+            showSnackbar('success', "Pest added successfully");
         }
     }, [response]);
 
     useEffect(() => {
-        if (error) {
+        if (patchResponse) {
+            onAction && onAction();
+            showSnackbar('success', "Pest edited successfully");
+        }
+    }, [patchResponse]);
+
+    useEffect(() => {
+        if (error || patchError) {
             showSnackbar('error', "An error occurred");
         }
-    }, [error]);
+    }, [error, patchError]);
 
     useEffect(() => {
         if (deleteResponse) {
@@ -133,9 +148,14 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
         setFormData({ ...formData, gdd_points: updatedGddPoints });
     };
 
-    const handleAction = () => {
+    const handlePost = () => {
         console.log("Form Data:", formData);
         fetchData();
+    };
+
+    const handlePatch = () => {
+        console.log("Form Data:", formData);
+        patchFetchData();
     };
 
     const handleDelete = () => {
@@ -229,7 +249,7 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
                             loading={loading}
                             loadingPosition="start"
                             disabled={isFormInvalid}
-                            onClick={handleAction}
+                            onClick={handlePatch}
                         >
                             Save Changes
                         </Button>
@@ -244,7 +264,7 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
                             loading={loading}
                             loadingPosition="start"
                             disabled={isFormInvalid}
-                            onClick={handleAction}
+                            onClick={handlePost}
                         >
                             Add pest
                         </Button>
