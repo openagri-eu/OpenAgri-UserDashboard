@@ -8,11 +8,12 @@ import { EventClickArg, EventInput } from "@fullcalendar/core/index.js";
 import useDialog from "@hooks/useDialog";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import dayjs, { Dayjs } from "dayjs";
 import { IrrigationOperationModel } from "@models/IrrigationOperation";
+import DateRangeSelect from "@components/shared/DateRangeSelect/DateRangeSelect";
 
 interface ReportHelper {
     reportType: string;
@@ -142,8 +143,6 @@ const IrrigationOperationsReportPage = () => {
 
     const handleCloseDialog = () => {
         dialogProps.onClose();
-        setFromDate(null)
-        setToDate(null)
         setActiveEventInfo(null);
     };
 
@@ -152,6 +151,35 @@ const IrrigationOperationsReportPage = () => {
             <ParcelSelectionModule></ParcelSelectionModule>
             <ContentGuard condition={session?.farm_parcel}>
                 <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <Card variant="outlined">
+                        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Typography variant="body1">
+                                Select a date range and press the button to generate a report or interact with the calendar to create a date range
+                            </Typography>
+                            <DateRangeSelect
+                                fromDate={fromDate}
+                                setFromDate={setFromDate}
+                                toDate={toDate}
+                                setToDate={setToDate}>
+                            </DateRangeSelect>
+                            <Button
+                                loading={loadingReport}
+                                loadingPosition="start"
+                                onClick={
+                                    () => handleGenerateReport(
+                                        {
+                                            reportType: 'irrigation-report',
+                                            irrigationOperationID: activeEventInfo?.event.id.split(':')[3],
+                                            fromDate: fromDate?.format('YYYY-MM-DD'),
+                                            toDate: toDate?.format('YYYY-MM-DD')
+                                        })
+                                }
+                                disabled={!fromDate || !toDate}
+                                variant="contained">
+                                Generate report
+                            </Button>
+                        </CardContent>
+                    </Card>
                     <StyledFullCalendar
                         events={calendarEvents}
                         eventClick={
