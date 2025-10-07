@@ -159,6 +159,11 @@ const EditCalendarActivityPage = () => {
                                     getOptionLabel={item => `${item.identifier} (${item.category})`}
                                     getOptionValue={item => item["@id"].split(':')[3]}>
                                 </GenericSelect>
+                                {/* Hardcoded */}
+                                <TextField fullWidth type="number" margin="normal" label="Applied amount" name="appliedAmount" value="2.80"/>
+                                <TextField fullWidth margin="normal" label="Applied amount unit" name="appliedAmountUnit" value="L" />
+                                <TextField fullWidth margin="normal" label="Pesticide" name="pesticide" value="Ranman Top 160 SC - 160g cyazofamid/L - 0" />
+                                {/* Hardcoded */}
                             </Stack>
                         </CardContent>
                     </Card>
