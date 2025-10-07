@@ -2,7 +2,7 @@ import { useSession } from "@contexts/SessionContext";
 import { useState } from "react";
 
 interface FetchOptions {
-    method?: "GET" | "POST" | "PUT" | "DELETE";
+    method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
     headers?: Record<string, string>;
     body?: any;
     responseType?: 'json' | 'blob';
@@ -108,11 +108,11 @@ const useFetch = <FetchResponse = any>(
             if (currentOptions.responseType === 'blob') {
                 const blobResult = await response.blob();
                 setResponse(blobResult as FetchResponse);
-            } else if (response.status !== 204) { // Handle No Content response
+            } else if (response.status === 204) {
+                setResponse(true as FetchResponse);
+            } else {
                 const jsonResult: FetchResponse = await response.json();
                 setResponse(jsonResult);
-            } else {
-                setResponse(undefined);
             }
             setError(null);
         } catch (err) {
