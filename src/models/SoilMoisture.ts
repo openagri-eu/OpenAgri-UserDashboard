@@ -10,6 +10,8 @@ export interface DatasetRow {
     rain: number;
     temperature: number;
     humidity: number;
+
+    [key: string]: any; // Needed for chart
 };
 
 export interface SoilMoistureResponseJSONLD {
