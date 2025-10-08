@@ -2,15 +2,27 @@ import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/P
 import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
 import DateRangeSelect from "@components/shared/DateRangeSelect/DateRangeSelect";
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
-import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
 import { useSession } from "@contexts/SessionContext";
-import { EventContentArg, EventInput } from "@fullcalendar/core/index.js";
 import useFetch from "@hooks/useFetch";
+import { GDDModel } from "@models/GDD";
 import { PestModel, PestsResponseModel } from "@models/Pest";
-import { GDDModel } from "@models/GDD.jsonld";
-import { Box, Button, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Skeleton, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+
+interface FormattedGDDStage {
+    start: string;
+    end: string;
+    descriptor: string;
+    startDate: string;
+    endDate: string;
+}
+
+interface ProcessedGDDModel {
+    name: string;
+    description: string;
+    stages: FormattedGDDStage[];
+}
 
 const GrowingDegreeDaysPage = () => {
 
@@ -20,11 +32,12 @@ const GrowingDegreeDaysPage = () => {
     const [toDate, setToDate] = useState<Dayjs | null>(dayjs().subtract(2, 'days'));
     const [selectedPest, setSelectedPest] = useState<string>('');
 
-    const [_, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
+    const [loadingFormat, setLoadingFormat] = useState<boolean>(false);
 
+    const [formattedData, setFormattedData] = useState<ProcessedGDDModel[] | null>(null);
 
     const { fetchData, response, error, loading } = useFetch<GDDModel>(
-        `proxy/pdm/api/v1/model/${selectedPest}/gdd/?parcel_id=${session?.farm_parcel?.["@id"].split(":")[3]}&from_date=${fromDate?.format('YYYY-MM-DD')}&to_date=${toDate?.format('YYYY-MM-DD')}`,
+        `proxy/pdm/api/v1/model/${selectedPest}/gdd/?formatting=JSON&parcel_id=${session?.farm_parcel?.["@id"].split(":")[3]}&from_date=${fromDate?.format('YYYY-MM-DD')}&to_date=${toDate?.format('YYYY-MM-DD')}`,
         {
             method: 'GET',
         }
@@ -34,45 +47,47 @@ const GrowingDegreeDaysPage = () => {
         fetchData();
     };
 
-    const calendarEvents = useMemo(() => {
-        if (!Array.isArray(response?.["@graph"])) {
-            return [];
+    useEffect(() => {
+        if (!response || !Array.isArray(response.models) || response.models.length === 0) {
+            setFormattedData([]);
+            return;
         }
-        return response["@graph"][0][0].hasMember.map((event): EventInput => ({
-            id: event['@id'],
-            title: event.descriptor,
-            start: event.phenomenonTime,
-            display: 'list-item',
-            extendedProps: {
-                details: event.descriptor,
-            }
-        }));
+
+        setLoadingFormat(true);
+
+        const allProcessedModels = response.models.map(model => {
+            const gddPoints = model.gdd_points;
+            const gddValues = model.gdd_values;
+
+            const processedStages = gddPoints.map(point => {
+
+                const relevantValues = gddValues.filter(value =>
+                    value.accumulated_gdd >= point.start && value.accumulated_gdd <= point.end
+                );
+
+                const startDate = relevantValues.length > 0 ? relevantValues[0].date : 'N/A';
+                const endDate = relevantValues.length > 0 ? relevantValues[relevantValues.length - 1].date : 'N/A';
+
+                return {
+                    start: String(point.start),
+                    end: String(point.end),
+                    descriptor: point.descriptor,
+                    startDate: startDate,
+                    endDate: endDate,
+                };
+            });
+
+            return {
+                name: model.name,
+                description: model.description,
+                stages: processedStages,
+            };
+        });
+
+        setFormattedData(allProcessedModels);
+        setLoadingFormat(false);
+
     }, [response]);
-
-    const renderEventContent = (eventInfo: EventContentArg) => {
-        const { event, timeText } = eventInfo;
-        const description = event.extendedProps.description;
-
-        return (
-            <Tooltip
-                title={
-                    <>
-                        <Typography color="inherit" variant="subtitle1" component="div">
-                            <b>{event.title}</b>
-                        </Typography>
-                        {description && <Typography variant="body2">{description}</Typography>}
-                    </>
-                }
-                placement="top"
-                arrow
-            >
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <em>{timeText}</em>
-                    <span> {event.title}</span>
-                </div>
-            </Tooltip>
-        );
-    };
 
     return (
         <>
@@ -102,14 +117,41 @@ const GrowingDegreeDaysPage = () => {
                     >
                         Display GDD
                     </Button></Box>
-                    {calendarEvents && !error &&
-                        <StyledFullCalendar
-                            events={calendarEvents}
-                            onDateRangeChange={setDateRange}
-                            eventContent={renderEventContent}
-                            loading={loading}
-                        />
-                    }
+                    {(loading || loadingFormat) && <Skeleton variant="rectangular" height={48} />}
+                    <Box display={'flex'} flexDirection={'column'} gap={2} >
+                        {formattedData && !error && formattedData.map(model => {
+                            return <Card key={`id-${model.name}-${model.description}`}>
+                                <CardContent>
+                                    <Typography variant="h4">{model.name}</Typography>
+                                    <Typography gutterBottom variant="body1">{model.description}</Typography>
+                                    <Box display={'flex'} flexDirection={'column'} gap={2} overflow={'auto'}>
+                                        <Box display={'flex'} gap={2}>
+                                            <Box display={'flex'} flex={1}>Threshold (hours)</Box>
+                                            <Box display={'flex'} flex={1}>Dates</Box>
+                                            <Box display={'flex'} flex={1}>Stage</Box>
+                                        </Box>
+                                        {model.stages.map(stage => {
+                                            return <Box
+                                                key={`id-stage-${model.name}-${model.description}-${stage.startDate}-${stage.endDate}-${stage.descriptor}`}
+                                                display={'flex'}
+                                                gap={2}
+                                            >
+                                                <Box display={'flex'} flex={1}>
+                                                    <Typography fontWeight={'bold'}>{stage.start}-{stage.end}</Typography>
+                                                </Box>
+                                                <Box display={'flex'} flex={1}>
+                                                    {stage.startDate} - {stage.endDate}
+                                                </Box>
+                                                <Box display={'flex'} flex={1}>
+                                                    {stage.descriptor}
+                                                </Box>
+                                            </Box>
+                                        })}
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        })}
+                    </Box>
                 </Box>
             </ContentGuard>
         </>
