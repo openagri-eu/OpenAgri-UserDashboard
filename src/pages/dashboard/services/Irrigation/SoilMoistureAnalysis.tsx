@@ -108,6 +108,8 @@ const SoilMoistureAnalysisPage = () => {
                                 <Typography variant="body1">estimated dates: 25/6/2025, 30/8/2025</Typography>
                                 <Typography variant="h6">Precipitation events: 6</Typography>
                                 <Typography variant="body1">estimated dates: 7/6/2025, 8/6/2025, 13/7/2025-25/7/2025</Typography>
+                                <Typography variant="h6">High dose irrigation events: 1</Typography>
+                                <Typography variant="body1">estimated dates: 25/6/2025</Typography>
                                 <Typography variant="h6">Stress level events: 12</Typography>
                                 <Typography variant="body1">estimated dates: 26/5/2025-6/6/2025, 8/7/2025</Typography>
                                 {/* Hardcoded */}
