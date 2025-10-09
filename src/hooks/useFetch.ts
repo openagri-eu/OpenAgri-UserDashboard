@@ -29,7 +29,7 @@ const useFetch = <FetchResponse = any>(
         try {
             const getFetchOptions = (token: string | undefined) => {
                 let finalBody: BodyInit | null = null;
-                
+
                 if (currentOptions.body && currentOptions.method !== "GET" && currentOptions.method !== "DELETE") {
                     if (currentOptions.body instanceof FormData) {
                         finalBody = currentOptions.body;
@@ -104,12 +104,15 @@ const useFetch = <FetchResponse = any>(
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
             }
+            if (response.status === 202) {
+                setResponse('202' as FetchResponse);
 
-            if (currentOptions.responseType === 'blob') {
-                const blobResult = await response.blob();
-                setResponse(blobResult as FetchResponse);
             } else if (response.status === 204) {
                 setResponse(true as FetchResponse);
+            }
+            else if (currentOptions.responseType === 'blob') {
+                const blobResult = await response.blob();
+                setResponse(blobResult as FetchResponse);
             } else {
                 const jsonResult: FetchResponse = await response.json();
                 setResponse(jsonResult);
