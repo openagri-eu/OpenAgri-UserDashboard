@@ -14,7 +14,7 @@ import SessionContext, { Session } from '@contexts/SessionContext';
 import { Folder } from '@mui/icons-material';
 import FenceIcon from '@mui/icons-material/Fence';
 import MapIcon from '@mui/icons-material/Map';
-import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
+// import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
@@ -93,11 +93,11 @@ const NAVIGATION: Navigation = [
     kind: 'header',
     title: 'Irrigation management',
   },
-  {
-    segment: 'wkt-input',
-    title: 'WKT input',
-    icon: <AddLocationAltIcon />,
-  },
+  // {
+  //   segment: 'wkt-input',
+  //   title: 'WKT input',
+  //   icon: <AddLocationAltIcon />,
+  // },
   {
     segment: 'eto-calculator',
     title: 'ETo Calculator',
