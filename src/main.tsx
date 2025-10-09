@@ -11,7 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import DashLayout from './layouts/dashboard.tsx';
 import LandingPage from '@pages/dashboard/LandingPage/LandingPage.tsx';
 import FarmCalendarPage from '@pages/dashboard/services/FarmCalendar/FarmCalendar.tsx';
-import WKTInputPage from '@pages/dashboard/services/Irrigation/WKTInput.tsx';
+// import WKTInputPage from '@pages/dashboard/services/Irrigation/WKTInput.tsx';
 import GrowingDegreeDaysPage from '@pages/dashboard/services/PestAndDisease/GrowingDegreeDays.tsx';
 import CompostOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/CompostOperations.tsx';
 import AuthLayout from '@layouts/auth.tsx';
@@ -116,10 +116,10 @@ const router = createBrowserRouter([
           },
           // ]
           // },
-          {
-            path: 'wkt-input',
-            Component: WKTInputPage
-          },
+          // {
+          //   path: 'wkt-input',
+          //   Component: WKTInputPage
+          // },
           {
             path: 'eto-calculator',
             Component: EToCalculatorPage
