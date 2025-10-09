@@ -31,6 +31,8 @@ const IrrigationOperationsReportPage = () => {
     const [reportUUID, setReportUUID] = useState<string>('');
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
+    const [tries, setTries] = useState<number>(0);
+
     const [fromDate, setFromDate] = useState<Dayjs | null>(null);
     const [toDate, setToDate] = useState<Dayjs | null>(null);
 
@@ -53,7 +55,7 @@ const IrrigationOperationsReportPage = () => {
         }
     );
 
-    const { fetchData: fetchDataReport, response: responseReport, error: errorReport } = useFetch<any[]>(
+    const { fetchData: fetchDataReport, response: responseReport, error: errorReport } = useFetch<any[]>( // TODO: refactor status codes
         `proxy/reporting/api/v1/openagri-report/${reportUUID}/`,
         {
             method: 'GET',
@@ -76,8 +78,9 @@ const IrrigationOperationsReportPage = () => {
         if (reportUUID) {
             setLoadingReport(true);
             setTimeout(() => {
+                setTries(tries + 1);
                 fetchDataReport();
-            }, 2000);
+            }, 1000);
         }
     }, [reportUUID])
 
@@ -89,20 +92,34 @@ const IrrigationOperationsReportPage = () => {
     }, [responseGenerate])
 
     useEffect(() => {
-        if (responseReport instanceof Blob) {
-            setLoadingReport(false);
+        if (responseReport) {
+            if (responseReport instanceof Blob) {
+                setLoadingReport(false);
+                setTries(0);
 
-            const url = URL.createObjectURL(responseReport);
+                const url = URL.createObjectURL(responseReport);
 
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `report-${reportUUID}.pdf`;
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `report-${reportUUID}.pdf`;
 
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
-            URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
+            } else {
+                setTries(tries + 1);
+                if (tries > 3) {
+                    setLoadingReport(false);
+                    setTries(0);
+                    showSnackbar('error', 'Error generating report');
+                } else {
+                    setTimeout(() => {
+                        fetchDataReport();
+                    }, 5000);
+                }
+            }
         }
     }, [responseReport])
 

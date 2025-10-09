@@ -31,6 +31,8 @@ const CompostOperationsReportPage = () => {
     const [reportUUID, setReportUUID] = useState<string>('');
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
 
+    const [tries, setTries] = useState<number>(0);
+
     const [fromDate, setFromDate] = useState<Dayjs | null>(null);
     const [toDate, setToDate] = useState<Dayjs | null>(null);
 
@@ -77,7 +79,7 @@ const CompostOperationsReportPage = () => {
             setLoadingReport(true);
             setTimeout(() => {
                 fetchDataReport();
-            }, 1500);
+            }, 1000);
         }
     }, [reportUUID])
 
@@ -89,20 +91,34 @@ const CompostOperationsReportPage = () => {
     }, [responseGenerate])
 
     useEffect(() => {
-        if (responseReport instanceof Blob) {
-            setLoadingReport(false);
+        if (responseReport) {
+            if (responseReport instanceof Blob) {
+                setLoadingReport(false);
+                setTries(0);
 
-            const url = URL.createObjectURL(responseReport);
+                const url = URL.createObjectURL(responseReport);
 
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `report-${reportUUID}.pdf`;
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `report-${reportUUID}.pdf`;
 
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
-            URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
+            } else {
+                setTries(tries + 1);
+                if (tries > 3) {
+                    setLoadingReport(false);
+                    setTries(0);
+                    showSnackbar('error', 'Error generating report');
+                } else {
+                    setTimeout(() => {
+                        fetchDataReport();
+                    }, 5000);
+                }
+            }
         }
     }, [responseReport])
 
