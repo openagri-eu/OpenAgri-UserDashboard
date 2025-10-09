@@ -108,7 +108,7 @@ const useFetch = <FetchResponse = any>(
             if (currentOptions.responseType === 'blob') {
                 const blobResult = await response.blob();
                 setResponse(blobResult as FetchResponse);
-            } else if (response.status === 204) {
+            } else if (response.status === 204 || response.status === 202) {
                 setResponse(true as FetchResponse);
             } else {
                 const jsonResult: FetchResponse = await response.json();
