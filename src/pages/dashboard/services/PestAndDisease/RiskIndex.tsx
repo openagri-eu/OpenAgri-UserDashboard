@@ -21,10 +21,17 @@ interface FormattedRiskIndexData {
     [day: string]: DailyData
 }
 
-const riskLevelMapping: { [key: string]: number } = {
-    'low': 0,
-    'medium': 1,
-    'high': 2,
+const riskLevelMapping = (label: string): number => {
+    switch (label) {
+        case 'low':
+            return 0;
+        case 'moderate':
+            return 1;
+        case 'high':
+            return 2;
+        default:
+            return 0;
+    }
 };
 
 const riskLevelLabels = ['low', 'medium', 'high'];
@@ -78,6 +85,12 @@ const RiskIndexPage = () => {
         }
     }, [response]);
 
+    useEffect(() => {
+        if (formattedData) {
+            console.log(formattedData);
+        }
+    }, [formattedData])
+
     return (
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
@@ -111,7 +124,7 @@ const RiskIndexPage = () => {
                         <Box display={'flex'} flexDirection={'column'} gap={2}>
                             {Object.entries(formattedData).map(([date, dailyData]: [string, DailyData]) => {
                                 const numericalRiskData = dailyData.riskIndex?.map(
-                                    (status) => riskLevelMapping[status]
+                                    (status) => riskLevelMapping(status)
                                 ).filter(value => value !== undefined) as number[] || [];
                                 return <Card key={`id-date-${date}`}>
                                     <CardContent>
