@@ -24,13 +24,16 @@ const GenericSelect = <T, R = T[]>({
 
     const items = response && transformResponse ? transformResponse(response) : response || [];
 
+    const isValueValid = Array.isArray(items) && items.some(item => getOptionValue(item) === selectedValue);
+    const valueToRender = loading || !isValueValid ? '' : selectedValue;
+
     return (
         <Box flex={1}>
             <FormControl fullWidth>
                 <InputLabel id={`${label}-label`}>{label}</InputLabel>
                 <Select
                     labelId={`${label}-label`}
-                    value={selectedValue}
+                    value={valueToRender}
                     label={label}
                     disabled={loading}
                     onChange={handleChange}
