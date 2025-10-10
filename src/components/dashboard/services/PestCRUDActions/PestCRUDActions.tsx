@@ -231,7 +231,6 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
                             startIcon={<DeleteIcon />}
                             loading={loading}
                             loadingPosition="start"
-                            disabled={isFormInvalid}
                             onClick={() => {
                                 showDialog({
                                     title: `Are you sure you want to delete this pest?`,
@@ -240,7 +239,7 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction }) => 
                                 });
                             }}
                         >
-                            Delete pest
+                            Delete
                         </Button>
                         <Button
                             variant="contained"
