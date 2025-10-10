@@ -17,6 +17,7 @@ import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 
 const EditCalendarActivityPage = () => {
     const [activity, setActivity] = useState<FarmCalendarActivityModel>();
+    const [title, setTitle] = useState<string>('');
 
     const [selectedParcel, setSelectedParcel] = useState<string>('');
 
@@ -75,6 +76,7 @@ const EditCalendarActivityPage = () => {
     useEffect(() => {
         if (response) {
             setActivity(response);
+            setTitle(response.title);
             setSelectedParcel(response.hasAgriParcel["@id"].split(':')[3]);
         }
     }, [response])
@@ -135,7 +137,7 @@ const EditCalendarActivityPage = () => {
             {
                 !(loading && error) &&
                 <Box display={'flex'} flexDirection={'column'} gap={2}>
-                    <Typography variant={'h4'} >Edit {activity?.title}</Typography>
+                    <Typography variant={'h4'} >Edit {title}</Typography>
                     <Card>
                         <CardContent>
                             <Stack direction={'column'} spacing={2} >
@@ -185,7 +187,6 @@ const EditCalendarActivityPage = () => {
                             startIcon={<DeleteIcon />}
                             loading={loading}
                             loadingPosition="start"
-                            disabled={isFormInvalid}
                             onClick={() => {
                                 showDialog({
                                     title: `Are you sure you want to delete this activity?`,
@@ -194,7 +195,7 @@ const EditCalendarActivityPage = () => {
                                 });
                             }}
                         >
-                            Delete pest
+                            Delete
                         </Button>
                     </Box>
                 </Box>
