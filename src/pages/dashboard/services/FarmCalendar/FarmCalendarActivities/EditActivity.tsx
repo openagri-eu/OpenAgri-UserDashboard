@@ -108,7 +108,7 @@ const EditCalendarActivityPage = () => {
         });
     };
 
-    
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -135,7 +135,7 @@ const EditCalendarActivityPage = () => {
         <>
             {loading && <Skeleton variant="rectangular" height={48} />}
             {
-                !(loading && error) &&
+                !(loading || error) &&
                 <Box display={'flex'} flexDirection={'column'} gap={2}>
                     <Typography variant={'h4'} >Edit {title}</Typography>
                     <Card>
@@ -153,16 +153,16 @@ const EditCalendarActivityPage = () => {
                                     onChange={(newValue) => handleDateChange(newValue, 'hasEndDatetime')}
                                 />
                                 <TextField fullWidth margin="normal" multiline rows={4} label="Details" name="details" value={activity?.details ?? ''} onChange={handleChange} />
-                                <GenericSelect<FarmParcelModel, string>
+                                {activity && <GenericSelect<FarmParcelModel>
                                     endpoint='proxy/farmcalendar/api/v1/FarmParcels/?format=json'
                                     label='Has Parcel'
                                     selectedValue={selectedParcel}
                                     setSelectedValue={setSelectedParcel}
                                     getOptionLabel={item => `${item.identifier} (${item.category})`}
                                     getOptionValue={item => item["@id"].split(':')[3]}>
-                                </GenericSelect>
+                                </GenericSelect>}
                                 {/* Hardcoded */}
-                                <TextField fullWidth type="number" margin="normal" label="Applied amount" name="appliedAmount" value="2.80"/>
+                                <TextField fullWidth type="number" margin="normal" label="Applied amount" name="appliedAmount" value="2.80" />
                                 <TextField fullWidth margin="normal" label="Applied amount unit" name="appliedAmountUnit" value="L" />
                                 <TextField fullWidth margin="normal" label="Pesticide" name="pesticide" value="Ranman Top 160 SC - 160g cyazofamid/L - 0" />
                                 {/* Hardcoded */}

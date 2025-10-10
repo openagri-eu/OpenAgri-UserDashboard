@@ -1,7 +1,7 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
-import { Box, Button } from "@mui/material";
+// import { Box, Button } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { EventInput } from '@fullcalendar/core';
 import useFetch from "@hooks/useFetch";
@@ -61,9 +61,9 @@ const FarmCalendarPage = () => {
             <ParcelSelectionModule></ParcelSelectionModule>
             <ContentGuard condition={session?.farm_parcel}>
                 <>
-                    <Box sx={{ marginBottom: 2 }}>
+                    {/* <Box sx={{ marginBottom: 2 }}>
                         <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>
-                    </Box>
+                    </Box> */}
                     <StyledFullCalendar
                         events={calendarEvents}
                         eventClick={
