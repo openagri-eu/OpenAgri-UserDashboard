@@ -1,5 +1,6 @@
 export interface FarmCalendarActivityTypeModel {
-    id: string;
+    '@id': string;
+    '@type': string;
     description: string;
     name: string;
     category: string;
