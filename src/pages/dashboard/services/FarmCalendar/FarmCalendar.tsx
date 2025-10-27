@@ -1,7 +1,7 @@
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
-// import { Box, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { EventInput } from '@fullcalendar/core';
 import useFetch from "@hooks/useFetch";
@@ -11,11 +11,14 @@ import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/Sty
 import dayjs from "dayjs";
 import { useSession } from "@contexts/SessionContext";
 import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
+import { FarmCalendarActivityTypeModel } from "@models/FarmCalendarActivityType";
 
 const FarmCalendarPage = () => {
     const navigate = useNavigate();
 
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
+
+    const [activityTypes, setActivityTypes] = useState<FarmCalendarActivityTypeModel[]>([]);
 
     const { session } = useSession();
 
@@ -26,7 +29,30 @@ const FarmCalendarPage = () => {
         }
     );
 
+    const { fetchData: activityTypesFetchData, response: activityTypesResponse, error: activityTypesError } = useFetch<FarmCalendarActivityTypeModel[]>(
+        `proxy/farmcalendar/api/v1/FarmCalendarActivityTypes/?format=json`,
+        {
+            method: 'GET',
+        }
+    );
+
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
+
+    useEffect(() => {
+        activityTypesFetchData();
+    }, [])
+
+    useEffect(() => {
+        if (activityTypesResponse) {
+            setActivityTypes(activityTypesResponse);
+        }
+    }, [activityTypesResponse])
+
+    useEffect(() => {
+        if (activityTypesError) {
+            showSnackbar('error', 'Error loading activity types');
+        }
+    }, [activityTypesError])
 
     useEffect(() => {
         if (dateRange.start && dateRange.end && session?.farm_parcel) {
@@ -61,14 +87,15 @@ const FarmCalendarPage = () => {
             <ParcelSelectionModule></ParcelSelectionModule>
             <ContentGuard condition={session?.farm_parcel}>
                 <>
-                    {/* <Box sx={{ marginBottom: 2 }}>
+                    <Box sx={{ marginBottom: 2 }}>
                         <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>
-                    </Box> */}
+                    </Box>
                     <StyledFullCalendar
                         events={calendarEvents}
                         eventClick={
                             (info) => {
-                                navigate(`edit-activity/${info.event.id.split(":")[3]}`)
+                                const api = activityTypes.find(a => { return a["@id"].split(":")[3] === info.event.extendedProps.activityType["@id"].split(":")[3] })?.activity_endpoint
+                                navigate(`edit-activity/${info.event.id.split(":")[3]}`, { state: { api: api } })
                             }
                         }
                         onDateRangeChange={setDateRange}
