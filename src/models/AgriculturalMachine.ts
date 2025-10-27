@@ -1,8 +1,12 @@
 export interface AgriculturalMachine {
-    id: string;
+    "@id": string;
+    "@type": string;
     name: string;
     description: string;
-    hasAgriParcel: string;
+    hasAgriParcel: {
+        "@id": string;
+        "@type": string;
+    };
     purchase_date: string;
     manufacturer: string;
     model: string;
