@@ -264,7 +264,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
             <>
                 {'isOperatedOn' in formData && (
                     <TextField
-                        fullWidth margin="normal" label="Observed property"
+                        fullWidth margin="normal" label="Operated on compost pile"
                         name="isOperatedOn.@id"
                         value={operatedOnCompostPile}
                         onChange={handleOperatedOnCompostPile}
