@@ -21,6 +21,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const [selectedParcel, setSelectedParcel] = useState<string>('');
     const [selectedAgriCrop, setSelectedAgriCrop] = useState<string>('');
     const [selectedAgriMachines, setSelectedAgriMachines] = useState<string[]>([]);
+    const [operatedOnCompostPile, setOperatedOnCompostPile] = useState<string>('');
 
     useEffect(() => {
         let parcelID: string | undefined;
@@ -43,12 +44,21 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
             setSelectedAgriCrop(idParts[idParts.length - 1]);
         }
 
-        let agriMachinesIDs: string[] | undefined
+        let agriMachinesIDs: string[] | undefined;
         if ('usesAgriculturalMachinery' in formData) {
             agriMachinesIDs = (formData as any).usesAgriculturalMachinery.map((m: any) => { return m["@id"].split(':')[3] });
         }
         if (agriMachinesIDs) {
             setSelectedAgriMachines(agriMachinesIDs);
+        }
+
+        let operatedOnCompostPile: string | undefined;
+        if ('isOperatedOn' in formData) {
+            operatedOnCompostPile = (formData as any).isOperatedOn["@id"];
+        }
+        if (operatedOnCompostPile) {
+            const idParts = operatedOnCompostPile.split(':');
+            setOperatedOnCompostPile(idParts[idParts.length - 1]);
         }
     }, [formData]);
 
@@ -87,6 +97,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         const formattedValue = newValue ? newValue.toISOString() : null;
         setFormData(prev => ({ ...prev, [fieldName]: formattedValue } as T));
     };
+
+    const handleOperatedOnCompostPile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setOperatedOnCompostPile(e.target.value);
+    }
     /** Field change handlers end */
 
     /** -------------------------------------------------------------------------- */
@@ -245,17 +259,26 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         )
     }
 
-    const renderCompostOpSpecificFields = () => {
+    const renderOperatedOnCompostPile = () => {
         return (
-            <></>
+            <>
+                {'isOperatedOn' in formData && (
+                    <TextField
+                        fullWidth margin="normal" label="Observed property"
+                        name="isOperatedOn.@id"
+                        value={operatedOnCompostPile}
+                        onChange={handleOperatedOnCompostPile}
+                        error={!operatedOnCompostPile.trim()} />
+                )}
+            </>
         )
     }
     /** Field rendering helpers end */
 
     /** -------------------------------------------------------------------------- */
 
-    /** Button helper functions start */
-    const handlePost = () => {
+    /** Button handler functions start */
+    const prepPostAndPatch = () => {
         let body = { ...formData };
         if ('hasAgriParcel' in body) {
             (body.hasAgriParcel as { '@id': string })['@id'] = `urn:farmcalendar:Parcel:${selectedParcel}`;
@@ -268,22 +291,19 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         if ('usesAgriculturalMachinery' in body) {
             (body.usesAgriculturalMachinery as string[]) = selectedAgriMachines;
         }
-        onAdd && onAdd(body);
+        if ('isOperatedOn' in body) {
+            (body.isOperatedOn as { '@id': string })['@id'] = `urn:farmcalendar:CompostPile:${operatedOnCompostPile}`;
+        }
+        return body;
+    }
+
+    const handlePost = () => {
+        onAdd && onAdd(prepPostAndPatch());
     };
 
     const handlePatch = () => {
-        let body = { ...formData };
-        if ('hasAgriParcel' in body) {
-            (body.hasAgriParcel as { '@id': string })['@id'] = `urn:farmcalendar:Parcel:${selectedParcel}`;
-        } else if ('operatedOn' in body) {
-            (body.operatedOn as { '@id': string })['@id'] = `urn:farmcalendar:Parcel:${selectedParcel}`;
-        }
-        if ('hasAgriCrop' in body) {
-            (body.hasAgriCrop as { '@id': string })['@id'] = `urn:farmcalendar:FarmCrop:${selectedAgriCrop}`;
-        }
-        if ('usesAgriculturalMachinery' in body) {
-            (body.usesAgriculturalMachinery as string[]) = selectedAgriMachines;
-        }
+        const body = prepPostAndPatch();
+
         console.log(body);
 
         onSave && onSave(body);
@@ -292,7 +312,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const handleDelete = () => {
         onDelete && onDelete();
     };
-    /** Button helper functions end */
+    /** Button handler functions end */
 
     return (
         <>
@@ -322,7 +342,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         {renderSensorResultAndObservedProperty()}
                         {renderSelectedCrop()}
                         {renderHasArea()}
-                        {renderCompostOpSpecificFields()}
+                        {renderOperatedOnCompostPile()}
                     </Stack>
                 </CardContent>
             </Card>
