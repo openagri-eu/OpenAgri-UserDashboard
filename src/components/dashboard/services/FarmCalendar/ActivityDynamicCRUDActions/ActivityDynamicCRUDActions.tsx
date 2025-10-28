@@ -1,6 +1,6 @@
 import { BaseActivityModel } from "@models/FarmCalendarActivities";
-import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions";
-import { Box, Button, Card, CardContent, Stack, TextField } from "@mui/material";
+import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions.types";
+import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
@@ -273,6 +273,37 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
             </>
         )
     }
+
+    const renderNestedActivities = () => {
+        // TODO: finish
+        const nestedActivities = [];
+        if ('hasMeasurement' in formData) {
+            nestedActivities.push(...(formData.hasMeasurement as any));
+        }
+        if ('hasNestedOperation' in formData) {
+            nestedActivities.push(...(formData.hasNestedOperation as any));
+        }
+        return (
+            <>
+                {nestedActivities.length &&
+                    <Card>
+                        <CardContent>
+                            <Typography variant="h6">Nested activities</Typography>
+                            <List dense={nestedActivities.length > 10}>
+                                {nestedActivities.map((n: any) => {
+                                    return <ListItem key={n["@id"]}>
+                                        <ListItemText
+                                            primary={n["@id"]}
+                                        />
+                                    </ListItem>
+                                })}
+                            </List>
+                        </CardContent>
+                    </Card>
+                }
+            </>
+        )
+    }
     /** Field rendering helpers end */
 
     /** -------------------------------------------------------------------------- */
@@ -343,6 +374,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         {renderSelectedCrop()}
                         {renderHasArea()}
                         {renderOperatedOnCompostPile()}
+                        {renderNestedActivities()}
                     </Stack>
                 </CardContent>
             </Card>
