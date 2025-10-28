@@ -14,6 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import useDialog from "@hooks/useDialog";
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import { AgriculturalMachine } from "@models/AgriculturalMachine";
+import { PesticideModel } from "@models/Pesticide";
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
 
@@ -22,6 +23,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const [selectedAgriCrop, setSelectedAgriCrop] = useState<string>('');
     const [selectedAgriMachines, setSelectedAgriMachines] = useState<string[]>([]);
     const [operatedOnCompostPile, setOperatedOnCompostPile] = useState<string>('');
+    const [selectedPesticide, setSelectedPesticide] = useState<string>('');
 
     useEffect(() => {
         let parcelID: string | undefined;
@@ -59,6 +61,15 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         if (operatedOnCompostPile) {
             const idParts = operatedOnCompostPile.split(':');
             setOperatedOnCompostPile(idParts[idParts.length - 1]);
+        }
+
+        let pesticideID: string | undefined;
+        if ('usesPesticide' in formData) {
+            pesticideID = (formData as any).usesPesticide["@id"];
+        }
+        if (pesticideID) {
+            const idParts = pesticideID.split(':');
+            setSelectedPesticide(idParts[idParts.length - 1]);
         }
     }, [formData]);
 
@@ -274,6 +285,53 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         )
     }
 
+    const renderAppliedAmount = () => {
+        type AppliedAmountShape = { unit: string, numericValue: number };
+
+        return (
+            <>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                    {'hasAppliedAmount' in formData && (
+                        <TextField
+                            fullWidth label="Applied amount"
+                            name="hasAppliedAmount.numericValue"
+                            type="number"
+                            value={isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue']) ?
+                                '' : (formData.hasAppliedAmount as AppliedAmountShape)["numericValue"]}
+                            onChange={handleChange}
+                            error={isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue'])} />
+                    )}
+                    {'hasAppliedAmount' in formData && (
+                        <TextField
+                            fullWidth margin="normal" label="Applied amount unit"
+                            name="hasAppliedAmount.unit"
+                            value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
+                            onChange={handleChange}
+                            error={!(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()} />
+                    )}
+                </Stack>
+            </>
+        )
+    }
+
+    const renderPesticide = () => {
+        // TODO: filter if parcel is selected
+        return (
+            <>
+                {'usesPesticide' in formData && (
+                    <GenericSelect<PesticideModel>
+                        endpoint='proxy/farmcalendar/api/v1/Pesticides/?format=json'
+                        label='Pesticide'
+                        selectedValue={selectedPesticide}
+                        setSelectedValue={setSelectedPesticide}
+                        getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasPreharvestInterval}`}
+                        getOptionValue={item => item["@id"].split(':')[3]}
+                    />
+                )}
+            </>
+        )
+    }
+
     const renderNestedActivities = () => {
         // TODO: finish
         const nestedActivities = [];
@@ -325,6 +383,9 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         if ('isOperatedOn' in body) {
             (body.isOperatedOn as { '@id': string })['@id'] = `urn:farmcalendar:CompostPile:${operatedOnCompostPile}`;
         }
+        if ('usesPesticide' in body) {
+            (body.usesPesticide as { '@id': string })['@id'] = `urn:farmcalendar:Pesticide:${selectedPesticide}`;
+        }
         return body;
     }
 
@@ -374,6 +435,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         {renderSelectedCrop()}
                         {renderHasArea()}
                         {renderOperatedOnCompostPile()}
+                        {renderAppliedAmount()}
+                        {renderPesticide()}
                         {renderNestedActivities()}
                     </Stack>
                 </CardContent>
