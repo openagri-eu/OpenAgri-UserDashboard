@@ -285,7 +285,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         }
         return (
             <>
-                {nestedActivities.length &&
+                {nestedActivities.length > 0 &&
                     <Card>
                         <CardContent>
                             <Typography variant="h6">Nested activities</Typography>
