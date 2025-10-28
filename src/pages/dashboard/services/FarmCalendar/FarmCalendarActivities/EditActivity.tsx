@@ -23,7 +23,7 @@ import {
     VigorEstimationModel,
     YieldPredictionModel
 } from '@models/FarmCalendarActivities';
-import ActivityDynamicCRUDActions from "@components/dashboard/services/FarmCalendar/ActivityDynamicCRUDActions/ActivityDynamicCRUDActions.types";
+import ActivityDynamicCRUDActions from "@components/dashboard/services/FarmCalendar/ActivityDynamicCRUDActions/ActivityDynamicCRUDActions";
 
 const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
     'AddRawMaterialOperation': (props) => <ActivityDynamicCRUDActions<AddRawMaterialOperationModel> {...props} />,
