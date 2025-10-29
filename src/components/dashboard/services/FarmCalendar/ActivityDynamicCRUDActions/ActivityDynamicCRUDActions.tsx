@@ -1,6 +1,6 @@
-import { BaseActivityModel } from "@models/FarmCalendarActivities";
+import { AddRawMaterialOperationModel, BaseActivityModel } from "@models/FarmCalendarActivities";
 import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions.types";
-import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
@@ -16,6 +16,8 @@ import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import { AgriculturalMachine } from "@models/AgriculturalMachine";
 import { PesticideModel } from "@models/Pesticide";
 import { FertilizerModel } from "@models/Fertilizer";
+
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
 
@@ -123,6 +125,73 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const handleOperatedOnCompostPile = (e: React.ChangeEvent<HTMLInputElement>) => {
         setOperatedOnCompostPile(e.target.value);
     }
+
+    const handleAddCompostMaterial = () => {
+        setFormData(prev => {
+            if (!prev || !('hasCompostMaterial' in prev)) return prev;
+
+            const newState = JSON.parse(JSON.stringify(prev)) as T & AddRawMaterialOperationModel;
+            const newMaterial = {
+                "@id": Date.now().toString(),
+                "@type": '',
+                typeName: '',
+                quantityValue: {
+                    "@id": '',
+                    "@type": '',
+                    unit: '',
+                    numericValue: 0
+                }
+            };
+            newState.hasCompostMaterial.push(newMaterial);
+
+            return newState;
+        });
+    };
+
+    const handleRemoveCompostMaterial = (itemId: string) => () => {
+        setFormData(prev => {
+            if (!prev || !('hasCompostMaterial' in prev)) return prev;
+
+            const newState = JSON.parse(JSON.stringify(prev)) as T & AddRawMaterialOperationModel;
+            newState.hasCompostMaterial = newState.hasCompostMaterial.filter(mat => mat['@id'] !== itemId);
+
+            return newState;
+        });
+    };
+
+    const handleCompostMaterialChange = (itemId: string) =>
+        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+            const { name, value } = e.target;
+            const keys = name.split('.');
+
+            setFormData(prev => {
+                if (!prev || !('hasCompostMaterial' in prev)) return prev;
+
+                const newState = JSON.parse(JSON.stringify(prev)) as T & AddRawMaterialOperationModel;
+
+                const materialToUpdate = newState.hasCompostMaterial.find(mat => mat['@id'] === itemId);
+                if (!materialToUpdate) return prev;
+
+                let currentLevel: any = materialToUpdate;
+                try {
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        currentLevel = currentLevel[keys[i]];
+                    }
+
+                    const finalKey = keys[keys.length - 1];
+
+                    const isNumeric = typeof currentLevel[finalKey] === 'number';
+                    currentLevel[finalKey] = isNumeric ? parseFloat(value) || 0 : value;
+
+                } catch (error) {
+                    console.error(`Error setting nested property "${name}" on item ${itemId}:`, error);
+                    return prev;
+                }
+
+                return newState;
+            });
+        };
     /** Field change handlers end */
 
     /** -------------------------------------------------------------------------- */
@@ -216,24 +285,22 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         onChange={handleChange}
                         error={!(formData.madeBySensor as SensorShape).name?.trim()} />
                 )}
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                    {'hasResult' in formData && (
+                {'hasResult' in formData && (
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                         <TextField
                             fullWidth margin="normal" label="Value"
                             name="hasResult.hasValue"
                             value={(formData.hasResult as ResultShape).hasValue ?? ''}
                             onChange={handleChange}
                             error={!(formData.hasResult as ResultShape).hasValue?.trim()} />
-                    )}
-                    {'hasResult' in formData && (
                         <TextField
                             fullWidth margin="normal" label="Value unit"
                             name="hasResult.unit"
                             value={(formData.hasResult as ResultShape).unit ?? ''}
                             onChange={handleChange}
                             error={!(formData.hasResult as ResultShape).unit?.trim()} />
-                    )}
-                </Stack>
+                    </Stack>
+                )}
                 {'observedProperty' in formData && (
                     <TextField
                         fullWidth margin="normal" label="Observed property"
@@ -316,8 +383,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
 
         return (
             <>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                    {'hasAppliedAmount' in formData && (
+                {'hasAppliedAmount' in formData && (
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                         <TextField
                             fullWidth label="Applied amount"
                             name="hasAppliedAmount.numericValue"
@@ -326,16 +393,14 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                                 '' : (formData.hasAppliedAmount as AppliedAmountShape)["numericValue"]}
                             onChange={handleChange}
                             error={isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue'])} />
-                    )}
-                    {'hasAppliedAmount' in formData && (
                         <TextField
                             fullWidth margin="normal" label="Applied amount unit"
                             name="hasAppliedAmount.unit"
                             value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
                             onChange={handleChange}
                             error={!(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()} />
-                    )}
-                </Stack>
+                    </Stack>
+                )}
             </>
         )
     }
@@ -371,6 +436,60 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasNutrientConcentration}`}
                         getOptionValue={item => item["@id"].split(':')[3]}
                     />
+                )}
+            </>
+        )
+    }
+
+    const renderCompostMaterials = () => {
+        return (
+            <>
+                {'hasCompostMaterial' in formData && (
+                    <Box display={'flex'} flexDirection={'column'} gap={2}>
+                        <Typography variant="h6">Compost materials</Typography>
+                        {(formData.hasCompostMaterial as AddRawMaterialOperationModel['hasCompostMaterial']).map((compMat) => {
+                            return (
+                                <Card key={`compMat-${compMat["@id"]}`} /*sx={{ backgroundColor: theme.palette.background.default }}*/>
+                                    <CardContent>
+                                        <Stack display={'flex'} direction={{ sm: 'column', md: 'row' }} gap={2}>
+                                            <Box display={'flex'} gap={2} minWidth={"60%"}>
+                                                <TextField fullWidth label="Material name"
+                                                    name="typeName"
+                                                    value={compMat.typeName ?? ''}
+                                                    onChange={handleCompostMaterialChange(compMat["@id"])}
+                                                    error={!compMat.typeName?.trim()} />
+                                                <TextField fullWidth label="Quantity"
+                                                    name="quantityValue.numericValue"
+                                                    type="number"
+                                                    value={isNaN(compMat.quantityValue.numericValue) ? '' : compMat.quantityValue.numericValue}
+                                                    onChange={handleCompostMaterialChange(compMat["@id"])}
+                                                    error={isNaN(compMat.quantityValue.numericValue)} />
+                                            </Box>
+                                            <Box display={'flex'} gap={2} flex={1} minWidth={200}>
+                                                <TextField fullWidth label="Unit"
+                                                    name="quantityValue.unit"
+                                                    value={compMat.quantityValue.unit ?? ''}
+                                                    onChange={handleCompostMaterialChange(compMat["@id"])}
+                                                    error={!compMat.quantityValue.unit?.trim()} />
+                                                <IconButton aria-label="remove"
+                                                    onClick={handleRemoveCompostMaterial(compMat["@id"])}>
+                                                    <RemoveCircleOutlineIcon />
+                                                </IconButton>
+                                            </Box>
+                                        </Stack>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                            <Button variant="outlined"
+                                startIcon={<AddIcon />}
+                                onClick={handleAddCompostMaterial}
+                            >
+                                Add compost material
+                            </Button>
+                        </Box>
+                    </Box>
                 )}
             </>
         )
@@ -486,6 +605,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         {renderApplicationMethod()}
                         {renderPesticide()}
                         {renderFertilizer()}
+                        {renderCompostMaterials()}
                         {renderNestedActivities()}
                     </Stack>
                 </CardContent>
