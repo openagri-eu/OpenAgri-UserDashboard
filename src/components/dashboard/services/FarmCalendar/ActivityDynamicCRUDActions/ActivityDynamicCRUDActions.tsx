@@ -168,7 +168,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         name="responsibleAgent"
                         value={formData.responsibleAgent ?? ''}
                         onChange={handleChange}
-                        error={!(formData.responsibleAgent as string).trim()} />
+                        error={!(formData.responsibleAgent ? formData.responsibleAgent as string : '').trim()} />
                 )}
                 {'usesAgriculturalMachinery' in formData && (
                     <GenericSelect<AgriculturalMachine>
@@ -280,6 +280,21 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         value={operatedOnCompostPile}
                         onChange={handleOperatedOnCompostPile}
                         error={!operatedOnCompostPile.trim()} />
+                )}
+            </>
+        )
+    }
+
+    const renderApplicationMethod = () => {
+        return (
+            <>
+                {'hasApplicationMethod' in formData && (
+                    <TextField
+                        fullWidth margin="normal" label="Application method"
+                        name="hasApplicationMethod"
+                        value={formData.hasApplicationMethod}
+                        onChange={handleChange}
+                        error={!(formData.hasApplicationMethod as string).trim()} />
                 )}
             </>
         )
@@ -436,6 +451,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         {renderHasArea()}
                         {renderOperatedOnCompostPile()}
                         {renderAppliedAmount()}
+                        {renderApplicationMethod()}
                         {renderPesticide()}
                         {renderNestedActivities()}
                     </Stack>
