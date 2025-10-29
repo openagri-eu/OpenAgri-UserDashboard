@@ -15,6 +15,7 @@ import useDialog from "@hooks/useDialog";
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import { AgriculturalMachine } from "@models/AgriculturalMachine";
 import { PesticideModel } from "@models/Pesticide";
+import { FertilizerModel } from "@models/Fertilizer";
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
 
@@ -24,6 +25,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const [selectedAgriMachines, setSelectedAgriMachines] = useState<string[]>([]);
     const [operatedOnCompostPile, setOperatedOnCompostPile] = useState<string>('');
     const [selectedPesticide, setSelectedPesticide] = useState<string>('');
+    const [selectedFertilizer, setSelectedFertilizer] = useState<string>('');
 
     useEffect(() => {
         let parcelID: string | undefined;
@@ -70,6 +72,15 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         if (pesticideID) {
             const idParts = pesticideID.split(':');
             setSelectedPesticide(idParts[idParts.length - 1]);
+        }
+
+        let fertilizerID: string | undefined;
+        if ('usesFertilizer' in formData) {
+            fertilizerID = (formData as any).usesFertilizer["@id"];
+        }
+        if (fertilizerID) {
+            const idParts = fertilizerID.split(':');
+            setSelectedFertilizer(idParts[idParts.length - 1]);
         }
     }, [formData]);
 
@@ -347,6 +358,24 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         )
     }
 
+    const renderFertilizer = () => {
+        // TODO: filter if parcel is selected
+        return (
+            <>
+                {'usesFertilizer' in formData && (
+                    <GenericSelect<FertilizerModel>
+                        endpoint='proxy/farmcalendar/api/v1/Fertilizers/?format=json'
+                        label='Fertilizer'
+                        selectedValue={selectedFertilizer}
+                        setSelectedValue={setSelectedFertilizer}
+                        getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasNutrientConcentration}`}
+                        getOptionValue={item => item["@id"].split(':')[3]}
+                    />
+                )}
+            </>
+        )
+    }
+
     const renderNestedActivities = () => {
         // TODO: finish
         const nestedActivities = [];
@@ -401,6 +430,9 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         if ('usesPesticide' in body) {
             (body.usesPesticide as { '@id': string })['@id'] = `urn:farmcalendar:Pesticide:${selectedPesticide}`;
         }
+        if ('usesFertilizer' in body) {
+            (body.usesFertilizer as { '@id': string })['@id'] = `urn:farmcalendar:Fertilizer:${selectedFertilizer}`;
+        }
         return body;
     }
 
@@ -453,6 +485,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         {renderAppliedAmount()}
                         {renderApplicationMethod()}
                         {renderPesticide()}
+                        {renderFertilizer()}
                         {renderNestedActivities()}
                     </Stack>
                 </CardContent>
