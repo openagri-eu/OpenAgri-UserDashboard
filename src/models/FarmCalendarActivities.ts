@@ -16,6 +16,10 @@ export interface AddRawMaterialOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     responsibleAgent: string | null;
     usesAgriculturalMachinery: {
         "@id": string;
@@ -46,6 +50,10 @@ export interface CompostOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     isOperatedOn: {
         "@id": string;
         "@type": string;
@@ -67,6 +75,10 @@ export interface CompostTurningOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     responsibleAgent: string | null;
     usesAgriculturalMachinery: {
         "@id": string;
@@ -86,6 +98,10 @@ export interface CropGrowthStageObservationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasAgriCrop: {
         "@id": string;
         "@type": string;
@@ -107,6 +123,10 @@ export interface CropProtectionOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     }[];
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasAppliedAmount: {
         "@id": string;
         "@type": string;
@@ -135,6 +155,10 @@ export interface CropStressIndicatorObservationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasAgriCrop: {
         "@id": string;
         "@type": string;
@@ -160,6 +184,10 @@ export interface DiseaseDetectionModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasArea: string;
     hasResult: {
         "@id": string;
@@ -178,6 +206,10 @@ export interface FertilizationOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     }[];
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasAppliedAmount: {
         "@id": string;
         "@type": string;
@@ -202,6 +234,10 @@ export interface GenericActivityModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     responsibleAgent: string | null;
     usesAgriculturalMachinery: {
         "@id": string;
@@ -222,7 +258,7 @@ export interface GenericAlertModel extends BaseActivityModel {
     relatedObservation: {
         "@id": string;
         "@type": string;
-    };
+    } | null;
 }
 
 export interface GenericObservationModel extends BaseActivityModel {
@@ -232,6 +268,10 @@ export interface GenericObservationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     madeBySensor: {
         "@id": string;
         "@type": string;
@@ -254,6 +294,10 @@ export interface IrrigationOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     }[];
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasAppliedAmount: {
         "@id": string;
         "@type": string;
@@ -279,6 +323,10 @@ export interface SprayingRecommendationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasArea: string;
     hasResult: {
         "@id": string;
@@ -305,6 +353,10 @@ export interface VigorEstimationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasArea: string;
     hasResult: {
         "@id": string;
@@ -327,6 +379,10 @@ export interface YieldPredictionModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
     hasArea: string;
     hasResult: {
         "@id": string;
