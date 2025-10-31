@@ -547,6 +547,9 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
             (body.operatedOn as { '@id': string })['@id'] = `urn:farmcalendar:Parcel:${selectedParcel}`;
         }
         if ('isPartOfActivity' in body) {
+            if (!body.isPartOfActivity) {
+                body.isPartOfActivity = { '@id': '', '@type': 'FarmCalendarActivity' }
+            }
             if (parentActivity) {
                 (body.isPartOfActivity as { '@id': string })['@id'] = `urn:farmcalendar:FarmCalendarActivity:${parentActivity}`;
             } else {
