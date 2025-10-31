@@ -127,6 +127,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     }, [responseAllActivities])
     /** All calendar activities section end */
 
+    /** -------------------------------------------------------------------------- */
 
     /** Field change handlers start */
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
