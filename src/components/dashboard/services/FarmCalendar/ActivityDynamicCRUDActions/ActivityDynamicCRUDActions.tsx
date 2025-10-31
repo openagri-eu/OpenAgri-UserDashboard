@@ -18,6 +18,7 @@ import { PesticideModel } from "@models/Pesticide";
 import { FertilizerModel } from "@models/Fertilizer";
 
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
 
@@ -28,6 +29,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const [operatedOnCompostPile, setOperatedOnCompostPile] = useState<string>('');
     const [selectedPesticide, setSelectedPesticide] = useState<string>('');
     const [selectedFertilizer, setSelectedFertilizer] = useState<string>('');
+    const [parentActivity, setParentActivity] = useState<string>('');
 
     useEffect(() => {
         let parcelID: string | undefined;
@@ -39,6 +41,19 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         if (parcelID) {
             const idParts = parcelID.split(':');
             setSelectedParcel(idParts[idParts.length - 1]);
+        }
+
+        let parentActivityID: string | undefined;
+        if ('isPartOfActivity' in formData) {
+            if (formData.isPartOfActivity)
+                parentActivityID = (formData as any).isPartOfActivity["@id"];
+        } else if ('relatedObservation' in formData) {
+            if (formData.relatedObservation)
+                parentActivityID = (formData as any).relatedObservation["@id"];
+        }
+        if (parentActivityID) {
+            const idParts = parentActivityID.split(':');
+            setParentActivity(idParts[idParts.length - 1]);
         }
 
         let cropID: string | undefined;
@@ -262,12 +277,6 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                     />
                 )}
             </>
-        )
-    }
-
-    const renderPartOfX = () => {
-        return (
-            <></>
         )
     }
 
@@ -537,6 +546,19 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
         } else if ('operatedOn' in body) {
             (body.operatedOn as { '@id': string })['@id'] = `urn:farmcalendar:Parcel:${selectedParcel}`;
         }
+        if ('isPartOfActivity' in body) {
+            if (parentActivity) {
+                (body.isPartOfActivity as { '@id': string })['@id'] = `urn:farmcalendar:FarmCalendarActivity:${parentActivity}`;
+            } else {
+                body.isPartOfActivity = null;
+            }
+        } else if ('relatedObservation' in body) {
+            if (parentActivity) {
+                (body.relatedObservation as { '@id': string })['@id'] = `urn:farmcalendar:FarmCalendarActivity:${parentActivity}`;
+            } else {
+                body.relatedObservation = null;
+            }
+        }
         if ('hasAgriCrop' in body) {
             (body.hasAgriCrop as { '@id': string })['@id'] = `urn:farmcalendar:FarmCrop:${selectedAgriCrop}`;
         }
@@ -596,7 +618,22 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                             getOptionLabel={item => `${item.identifier} (${item.category})`}
                             getOptionValue={item => item["@id"].split(':')[3]}
                         />
-                        {renderPartOfX()}
+                        <GenericSelect<FarmCalendarActivityModel>
+                            endpoint='proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json'
+                            label='Part of activity'
+                            // Filtering out the current activity to avoid recursive links
+                            transformResponse={resp => {
+                                return resp.filter(fa => {
+                                    return fa["@id"].split(':')[3] !== formData["@id"].split(':')[3]
+                                })
+                            }}
+                            selectedValue={parentActivity}
+                            setSelectedValue={setParentActivity}
+                            getOptionLabel={
+                                item => `${item.title} (${dayjs(item.hasStartDatetime).format('YYYY-MM-DD HH:mm')} - ${dayjs(item.hasEndDatetime).format('YYYY-MM-DD HH:mm')})`
+                            }
+                            getOptionValue={item => item["@id"].split(':')[3]}
+                        />
                         {renderSensorResultAndObservedProperty()}
                         {renderSelectedCrop()}
                         {renderHasArea()}
