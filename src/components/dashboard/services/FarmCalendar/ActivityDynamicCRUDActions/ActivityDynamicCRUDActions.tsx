@@ -125,7 +125,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
             setAllActivities(responseAllActivities);
         }
     }, [responseAllActivities])
-    /** All calendar activities section start */
+    /** All calendar activities section end */
 
 
     /** Field change handlers start */
