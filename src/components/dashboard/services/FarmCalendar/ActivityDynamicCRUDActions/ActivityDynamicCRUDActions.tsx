@@ -32,6 +32,23 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const [selectedFertilizer, setSelectedFertilizer] = useState<string>('');
     const [parentActivity, setParentActivity] = useState<string>('');
 
+    /** All calendar activities section start */
+    const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
+
+    const { fetchData: fetchDataAllActivities, response: responseAllActivities } = useFetch<FarmCalendarActivityModel[]>(
+        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json`,
+        {
+            method: 'GET',
+        }
+    );
+
+    useEffect(() => {
+        if (responseAllActivities) {
+            setAllActivities(responseAllActivities);
+        }
+    }, [responseAllActivities])
+    /** All calendar activities section end */
+
     useEffect(() => {
         fetchDataAllActivities();
 
@@ -109,23 +126,6 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const handleCloseDialog = () => {
         dialogProps.onClose();
     };
-
-    /** All calendar activities section start */
-    const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
-
-    const { fetchData: fetchDataAllActivities, response: responseAllActivities } = useFetch<FarmCalendarActivityModel[]>(
-        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json`,
-        {
-            method: 'GET',
-        }
-    );
-
-    useEffect(() => {
-        if (responseAllActivities) {
-            setAllActivities(responseAllActivities);
-        }
-    }, [responseAllActivities])
-    /** All calendar activities section end */
 
     /** -------------------------------------------------------------------------- */
 
