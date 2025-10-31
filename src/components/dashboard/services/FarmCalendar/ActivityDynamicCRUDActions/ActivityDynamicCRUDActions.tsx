@@ -19,6 +19,7 @@ import { FertilizerModel } from "@models/Fertilizer";
 
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
+import useFetch from "@hooks/useFetch";
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
 
@@ -32,6 +33,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     const [parentActivity, setParentActivity] = useState<string>('');
 
     useEffect(() => {
+        fetchDataAllActivities();
+
         let parcelID: string | undefined;
         if ('hasAgriParcel' in formData) {
             parcelID = (formData as any).hasAgriParcel["@id"];
@@ -99,13 +102,31 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
             const idParts = fertilizerID.split(':');
             setSelectedFertilizer(idParts[idParts.length - 1]);
         }
-    }, [formData]);
+    }, []);
 
     const { dialogProps, showDialog } = useDialog();
 
     const handleCloseDialog = () => {
         dialogProps.onClose();
     };
+
+    /** All calendar activities section start */
+    const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
+
+    const { fetchData: fetchDataAllActivities, response: responseAllActivities } = useFetch<FarmCalendarActivityModel[]>(
+        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json`,
+        {
+            method: 'GET',
+        }
+    );
+
+    useEffect(() => {
+        if (responseAllActivities) {
+            setAllActivities(responseAllActivities);
+        }
+    }, [responseAllActivities])
+    /** All calendar activities section start */
+
 
     /** Field change handlers start */
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -623,7 +644,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                         />
                         {/* NTH: string filtering of the displayed activities */}
                         <GenericSelect<FarmCalendarActivityModel>
-                            endpoint='proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json'
+                            endpoint=''
+                            data={allActivities}
                             label='Part of activity'
                             // Filtering out the current activity to avoid recursive links
                             transformResponse={resp => {
