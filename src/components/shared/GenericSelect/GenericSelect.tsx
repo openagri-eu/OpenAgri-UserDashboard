@@ -11,6 +11,7 @@ const GenericSelect = <T, R = T[]>({
     selectedValue,
     setSelectedValue,
     transformResponse,
+    data = undefined,
     multiple = false,
 }: GenericSelectProps<T, R>) => {
     const { fetchData, response, loading } = useFetch<R>(endpoint, { method: 'GET' });
@@ -21,12 +22,13 @@ const GenericSelect = <T, R = T[]>({
     };
 
     useEffect(() => {
-        fetchData();
+        if (!data) fetchData();
     }, []);
 
-    const items = useMemo(() =>
-        response && transformResponse ? transformResponse(response) : (response || []) as T[]
-        , [response, transformResponse]);
+    const items = useMemo(() => {
+        const dataToUse = data ? data : response;
+        return dataToUse && transformResponse ? transformResponse(dataToUse) : (dataToUse || []) as T[]
+    }, [data, response, transformResponse]);
 
     const valueToRender = useMemo(() => {
         if (loading) {

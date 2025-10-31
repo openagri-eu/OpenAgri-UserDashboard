@@ -1,5 +1,6 @@
 interface GenericSelectPropsBase<T, R = T[]> {
     endpoint: string;
+    data?: R;
     label: string;
     getOptionLabel: (item: T) => string;
     getOptionValue: (item: T) => string;
