@@ -323,7 +323,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     }
 
     const renderSelectedCrop = () => {
-        // TODO: filter if parcel is selected
+        // NTH: filter if parcel is selected
         return (
             <>
                 {'hasAgriCrop' in formData && (
@@ -415,7 +415,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     }
 
     const renderPesticide = () => {
-        // TODO: filter if parcel is selected
+        // NTH: filter if parcel is selected
         return (
             <>
                 {'usesPesticide' in formData && (
@@ -433,7 +433,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     }
 
     const renderFertilizer = () => {
-        // TODO: filter if parcel is selected
+        // NTH: filter if parcel is selected
         return (
             <>
                 {'usesFertilizer' in formData && (
@@ -618,6 +618,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                             getOptionLabel={item => `${item.identifier} (${item.category})`}
                             getOptionValue={item => item["@id"].split(':')[3]}
                         />
+                        {/* NTH: string filtering of the displayed activities */}
                         <GenericSelect<FarmCalendarActivityModel>
                             endpoint='proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json'
                             label='Part of activity'
