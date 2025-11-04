@@ -1,6 +1,6 @@
 import { AddRawMaterialOperationModel, BaseActivityModel } from "@models/FarmCalendarActivities";
 import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions.types";
-import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemButton, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
@@ -20,8 +20,10 @@ import { FertilizerModel } from "@models/Fertilizer";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 import useFetch from "@hooks/useFetch";
+import { useNavigate } from "react-router-dom";
 
-const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
+const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, activityTypes, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState<T>(activity);
     const [selectedParcel, setSelectedParcel] = useState<string>('');
@@ -527,13 +529,33 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
     }
 
     const renderNestedActivities = () => {
-        // TODO: finish
-        const nestedActivities = [];
+        let nestedActivities = [];
         if ('hasMeasurement' in formData) {
             nestedActivities.push(...(formData.hasMeasurement as any));
         }
         if ('hasNestedOperation' in formData) {
             nestedActivities.push(...(formData.hasNestedOperation as any));
+        }
+        if (nestedActivities.length && allActivities.length) {
+            const allActivitiesWithEndpoints = allActivities.map(a => {
+                return {
+                    ...a,
+                    activity_endpoint: activityTypes.find(at => at["@id"].split(':')[3] === a.activityType["@id"].split(':')[3])?.activity_endpoint
+                }
+            })
+
+            nestedActivities = nestedActivities.map(na => {
+                const naID = na["@id"].split(':')[3];
+                const additionalParams = allActivitiesWithEndpoints.find(a => a["@id"].split(':')[3] === naID);
+
+                return {
+                    ...na,
+                    title: additionalParams?.title,
+                    hasStartDatetime: additionalParams?.hasStartDatetime,
+                    hasEndDatetime: additionalParams?.hasEndDatetime,
+                    activity_endpoint: additionalParams?.activity_endpoint
+                }
+            })
         }
         return (
             <>
@@ -543,10 +565,15 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, onA
                             <Typography variant="h6">Nested activities</Typography>
                             <List dense={nestedActivities.length > 10}>
                                 {nestedActivities.map((n: any) => {
-                                    return <ListItem key={n["@id"]}>
-                                        <ListItemText
-                                            primary={n["@id"]}
-                                        />
+                                    return <ListItem key={`nested-activity-${n["@id"]}`} disablePadding>
+                                        <ListItemButton onClick={() => {
+                                            navigate(`/farm-calendar/edit-activity/${n["@id"].split(":")[3]}`, { state: { api: n.activity_endpoint, activityTypes: activityTypes } })
+
+                                        }}>
+                                            <ListItemText
+                                                primary={`${n.title} (${dayjs(n.hasStartDatetime).format('YYYY-MM-DD HH:mm')} - ${dayjs(n.hasEndDatetime).format('YYYY-MM-DD HH:mm')})`}
+                                            />
+                                        </ListItemButton>
                                     </ListItem>
                                 })}
                             </List>

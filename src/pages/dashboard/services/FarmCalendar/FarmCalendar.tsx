@@ -95,7 +95,7 @@ const FarmCalendarPage = () => {
                         eventClick={
                             (info) => {
                                 const api = activityTypes.find(a => { return a["@id"].split(":")[3] === info.event.extendedProps.activityType["@id"].split(":")[3] })?.activity_endpoint
-                                navigate(`edit-activity/${info.event.id.split(":")[3]}`, { state: { api: api } })
+                                navigate(`edit-activity/${info.event.id.split(":")[3]}`, { state: { api: api, activityTypes: activityTypes } })
                             }
                         }
                         onDateRangeChange={setDateRange}

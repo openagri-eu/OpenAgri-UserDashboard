@@ -24,6 +24,7 @@ import {
     YieldPredictionModel
 } from '@models/FarmCalendarActivities';
 import ActivityDynamicCRUDActions from "@components/dashboard/services/FarmCalendar/ActivityDynamicCRUDActions/ActivityDynamicCRUDActions";
+import { FarmCalendarActivityTypeModel } from "@models/FarmCalendarActivityType";
 
 const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
     'AddRawMaterialOperation': (props) => <ActivityDynamicCRUDActions<AddRawMaterialOperationModel> {...props} />,
@@ -45,6 +46,7 @@ const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
 
 interface LocationState {
     api: string | undefined;
+    activityTypes: FarmCalendarActivityTypeModel[] | undefined;
 }
 
 const EditCalendarActivityPage = () => {
@@ -57,6 +59,7 @@ const EditCalendarActivityPage = () => {
 
     const state = location.state as LocationState;
     const api = state?.api;
+    const activityTypes = state?.activityTypes;
 
     const { fetchData, loading, response, error } = useFetch<any>(
         api ? `proxy/farmcalendar${api}${id}/?format=json` : '',
@@ -127,6 +130,7 @@ const EditCalendarActivityPage = () => {
         return (
             <FormComponent
                 activity={activityData}
+                activityTypes={activityTypes}
                 onSave={handlePatch}
                 onDelete={handleDelete}
                 loading={isMutating}
