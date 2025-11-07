@@ -346,6 +346,26 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         )
     }
 
+    const renderSeverity = () => {
+        return (
+            <>
+                {'severity' in formData && (
+                    <div>severity WIP</div>
+                )}
+            </>
+        )
+    }
+
+    const renderUsesIrrigationSystem = () => {
+        return (
+            <>
+                {'usesIrrigationSystem' in formData && (
+                    <div>irrigation system WIP</div>
+                )}
+            </>
+        )
+    }
+
     const renderSelectedCrop = () => {
         // NTH: filter if parcel is selected
         return (
@@ -688,11 +708,13 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             }
                             getOptionValue={item => item["@id"].split(':')[3]}
                         />
+                        {renderSeverity()}
                         {renderSensorResultAndObservedProperty()}
                         {renderSelectedCrop()}
                         {renderHasArea()}
                         {renderOperatedOnCompostPile()}
                         {renderAppliedAmount()}
+                        {renderUsesIrrigationSystem()}
                         {renderApplicationMethod()}
                         {renderPesticide()}
                         {renderFertilizer()}
