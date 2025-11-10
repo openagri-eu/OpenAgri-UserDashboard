@@ -16,27 +16,28 @@ import {
     VigorEstimationModel,
     YieldPredictionModel
 } from '@models/FarmCalendarActivities';
+import dayjs from 'dayjs';
 
-const getEmptyBaseActivity = (): BaseActivityModel => ({
+const getEmptyBaseActivity = (id: string): BaseActivityModel => ({
     "@id": "",
     "@type": "",
     activityType: {
-        "@id": "",
-        "@type": ""
+        "@id": `urn:farmcalendar:FarmCalendarActivityType:${id}`,
+        "@type": "FarmCalendarActivityType"
     },
     title: "",
     details: ""
 });
 
 
-const getEmptyAddRawMaterialOperation = (): AddRawMaterialOperationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyAddRawMaterialOperation = (id: string): AddRawMaterialOperationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "AddRawMaterialOperation",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     operatedOn: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     responsibleAgent: null,
@@ -44,45 +45,45 @@ const getEmptyAddRawMaterialOperation = (): AddRawMaterialOperationModel => ({
     hasCompostMaterial: []
 });
 
-const getEmptyCompostOperation = (): CompostOperationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyCompostOperation = (id: string): CompostOperationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "CompostOperation",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     responsibleAgent: null,
     usesAgriculturalMachinery: [],
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     isOperatedOn: {
         "@id": "",
-        "@type": ""
+        "@type": "CompostPile"
     },
     hasNestedOperation: [],
     hasMeasurement: []
 });
 
-const getEmptyCompostTurningOperation = (): CompostTurningOperationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyCompostTurningOperation = (id: string): CompostTurningOperationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "CompostTurningOperation",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     operatedOn: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     responsibleAgent: null,
     usesAgriculturalMachinery: []
 });
 
-const getEmptyCropGrowthStageObservation = (): CropGrowthStageObservationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyCropGrowthStageObservation = (id: string): CropGrowthStageObservationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "CropGrowthStageObservation",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     madeBySensor: {
         "@id": "",
         "@type": "",
@@ -90,12 +91,12 @@ const getEmptyCropGrowthStageObservation = (): CropGrowthStageObservationModel =
     },
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     hasAgriCrop: {
         "@id": "",
-        "@type": ""
+        "@type": "FarmCrop"
     },
     hasResult: {
         "@id": "",
@@ -106,11 +107,11 @@ const getEmptyCropGrowthStageObservation = (): CropGrowthStageObservationModel =
     observedProperty: ""
 });
 
-const getEmptyCropProtectionOperation = (): CropProtectionOperationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyCropProtectionOperation = (id: string): CropProtectionOperationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "CropProtectionOperation",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     responsibleAgent: null,
     usesAgriculturalMachinery: [],
     isPartOfActivity: null,
@@ -122,19 +123,19 @@ const getEmptyCropProtectionOperation = (): CropProtectionOperationModel => ({
     },
     usesPesticide: {
         "@id": "",
-        "@type": ""
+        "@type": "Pesticide"
     },
     operatedOn: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     }
 });
 
-const getEmptyCropStressIndicatorObservation = (): CropStressIndicatorObservationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyCropStressIndicatorObservation = (id: string): CropStressIndicatorObservationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "CropStressIndicatorObservation",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     madeBySensor: {
         "@id": "",
         "@type": "",
@@ -142,12 +143,12 @@ const getEmptyCropStressIndicatorObservation = (): CropStressIndicatorObservatio
     },
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     hasAgriCrop: {
         "@id": "",
-        "@type": ""
+        "@type": "FarmCrop"
     },
     hasResult: {
         "@id": "",
@@ -158,11 +159,11 @@ const getEmptyCropStressIndicatorObservation = (): CropStressIndicatorObservatio
     observedProperty: ""
 });
 
-const getEmptyDiseaseDetection = (): DiseaseDetectionModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyDiseaseDetection = (id: string): DiseaseDetectionModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "DiseaseDetection",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     madeBySensor: {
         "@id": "",
         "@type": "",
@@ -170,7 +171,7 @@ const getEmptyDiseaseDetection = (): DiseaseDetectionModel => ({
     },
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     hasArea: "",
@@ -183,11 +184,11 @@ const getEmptyDiseaseDetection = (): DiseaseDetectionModel => ({
     observedProperty: ""
 });
 
-const getEmptyFertilizationOperation = (): FertilizationOperationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyFertilizationOperation = (id: string): FertilizationOperationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "FertilizationOperation",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     responsibleAgent: null,
     usesAgriculturalMachinery: [],
     isPartOfActivity: null,
@@ -200,51 +201,51 @@ const getEmptyFertilizationOperation = (): FertilizationOperationModel => ({
     hasApplicationMethod: "",
     usesFertilizer: {
         "@id": "",
-        "@type": ""
+        "@type": "Fertilizer"
     },
     operatedOn: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     }
 });
 
-const getEmptyGenericActivity = (): GenericActivityModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyGenericActivity = (id: string): GenericActivityModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "FarmCalendarActivity",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     responsibleAgent: null,
     usesAgriculturalMachinery: []
 });
 
-const getEmptyGenericAlert = (): GenericAlertModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyGenericAlert = (id: string): GenericAlertModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "Alert",
     severity: "",
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
-    validFrom: "",
-    validTo: "",
+    validFrom: dayjs().toISOString(),
+    validTo: dayjs().toISOString(),
     dateIssued: "",
     quantityValue: {},
     relatedObservation: null
 });
 
-const getEmptyGenericObservation = (): GenericObservationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyGenericObservation = (id: string): GenericObservationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "Observation",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     madeBySensor: {
@@ -261,11 +262,11 @@ const getEmptyGenericObservation = (): GenericObservationModel => ({
     observedProperty: ""
 });
 
-const getEmptyIrrigationOperation = (): IrrigationOperationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyIrrigationOperation = (id: string): IrrigationOperationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "IrrigationOperation",
-    hasStartDatetime: "",
-    hasEndDatetime: "",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     responsibleAgent: null,
     usesAgriculturalMachinery: [],
     isPartOfActivity: null,
@@ -278,15 +279,15 @@ const getEmptyIrrigationOperation = (): IrrigationOperationModel => ({
     usesIrrigationSystem: "",
     operatedOn: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     }
 });
 
-const getEmptySprayingRecommendation = (): SprayingRecommendationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptySprayingRecommendation = (id: string): SprayingRecommendationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "SprayingRecommendation",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     madeBySensor: {
         "@id": "",
         "@type": "",
@@ -294,7 +295,7 @@ const getEmptySprayingRecommendation = (): SprayingRecommendationModel => ({
     },
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     hasArea: "",
@@ -307,15 +308,15 @@ const getEmptySprayingRecommendation = (): SprayingRecommendationModel => ({
     observedProperty: "",
     usesPesticide: {
         "@id": "",
-        "@type": ""
+        "@type": "Pesticide"
     }
 });
 
-const getEmptyVigorEstimation = (): VigorEstimationModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyVigorEstimation = (id: string): VigorEstimationModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "VigorEstimation",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     madeBySensor: {
         "@id": "",
         "@type": "",
@@ -323,7 +324,7 @@ const getEmptyVigorEstimation = (): VigorEstimationModel => ({
     },
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     hasArea: "",
@@ -336,11 +337,11 @@ const getEmptyVigorEstimation = (): VigorEstimationModel => ({
     observedProperty: ""
 });
 
-const getEmptyYieldPrediction = (): YieldPredictionModel => ({
-    ...getEmptyBaseActivity(),
+const getEmptyYieldPrediction = (id: string): YieldPredictionModel => ({
+    ...getEmptyBaseActivity(id),
     "@type": "YieldPrediction",
-    phenomenonTime: "",
-    hasEndDatetime: "",
+    phenomenonTime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
     madeBySensor: {
         "@id": "",
         "@type": "",
@@ -348,7 +349,7 @@ const getEmptyYieldPrediction = (): YieldPredictionModel => ({
     },
     hasAgriParcel: {
         "@id": "",
-        "@type": ""
+        "@type": "Parcel"
     },
     isPartOfActivity: null,
     hasArea: "",
@@ -362,7 +363,7 @@ const getEmptyYieldPrediction = (): YieldPredictionModel => ({
 });
 
 
-export const activityModelFactory: Record<string, () => BaseActivityModel> = {
+export const activityModelFactory: Record<string, (id: string) => BaseActivityModel> = {
     "/api/v1/YieldPrediction/": getEmptyYieldPrediction,
     "/api/v1/VigorEstimation/": getEmptyVigorEstimation,
     "/api/v1/Observations/": getEmptyGenericObservation,

@@ -22,7 +22,10 @@ import { Box, Typography } from "@mui/material";
 import { activityModelFactory } from "@utils/activityModelFactory";
 import { useEffect, useState } from "react";
 import ActivityDynamicCRUDActions from "@components/dashboard/services/FarmCalendar/ActivityDynamicCRUDActions/ActivityDynamicCRUDActions";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import useFetch from "@hooks/useFetch";
+import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
+import useSnackbar from "@hooks/useSnackbar";
 
 const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
     'AddRawMaterialOperation': (props) => <ActivityDynamicCRUDActions<AddRawMaterialOperationModel> {...props} />,
@@ -47,22 +50,34 @@ interface LocationState {
 
 const RegisterCalendarActivityPage = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
     const state = location.state as LocationState;
     const activityTypes = state?.activityTypes;
 
     const [selectedActivityType, setSelectedActivityType] = useState<string>('');
+    const [api, setAPI] = useState<string>('');
 
     const [activityData, setActivityData] = useState<BaseActivityModel | null>(null);
 
+    const { fetchData, loading, response, error } = useFetch<any>(
+        api ? `proxy/farmcalendar${api}` : '',
+        { method: 'POST' }
+    );
+
     useEffect(() => {
         if (selectedActivityType) {
-            const getEmptyModel = activityModelFactory[selectedActivityType];
+            const selectedActivityTypeObject = activityTypes?.find(at => at["@id"] === selectedActivityType);
+            const api = selectedActivityTypeObject?.activity_endpoint ?? '';
+            setAPI(api);
 
-            if (getEmptyModel) {
-                setActivityData(getEmptyModel());
+            const getEmptyModel = activityModelFactory[api];
+
+            if (getEmptyModel && selectedActivityTypeObject) {
+                setActivityData(getEmptyModel(selectedActivityTypeObject["@id"].split(':')[3]));
             } else {
-                console.warn(`No empty model factory found for endpoint: ${selectedActivityType}`);
+                console.warn(`No empty model factory found for endpoint: ${api}`);
                 setActivityData(null);
             }
         } else {
@@ -72,7 +87,19 @@ const RegisterCalendarActivityPage = () => {
 
     const handlePost = (activityToSave: BaseActivityModel) => {
         console.log({ body: activityToSave });
+        fetchData({ body: activityToSave })
     };
+
+    useEffect(() => {
+        if (error) showSnackbar('error', 'Error adding activity');
+    }, [error]);
+
+    useEffect(() => {
+        if (response) {
+            showSnackbar('success', 'Activity updated successfully.');
+            navigate("/farm-calendar");
+        }
+    }, [response]);
 
     const renderForm = () => {
         if (!activityData) return null;
@@ -89,7 +116,7 @@ const RegisterCalendarActivityPage = () => {
                 activity={activityData}
                 activityTypes={activityTypes}
                 onAdd={handlePost}
-            // loading={loading}
+                loading={loading}
             />
         );
     };
@@ -106,11 +133,17 @@ const RegisterCalendarActivityPage = () => {
                     selectedValue={selectedActivityType}
                     setSelectedValue={setSelectedActivityType}
                     getOptionLabel={item => `${item.name}`}
-                    getOptionValue={item => item.activity_endpoint}
+                    getOptionValue={item => item["@id"]}
                 />
 
                 {activityData && renderForm()}
             </Box>
+            <GenericSnackbar
+                type={snackbarState.type}
+                message={snackbarState.message}
+                open={snackbarState.open}
+                onClose={closeSnackbar}
+            />
         </>
     )
 }
