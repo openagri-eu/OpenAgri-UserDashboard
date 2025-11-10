@@ -88,7 +88,7 @@ const FarmCalendarPage = () => {
             <ContentGuard condition={session?.farm_parcel}>
                 <>
                     <Box sx={{ marginBottom: 2 }}>
-                        <Button onClick={() => navigate('register-activity')} variant="contained">Register new calendar activity</Button>
+                        <Button onClick={() => navigate('register-activity', { state: { activityTypes: activityTypes } })} variant="contained">Register new calendar activity</Button>
                     </Box>
                     <StyledFullCalendar
                         events={calendarEvents}
