@@ -625,8 +625,11 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 body.isPartOfActivity = null;
             }
         } else if ('relatedObservation' in body) {
+            if (!body.relatedObservation) {
+                body.relatedObservation = { '@id': '', '@type': 'Observation' }
+            }
             if (parentActivity) {
-                (body.relatedObservation as { '@id': string })['@id'] = `urn:farmcalendar:FarmCalendarActivity:${parentActivity}`;
+                (body.relatedObservation as { '@id': string })['@id'] = `urn:farmcalendar:Observation:${parentActivity}`;
             } else {
                 body.relatedObservation = null;
             }
