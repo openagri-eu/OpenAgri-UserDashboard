@@ -2,7 +2,7 @@ import { useSession } from "@contexts/SessionContext";
 import { useState } from "react";
 
 interface FetchOptions {
-    method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS";
     headers?: Record<string, string>;
     body?: any;
     responseType?: 'json' | 'blob';

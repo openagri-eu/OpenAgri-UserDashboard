@@ -6,6 +6,7 @@ import useFetch from '@hooks/useFetch';
 const GenericSelect = <T, R = T[]>({
     endpoint,
     label,
+    method = "GET",
     getOptionLabel,
     getOptionValue,
     selectedValue,
@@ -14,7 +15,7 @@ const GenericSelect = <T, R = T[]>({
     data = undefined,
     multiple = false,
 }: GenericSelectProps<T, R>) => {
-    const { fetchData, response, loading } = useFetch<R>(endpoint, { method: 'GET' });
+    const { fetchData, response, loading } = useFetch<R>(endpoint, { method: method });
 
     const handleChange = (event: SelectChangeEvent<any>) => {
         const { target: { value } } = event;

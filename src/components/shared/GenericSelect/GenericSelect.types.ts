@@ -2,6 +2,7 @@ interface GenericSelectPropsBase<T, R = T[]> {
     endpoint: string;
     data?: R;
     label: string;
+    method?: "GET" | "OPTIONS";
     getOptionLabel: (item: T) => string;
     getOptionValue: (item: T) => string;
     transformResponse?: (response: R) => T[];
