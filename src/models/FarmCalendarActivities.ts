@@ -261,6 +261,19 @@ export interface GenericAlertModel extends BaseActivityModel {
     } | null;
 }
 
+export interface GenericAlertOptions {
+    actions: {
+        POST: {
+            severity: {
+                choices: {
+                    value: string,
+                    display_name: string
+                }[]
+            }
+        }
+    }
+}
+
 export interface GenericObservationModel extends BaseActivityModel {
     phenomenonTime: string;
     hasEndDatetime: string;
@@ -309,6 +322,19 @@ export interface IrrigationOperationModel extends BaseActivityModel {
         "@id": string;
         "@type": string;
     };
+}
+
+export interface IrrigationOperationOptions {
+    actions: {
+        POST: {
+            usesIrrigationSystem: {
+                choices: {
+                    value: string,
+                    display_name: string
+                }[]
+            }
+        }
+    }
 }
 
 export interface SprayingRecommendationModel extends BaseActivityModel {

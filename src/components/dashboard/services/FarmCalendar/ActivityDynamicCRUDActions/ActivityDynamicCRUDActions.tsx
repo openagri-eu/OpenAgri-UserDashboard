@@ -1,4 +1,4 @@
-import { AddRawMaterialOperationModel, BaseActivityModel } from "@models/FarmCalendarActivities";
+import { AddRawMaterialOperationModel, BaseActivityModel, GenericAlertOptions, IrrigationOperationOptions } from "@models/FarmCalendarActivities";
 import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions.types";
 import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemButton, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
@@ -33,6 +33,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
     const [selectedPesticide, setSelectedPesticide] = useState<string>('');
     const [selectedFertilizer, setSelectedFertilizer] = useState<string>('');
     const [parentActivity, setParentActivity] = useState<string>('');
+    const [severity, setSeverity] = useState<string>('');
+    const [usesIrrigationSystem, setUsesIrrigationSystem] = useState<string>('');
 
     /** All calendar activities section start */
     const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
@@ -120,6 +122,22 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         if (fertilizerID) {
             const idParts = fertilizerID.split(':');
             setSelectedFertilizer(idParts[idParts.length - 1]);
+        }
+
+        let severity: string | undefined;
+        if ('severity' in formData) {
+            severity = (formData as any).severity;
+        }
+        if (severity) {
+            setSeverity(severity);
+        }
+
+        let usesIrrigationSystem: string | undefined;
+        if ('usesIrrigationSystem' in formData) {
+            usesIrrigationSystem = (formData as any).usesIrrigationSystem;
+        }
+        if (usesIrrigationSystem) {
+            setUsesIrrigationSystem(usesIrrigationSystem);
         }
     }, []);
 
@@ -350,7 +368,16 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         return (
             <>
                 {'severity' in formData && (
-                    <div>severity WIP</div>
+                    <GenericSelect<GenericAlertOptions['actions']['POST']['severity']['choices'][number], GenericAlertOptions>
+                        endpoint='proxy/farmcalendar/api/v1/Alerts/?format=json'
+                        method="OPTIONS"
+                        label='Severity'
+                        selectedValue={severity}
+                        setSelectedValue={setSeverity}
+                        transformResponse={a => a.actions.POST.severity.choices}
+                        getOptionLabel={item => item.display_name}
+                        getOptionValue={item => item.value}
+                    />
                 )}
             </>
         )
@@ -360,7 +387,16 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         return (
             <>
                 {'usesIrrigationSystem' in formData && (
-                    <div>irrigation system WIP</div>
+                    <GenericSelect<IrrigationOperationOptions['actions']['POST']['usesIrrigationSystem']['choices'][number], IrrigationOperationOptions>
+                        endpoint='proxy/farmcalendar/api/v1/IrrigationOperations/?format=json'
+                        method="OPTIONS"
+                        label='Irrigation system'
+                        selectedValue={usesIrrigationSystem}
+                        setSelectedValue={setUsesIrrigationSystem}
+                        transformResponse={a => a.actions.POST.usesIrrigationSystem.choices}
+                        getOptionLabel={item => item.display_name}
+                        getOptionValue={item => item.value}
+                    />
                 )}
             </>
         )
@@ -648,6 +684,16 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         }
         if ('usesFertilizer' in body) {
             (body.usesFertilizer as { '@id': string })['@id'] = `urn:farmcalendar:Fertilizer:${selectedFertilizer}`;
+        }
+        if ('severity' in body) {
+            body.severity = severity;
+        }
+        // Necessary for generic alerts as they have this field set to null
+        if ('quantityValue' in body && !body.quantityValue) {
+            body.quantityValue = {};
+        }
+        if ('usesIrrigationSystem' in body) {
+            body.usesIrrigationSystem = usesIrrigationSystem;
         }
         return body;
     }
