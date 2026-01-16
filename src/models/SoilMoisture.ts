@@ -16,7 +16,10 @@ export interface DatasetRow {
 
 export interface DatasetResponse {
     data_points: DatasetRow[];
-    high_dose_irrigation_days: string[]
+    high_dose_irrigation_days: string[];
+    field_capacity: number;
+    stress_level: number;
+    wilting_point: number;
 }
 
 export interface SoilMoistureResponseJSONLD {

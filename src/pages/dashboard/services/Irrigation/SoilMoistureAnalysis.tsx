@@ -3,8 +3,7 @@ import {
     Chart,
     Series,
     Title,
-    Tooltip,
-    YAxis
+    Tooltip
 } from '@highcharts/react';
 import * as Highcharts from 'highcharts';
 
@@ -33,12 +32,14 @@ const SoilMoistureAnalysisPage = () => {
         }
     }, [selectedDataset])
 
-    const { seriesData, highDoseDays } = useMemo(() => {
+    const { seriesData, highDoseDays, horizontalPlotLines } = useMemo(() => {
         if (!datapointsResponse || datapointsResponse.data_points.length === 0) {
-            return { seriesData: [], highDoseDays: [] };
+            return { seriesData: [], highDoseDays: [], horizontalPlotLines: [] };
         }
 
-        const { data_points, high_dose_irrigation_days } = datapointsResponse;
+        const { data_points, high_dose_irrigation_days, field_capacity, stress_level, wilting_point } = datapointsResponse;
+
+        console.log(field_capacity, stress_level, wilting_point);
 
         const soilMoistureKeys = ['soil_moisture_10', 'soil_moisture_20', 'soil_moisture_30', 'soil_moisture_40', 'soil_moisture_50', 'soil_moisture_60'];
 
@@ -60,6 +61,28 @@ const SoilMoistureAnalysisPage = () => {
             };
         });
 
+        const thresholds = [
+            { value: field_capacity * 100, label: 'Field capacity' },
+            { value: stress_level * 100, label: 'Stress level' },
+            { value: wilting_point * 100, label: 'Wilting point' }
+        ];
+
+        const preparedThresholdLines = thresholds.map((t) => {
+            const plotLine: Highcharts.YAxisPlotLinesOptions = {
+                value: t.value,
+                color: 'black',
+                dashStyle: 'Solid',
+                width: 2,
+                zIndex: 3,
+                label: {
+                    text: t.label
+                }
+            }
+            return plotLine;
+        });
+
+        console.log(preparedThresholdLines);
+
         const preparedhighDoseDays = high_dose_irrigation_days.map((dateStr) => {
             const timestamp = dayjs.utc(dateStr).valueOf();
 
@@ -73,7 +96,7 @@ const SoilMoistureAnalysisPage = () => {
             return plotLineProps;
         });
 
-        return { seriesData: preparedSeriesData, highDoseDays: preparedhighDoseDays };
+        return { seriesData: preparedSeriesData, highDoseDays: preparedhighDoseDays, horizontalPlotLines: preparedThresholdLines };
 
     }, [datapointsResponse]);
 
@@ -103,7 +126,15 @@ const SoilMoistureAnalysisPage = () => {
                             {datapointsLoading && <Skeleton variant="rectangular" width={'100%'} height={400} />}
 
                             {chartReady && (
-                                <Chart options={{ chart: { backgroundColor: 'transparent' }, xAxis: { type: 'datetime', plotLines: highDoseDays } }}>
+                                <Chart options={
+                                    {
+                                        chart:
+                                        {
+                                            backgroundColor: 'transparent'
+                                        },
+                                        xAxis: { type: 'datetime', plotLines: highDoseDays },
+                                        yAxis: { title: { text: 'Soil Moisture (%)' }, plotLines: horizontalPlotLines },
+                                    }}>
                                     <Title>Soil Moisture Analysis and Irrigation Events</Title>
                                     {seriesData.map(series => (
                                         <Series
@@ -116,7 +147,6 @@ const SoilMoistureAnalysisPage = () => {
                                         />
                                     ))}
 
-                                    <YAxis title={{ text: 'Soil Moisture (%)' }} />
                                     <Tooltip
                                         shared={true}
                                         valueSuffix='%'
@@ -138,13 +168,27 @@ const SoilMoistureAnalysisPage = () => {
                     <Card variant="outlined">
                         <CardContent>
                             <Box display={'flex'} flexDirection={'column'} gap={2}>
-                                <Typography variant="h6">High dose irrigation days: {highDoseDays.length}</Typography>
-                                <Typography variant="body1">
-                                    Estimated dates:&nbsp;
-                                    {highDoseDays.map((d, index) => {
-                                        return dayjs(d.value).format('dddd MMM D') + `${(index < highDoseDays.length - 1) ? ', ' : ''}`
-                                    })}
-                                </Typography>
+                                <Box display={'flex'} flexDirection={'column'} gap={1}>
+                                    <Typography variant="h6">Thresholds:</Typography>
+                                    <Typography variant="body1">
+                                        Field capacity: {Math.round(Number(horizontalPlotLines[0].value))}%
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        Stress level: {Math.round(Number(horizontalPlotLines[1].value))}%
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        Wilting point: {Math.round(Number(horizontalPlotLines[2].value))}%
+                                    </Typography>
+                                </Box>
+                                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                                    <Typography variant="h6">High dose irrigation days: {highDoseDays.length}</Typography>
+                                    <Typography variant="body1">
+                                        Estimated dates:&nbsp;
+                                        {highDoseDays.map((d, index) => {
+                                            return dayjs(d.value).format('dddd MMM D') + `${(index < highDoseDays.length - 1) ? ', ' : ''}`
+                                        })}
+                                    </Typography>
+                                </Box>
                             </Box>
                         </CardContent>
                     </Card>
