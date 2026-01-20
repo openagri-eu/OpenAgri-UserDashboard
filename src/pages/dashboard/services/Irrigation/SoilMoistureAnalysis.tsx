@@ -18,9 +18,10 @@ dayjs.extend(utc);
 
 const SoilMoistureAnalysisPage = () => {
     const [selectedDataset, setSelectedDataset] = useState<string>('');
+    const [selectedSoil, setSelectedSoil] = useState<string>('');
 
     const { fetchData: datapointsFetchData, loading: datapointsLoading, response: datapointsResponse } = useFetch<DatasetResponse>(
-        `proxy/irrigation/api/v1/dataset/${selectedDataset}/irrigation-datapoints/?formatting=JSON`,
+        `proxy/irrigation/api/v1/dataset/${selectedDataset}/irrigation-datapoints/?formatting=JSON${selectedSoil && '&soil=' + selectedSoil}`,
         {
             method: 'GET'
         }
@@ -31,6 +32,14 @@ const SoilMoistureAnalysisPage = () => {
             datapointsFetchData();
         }
     }, [selectedDataset])
+
+    useEffect(() => {
+        if (selectedSoil) {
+            if (selectedDataset) {
+                datapointsFetchData();
+            }
+        }
+    }, [selectedSoil])
 
     const { seriesData, highDoseDays, horizontalPlotLines } = useMemo(() => {
         if (!datapointsResponse || datapointsResponse.data_points.length === 0) {
@@ -111,7 +120,7 @@ const SoilMoistureAnalysisPage = () => {
                     <Box display={'flex'} flexDirection={'column'} gap={2}>
                         <Box display={'flex'} flexDirection={'column'} gap={2}>
                             <Typography variant="body1">
-                                Select a dataset to see its soil moisture analysis
+                                Select a dataset to see its soil moisture analysis. Also select a soil type to dynamically adjust the thresholds
                             </Typography>
                             <GenericSelect<string>
                                 endpoint='proxy/irrigation/api/v1/dataset/'
@@ -121,6 +130,15 @@ const SoilMoistureAnalysisPage = () => {
                                 getOptionLabel={item => item}
                                 getOptionValue={item => item}>
                             </GenericSelect>
+                            <GenericSelect<string>
+                                endpoint='proxy/irrigation/api/v1/dataset/soil-types/'
+                                method="GET"
+                                label='Soil type'
+                                selectedValue={selectedSoil}
+                                setSelectedValue={setSelectedSoil}
+                                getOptionLabel={item => item}
+                                getOptionValue={item => item}
+                            />
                         </Box>
                         <Box width={'100%'}>
                             {datapointsLoading && <Skeleton variant="rectangular" width={'100%'} height={400} />}
