@@ -1,121 +1,212 @@
+import { useMemo, useState, useEffect } from 'react';
+import {
+    Chart,
+    Series,
+    Title,
+    Tooltip
+} from '@highcharts/react';
+import * as Highcharts from 'highcharts';
+
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import useFetch from "@hooks/useFetch";
-import { DatasetRow, SoilMoistureResponseJSON } from "@models/SoilMoisture";
-import { Box, Card, CardContent, Skeleton, Typography, /* useTheme */ } from "@mui/material";
-// import { LineChart } from "@mui/x-charts";
-// import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { DatasetResponse, DatasetRow } from "@models/SoilMoisture";
+import { Box, Card, CardContent, Skeleton, Typography } from "@mui/material";
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
 
-// const dateFormatter = Intl.DateTimeFormat(undefined, {
-//     month: '2-digit',
-//     day: '2-digit',
-//   });
+dayjs.extend(utc);
 
 const SoilMoistureAnalysisPage = () => {
-    // const theme = useTheme();
-
     const [selectedDataset, setSelectedDataset] = useState<string>('');
+    const [selectedSoil, setSelectedSoil] = useState<string>('');
 
-    // const [formattedData, setFormattedData] = useState<DatasetRow[]>([]);
-
-    const { fetchData: analysisFetchData, loading: analysisLoading, response: analysisResponse } = useFetch<SoilMoistureResponseJSON>(
-        `proxy/irrigation/api/v1/dataset/${selectedDataset}/analysis/?formatting=JSON`,
-        {
-            method: 'GET'
-        }
-    )
-
-    const { fetchData: datasetFetchData, loading: datasetLoading, response: datasetResponse } = useFetch<DatasetRow[]>(
-        `proxy/irrigation/api/v1/dataset/${selectedDataset}/?formatting=JSON`,
+    const { fetchData: datapointsFetchData, loading: datapointsLoading, response: datapointsResponse } = useFetch<DatasetResponse>(
+        `proxy/irrigation/api/v1/dataset/${selectedDataset}/irrigation-datapoints/?formatting=JSON${selectedSoil && '&soil=' + selectedSoil}`,
         {
             method: 'GET'
         }
     )
 
     useEffect(() => {
-        if (selectedDataset && !analysisLoading) {
-            analysisFetchData();
-            datasetFetchData();
+        if (selectedDataset) {
+            datapointsFetchData();
         }
     }, [selectedDataset])
 
-    // useEffect(() => {
-    //     if (datasetResponse) {
-    //         const formattedData = datasetResponse?.slice(0,200);
-    //         setFormattedData(formattedData);
-    //     }
-    // }, [datasetResponse])
+    useEffect(() => {
+        if (selectedSoil) {
+            if (selectedDataset) {
+                datapointsFetchData();
+            }
+        }
+    }, [selectedSoil])
+
+    const { seriesData, highDoseDays, horizontalPlotLines } = useMemo(() => {
+        if (!datapointsResponse || datapointsResponse.data_points.length === 0) {
+            return { seriesData: [], highDoseDays: [], horizontalPlotLines: [] };
+        }
+
+        const { data_points, high_dose_irrigation_days, field_capacity, stress_level, wilting_point } = datapointsResponse;
+
+        console.log(field_capacity, stress_level, wilting_point);
+
+        const soilMoistureKeys = ['soil_moisture_10', 'soil_moisture_20', 'soil_moisture_30', 'soil_moisture_40', 'soil_moisture_50', 'soil_moisture_60'];
+
+        const preparedSeriesData = soilMoistureKeys.map(key => {
+            const depth = key.split('_')[2];
+
+            const data = data_points
+                .map(d => {
+                    const timestamp = dayjs.utc(d.date).valueOf();
+                    const value = d[key as keyof DatasetRow] as number;
+                    return [timestamp, value] as [number, number];
+                })
+                .filter(([_ts, val]) => val !== 0) as [number, number][];
+
+            return {
+                name: `Soil Moisture ${depth}cm`,
+                data: data,
+                key: key,
+            };
+        });
+
+        const thresholds = [
+            { value: field_capacity * 100, label: 'Field capacity' },
+            { value: stress_level * 100, label: 'Stress level' },
+            { value: wilting_point * 100, label: 'Wilting point' }
+        ];
+
+        const preparedThresholdLines = thresholds.map((t) => {
+            const plotLine: Highcharts.YAxisPlotLinesOptions = {
+                value: t.value,
+                color: 'black',
+                dashStyle: 'Solid',
+                width: 2,
+                zIndex: 3,
+                label: {
+                    text: t.label
+                }
+            }
+            return plotLine;
+        });
+
+        console.log(preparedThresholdLines);
+
+        const preparedhighDoseDays = high_dose_irrigation_days.map((dateStr) => {
+            const timestamp = dayjs.utc(dateStr).valueOf();
+
+            const plotLineProps: Highcharts.XAxisPlotLinesOptions = {
+                value: timestamp,
+                color: '#FF0000',
+                dashStyle: 'LongDash',
+                width: 1,
+                zIndex: -5,
+            };
+            return plotLineProps;
+        });
+
+        return { seriesData: preparedSeriesData, highDoseDays: preparedhighDoseDays, horizontalPlotLines: preparedThresholdLines };
+
+    }, [datapointsResponse]);
+
+    console.log(seriesData);
+
+    const chartReady = !datapointsLoading && datapointsResponse && seriesData.length > 0;
 
     return (
         <Box display={'flex'} flexDirection={'column'} gap={3}>
             <Card variant="outlined">
                 <CardContent>
                     <Box display={'flex'} flexDirection={'column'} gap={2}>
-                        <Typography variant="body1">
-                            Select a dataset to see its soil moisture analysis
-                        </Typography>
-                        <GenericSelect<string>
-                            endpoint='proxy/irrigation/api/v1/dataset/'
-                            label='Datasets'
-                            selectedValue={selectedDataset}
-                            setSelectedValue={setSelectedDataset}
-                            getOptionLabel={item => item}
-                            getOptionValue={item => item}>
-                        </GenericSelect>
-                    </Box>
-                    <Box width={'100%'}>
-                        {analysisLoading || datasetLoading && <Skeleton variant="rectangular" width={'100%'} height={300} />}
-                        {!(analysisLoading || datasetLoading) && datasetResponse
-                            &&
-                            <img height={'100%'} style={{ marginTop: 20 }} src="/soil-moisture.png" alt="" />
-                            // <LineChart
-                            //     dataset={datasetResponse}
-                            //     xAxis={[
-                            //         {
-                            //             dataKey: 'date',
-                            //             scaleType: 'point',
-                            //             valueFormatter: (date: string) => dateFormatter.format(new Date(date)),
-                            //             label: 'Timeline',
-                            //         },
-                            //     ]}
-                            //     yAxis={[
-                            //         {
-                            //             label: 'Soil moisture depth (%)',
-                            //         },
-                            //     ]}
-                            //     series={[
-                            //         { dataKey: 'soil_moisture_10', label: 'Soil Moisture 10', showMark: false, color: theme.palette.primary.light },
-                            //         { dataKey: 'soil_moisture_20', label: 'Soil Moisture 20', showMark: false, color: theme.palette.secondary.dark },
-                            //         { dataKey: 'soil_moisture_30', label: 'Soil Moisture 30', showMark: false, color: theme.palette.secondary.main },
-                            //         { dataKey: 'soil_moisture_40', label: 'Soil Moisture 40', showMark: false, color: theme.palette.secondary.light },
-                            //         { dataKey: 'soil_moisture_50', label: 'Soil Moisture 50', showMark: false, color: theme.palette.primary.main },
-                            //         { dataKey: 'soil_moisture_60', label: 'Soil Moisture 60', showMark: false, color: theme.palette.primary.dark },
-                            //     ]}
-                            //     height={300}
-                            // />
-                        }
+                        <Box display={'flex'} flexDirection={'column'} gap={2}>
+                            <Typography variant="body1">
+                                Select a dataset to see its soil moisture analysis. Also select a soil type to dynamically adjust the thresholds
+                            </Typography>
+                            <GenericSelect<string>
+                                endpoint='proxy/irrigation/api/v1/dataset/'
+                                label='Datasets'
+                                selectedValue={selectedDataset}
+                                setSelectedValue={setSelectedDataset}
+                                getOptionLabel={item => item}
+                                getOptionValue={item => item}>
+                            </GenericSelect>
+                            <GenericSelect<string>
+                                endpoint='proxy/irrigation/api/v1/dataset/soil-types/'
+                                method="GET"
+                                label='Soil type'
+                                selectedValue={selectedSoil}
+                                setSelectedValue={setSelectedSoil}
+                                getOptionLabel={item => item}
+                                getOptionValue={item => item}
+                            />
+                        </Box>
+                        <Box width={'100%'}>
+                            {datapointsLoading && <Skeleton variant="rectangular" width={'100%'} height={400} />}
+
+                            {chartReady && (
+                                <Chart options={
+                                    {
+                                        chart:
+                                        {
+                                            backgroundColor: 'transparent'
+                                        },
+                                        xAxis: { type: 'datetime', plotLines: highDoseDays },
+                                        yAxis: { title: { text: 'Soil Moisture (%)' }, plotLines: horizontalPlotLines },
+                                    }}>
+                                    <Title>Soil Moisture Analysis and Irrigation Events</Title>
+                                    {seriesData.map(series => (
+                                        <Series
+                                            type='line'
+                                            key={series.key}
+                                            options={{
+                                                name: series.name
+                                            }}
+                                            data={series.data}
+                                        />
+                                    ))}
+
+                                    <Tooltip
+                                        shared={true}
+                                        valueSuffix='%'
+                                    />
+                                </Chart>
+                            )}
+
+                            {!datapointsLoading && !datapointsResponse && (
+                                <Typography variant="caption" color="text.secondary" p={2}>
+                                    Please select a dataset to load soil moisture readings.
+                                </Typography>
+                            )}
+                        </Box>
                     </Box>
                 </CardContent>
             </Card>
-            {!(analysisLoading || datasetLoading) && analysisResponse &&
+            {chartReady &&
                 <>
                     <Card variant="outlined">
                         <CardContent>
-                            {/* <Typography gutterBottom variant="h4">High dose irrigation event dates</Typography> */}
                             <Box display={'flex'} flexDirection={'column'} gap={2}>
-                                {/* Hardcoded */}
-                                <Typography variant="h6">Irrigation events: 2</Typography>
-                                <Typography variant="body1">estimated dates: 25/6/2025, 30/8/2025</Typography>
-                                <Typography variant="h6">Precipitation events: 6</Typography>
-                                <Typography variant="body1">estimated dates: 7/6/2025, 8/6/2025, 13/7/2025-25/7/2025</Typography>
-                                <Typography variant="h6">High dose irrigation events: 1</Typography>
-                                <Typography variant="body1">estimated dates: 25/6/2025</Typography>
-                                <Typography variant="h6">Stress level events: 12</Typography>
-                                <Typography variant="body1">estimated dates: 26/5/2025-6/6/2025, 8/7/2025</Typography>
-                                {/* Hardcoded */}
-                                {/* {analysisResponse.high_dose_irrigation_events_dates.map(d => {
-                                    return <div key={d}>{dayjs(d).format('dddd, D/MMM/YYYY')}</div>
-                                })} */}
+                                <Box display={'flex'} flexDirection={'column'} gap={1}>
+                                    <Typography variant="h6">Thresholds:</Typography>
+                                    <Typography variant="body1">
+                                        Field capacity: {Math.round(Number(horizontalPlotLines[0].value))}%
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        Stress level: {Math.round(Number(horizontalPlotLines[1].value))}%
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        Wilting point: {Math.round(Number(horizontalPlotLines[2].value))}%
+                                    </Typography>
+                                </Box>
+                                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                                    <Typography variant="h6">High dose irrigation days: {highDoseDays.length}</Typography>
+                                    <Typography variant="body1">
+                                        Estimated dates:&nbsp;
+                                        {highDoseDays.map((d, index) => {
+                                            return dayjs(d.value).format('dddd MMM D') + `${(index < highDoseDays.length - 1) ? ', ' : ''}`
+                                        })}
+                                    </Typography>
+                                </Box>
                             </Box>
                         </CardContent>
                     </Card>

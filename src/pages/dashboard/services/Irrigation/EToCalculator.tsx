@@ -14,6 +14,7 @@ import { LineChart } from "@mui/x-charts";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import { useSession } from "@contexts/SessionContext";
+import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 
 
 const EToCalculatorPage = () => {
@@ -24,13 +25,16 @@ const EToCalculatorPage = () => {
     const [fromDate, setFromDate] = useState<Dayjs | null>(dayjs().subtract(14, 'days'));
     const [toDate, setToDate] = useState<Dayjs | null>(dayjs());
     const [calculations, setSetCalculations] = useState<EToCalculation | undefined>(undefined);
+    const [selectedCropType, setSelectedCropType] = useState<string>('');
+    const [selectedCropStage, setSelectedCropStage] = useState<string>('');
+
 
     const [chartData, setChartData] = useState<
         { x: Date; y: number; }[] | undefined>(undefined);
 
 
     const { fetchData, response, error, loading } = useFetch<EToCalculation>(
-        `proxy/irrigation/api/v1/eto/calculate-gk/?parcel_id=${session?.farm_parcel?.["@id"].split(":")[3]}&from_date=${fromDate?.format('YYYY-MM-DD')}&to_date=${toDate?.format('YYYY-MM-DD')}&formatting=JSON`,
+        `proxy/irrigation/api/v1/eto/calculate-gk/?parcel_id=${session?.farm_parcel?.["@id"].split(":")[3]}&from_date=${fromDate?.format('YYYY-MM-DD')}&to_date=${toDate?.format('YYYY-MM-DD')}&formatting=JSON${selectedCropType && '&crop=' + selectedCropType}${selectedCropStage && '&stage=' + selectedCropStage}`,
         // `proxy/irrigation/api/v1/eto/get-calculations/${selectedLocation}/from/${fromDate?.format('YYYY-MM-DD')}/to/${toDate?.format('YYYY-MM-DD')}/?response_format=JSON-LD/`,
         {
             method: 'GET',
@@ -64,7 +68,7 @@ const EToCalculatorPage = () => {
             }));
             setChartData(chartData);
         }
-    }, [calculations])  
+    }, [calculations])
 
     return (
         <>
@@ -73,17 +77,28 @@ const EToCalculatorPage = () => {
                 <CardContent>
                     <Box display={'flex'} flexDirection={'column'} gap={2}>
                         <Typography variant="body1">
-                            Select a location and a time frame to view its ETo calculation.
+                            Select a location and a time frame to view its ETo calculation. Additionally select the crop type and growth stage for finer tuning.
                         </Typography>
-                        {/* <GenericSelect<Location, LocationResponse>
-                            endpoint='proxy/irrigation/api/v1/location/'
-                            label='Locations'
-                            transformResponse={response => response.locations}
-                            selectedValue={selectedLocation}
-                            setSelectedValue={setSelectedLocation}
-                            getOptionLabel={item => `(${item.longitude}, ${item.latitude})`}
-                            getOptionValue={item => item.id}>
-                        </GenericSelect> */}
+                        <GenericSelect<string, { crops: string[], stages: string[] }>
+                            endpoint='proxy/irrigation/api/v1/eto/option-types/'
+                            method="GET"
+                            label='Crop type'
+                            selectedValue={selectedCropType}
+                            transformResponse={response => response.crops}
+                            setSelectedValue={setSelectedCropType}
+                            getOptionLabel={item => item}
+                            getOptionValue={item => item}
+                        />
+                        <GenericSelect<string, { crops: string[], stages: string[] }>
+                            endpoint='proxy/irrigation/api/v1/eto/option-types/'
+                            method="GET"
+                            label='Stages'
+                            selectedValue={selectedCropStage}
+                            transformResponse={response => response.stages}
+                            setSelectedValue={setSelectedCropStage}
+                            getOptionLabel={item => item}
+                            getOptionValue={item => item}
+                        />
                         <DateRangeSelect
                             fromDate={fromDate}
                             setFromDate={setFromDate}
@@ -96,7 +111,7 @@ const EToCalculatorPage = () => {
                             loadingPosition="start"
                             onClick={handleSubmit}
                             // disabled={!selectedLocation || !fromDate || !toDate}
-                            disabled={!fromDate || !toDate}
+                            disabled={!fromDate || !toDate || Boolean(selectedCropType && !selectedCropStage) || Boolean(selectedCropStage && !selectedCropType)}
                             variant="contained">
                             Get calculations
                         </Button>
