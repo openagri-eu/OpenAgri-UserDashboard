@@ -9,7 +9,7 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import PestControlIcon from '@mui/icons-material/PestControl';
 import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
 import ThermostatIcon from '@mui/icons-material/Thermostat';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SessionContext, { Session } from '@contexts/SessionContext';
 import { Folder } from '@mui/icons-material';
 import FenceIcon from '@mui/icons-material/Fence';
@@ -23,6 +23,8 @@ import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
 import ReportIcon from '@mui/icons-material/Report';
 import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 import GrassIcon from '@mui/icons-material/Grass';
+
+import { useAuth0 } from '@auth0/auth0-react';
 
 const NAVIGATION: Navigation = [
   {
@@ -154,10 +156,28 @@ const BRANDING = {
 };
 
 export default function App() {
+  const { user, isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0();
+
   const [session, setSession] = useState<Session | null>(() => {
     const storedSession = localStorage.getItem("session");
     return storedSession ? JSON.parse(storedSession) : null;
   });
+
+  const toolpadSession = useMemo(() => {
+    if (isLoading || !isAuthenticated || !user) return null;
+    return {
+      user: {
+        name: user.name,
+        email: user.email,
+        image: user.picture,
+      },
+    };
+  }, [user, isAuthenticated, isLoading]);
+
+  const authentication = useMemo(() => ({
+    signIn: () => loginWithRedirect(),
+    signOut: () => logout({ logoutParams: { returnTo: window.location.origin } }),
+  }), [loginWithRedirect, logout]);
 
   useEffect(() => {
     if (session) {
@@ -168,7 +188,8 @@ export default function App() {
   }, [session]);
 
   return (
-    <ReactRouterAppProvider theme={theme} navigation={NAVIGATION} branding={BRANDING}>
+    <ReactRouterAppProvider theme={theme} navigation={NAVIGATION}
+      branding={BRANDING} session={toolpadSession} authentication={authentication}>
       <SessionContext.Provider value={{ session, setSession }}>
         <Outlet />
       </SessionContext.Provider>

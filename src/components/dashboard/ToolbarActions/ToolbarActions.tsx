@@ -1,13 +1,15 @@
 import { IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popover, Tooltip } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useNavigate } from "react-router-dom";
-import { useSession } from "@contexts/SessionContext";
-import useFetch from "@hooks/useFetch";
+// import { useNavigate } from "react-router-dom";
+// import { useSession } from "@contexts/SessionContext";
+// import useFetch from "@hooks/useFetch";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ToolbarActions = () => {
+    const { logout } = useAuth0();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -19,28 +21,27 @@ const ToolbarActions = () => {
         [isMenuOpen],
     );
 
+    // const { session, setSession } = useSession();
+    // const navigate = useNavigate();
 
-    const { session, setSession } = useSession();
-    const navigate = useNavigate();
+    // const { fetchData, response, error } = useFetch<{ success: string }>(
+    //     "logout/",
+    //     {
+    //         method: 'POST',
+    //         body: { refresh: session?.user.refresh_token }
+    //     }
+    // );
 
-    const { fetchData, response, error } = useFetch<{ success: string }>(
-        "logout/",
-        {
-            method: 'POST',
-            body: { refresh: session?.user.refresh_token }
-        }
-    );
+    // useEffect(() => {
+    //     if (response || error) {
+    //         setSession(null);
+    //         navigate("/");
+    //     }
+    // }, [response, error]);
 
-    useEffect(() => {
-        if (response || error) {
-            setSession(null);
-            navigate("/");
-        }
-    }, [response, error]);
-
-    const handleSignOut = () => {
-        fetchData();
-    }
+    // const handleSignOut = () => {
+    //     fetchData();
+    // }
 
     return (
         <>
@@ -70,7 +71,7 @@ const ToolbarActions = () => {
                             <ListItemText>Account</ListItemText>
                         </MenuItem> */}
                         {/* <Divider /> */}
-                        <MenuItem onClick={handleSignOut}>
+                        <MenuItem onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
                             <ListItemIcon>
                                 <LogoutIcon fontSize="small" />
                             </ListItemIcon>

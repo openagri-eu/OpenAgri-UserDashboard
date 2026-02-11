@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import { DashboardContextType } from "@layouts/dashboard";
 import { useEffect } from "react";
+import Auth0Profile from "@components/auth0/Auth0Profile";
 
 const LandingPage = () => {
     const { setPageTitle, setBreadcrumbs } = useOutletContext<DashboardContextType>();
@@ -21,6 +22,7 @@ const LandingPage = () => {
         <>
             <ParcelSelectionModule></ParcelSelectionModule>
             <ImageButtonGrid></ImageButtonGrid>
+            <Auth0Profile></Auth0Profile>
         </>
     )
 }

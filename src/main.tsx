@@ -34,6 +34,8 @@ import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
 import DiseasesPage from '@pages/dashboard/services/PestAndDisease/Diseases.tsx';
 import RiskIndexPage from '@pages/dashboard/services/PestAndDisease/RiskIndex.tsx';
 
+import { Auth0Provider } from '@auth0/auth0-react';
+
 const router = createBrowserRouter([
   {
     Component: App,
@@ -178,8 +180,16 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <RouterProvider router={router} />
-    </LocalizationProvider>
+    <Auth0Provider
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+      }}
+    >
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={router} />
+      </LocalizationProvider>
+    </Auth0Provider>
   </StrictMode>,
 )
