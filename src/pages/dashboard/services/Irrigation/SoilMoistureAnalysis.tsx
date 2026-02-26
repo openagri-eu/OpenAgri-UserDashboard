@@ -84,7 +84,14 @@ const SoilMoistureAnalysisPage = () => {
                 width: 2,
                 zIndex: 3,
                 label: {
-                    text: t.label
+                    text: t.label,
+                    align: 'right',
+                    x: -10,
+                    style: {
+                        fontSize: '10px',
+                        fontWeight: 'bold'
+                    },
+                    y: t.label === 'Stress level' ? 0 : (t.label === 'Field capacity' ? -10 : 10) 
                 }
             }
             return plotLine;
@@ -151,7 +158,13 @@ const SoilMoistureAnalysisPage = () => {
                                             backgroundColor: 'transparent'
                                         },
                                         xAxis: { type: 'datetime', plotLines: highDoseDays },
-                                        yAxis: { title: { text: 'Soil Moisture (%)' }, plotLines: horizontalPlotLines },
+                                        yAxis: { 
+                                            title: { text: 'Soil Moisture (%)' }, 
+                                            plotLines: horizontalPlotLines,
+                                            min: 0,
+                                            startOnTick: false,
+                                            endOnTick: false
+                                        },
                                     }}>
                                     <Title>Soil Moisture Analysis and Irrigation Events</Title>
                                     {seriesData.map(series => (
