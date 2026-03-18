@@ -9,7 +9,8 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
     return (
         parcels.map((p) => {
             const isSelected = p["@id"] === selectedParcelId;
-
+            const parcelImage = p.depiction?.trim() ?? placeholder
+            
             return (
                 <Box
                     key={p["@id"]}
@@ -30,7 +31,7 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
                 >
                     <Box
                         component="img"
-                        src={p.depiction[0] ?? placeholder}
+                        src={parcelImage}
                         alt={`Image of ${p.identifier}`}
                         sx={{
                             width: 80,
