@@ -9,7 +9,7 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
     return (
         parcels.map((p) => {
             const isSelected = p["@id"] === selectedParcelId;
-            const parcelImage = p.depiction?.trim() ?? placeholder
+            const parcelImage = (p.depiction || "").trim() || placeholder;
             
             return (
                 <Box
