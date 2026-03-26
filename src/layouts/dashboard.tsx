@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Breadcrumb, PageContainer } from '@toolpad/core/PageContainer';
 import ToolbarActions from '@components/dashboard/ToolbarActions/ToolbarActions';
@@ -6,7 +6,8 @@ import { useSession } from '@contexts/SessionContext';
 import Redirect from '@components/shared/Redirect/Redirect';
 import { jwtDecode } from 'jwt-decode';
 import Footer from '@components/shared/Footer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import useFetch from '@hooks/useFetch';
 
 export type DashboardContextType = {
   setPageTitle: (title: string | undefined) => void;
@@ -14,8 +15,46 @@ export type DashboardContextType = {
 };
 
 export default function DashLayout() {
-  const { session } = useSession()
+  const { session, setSession } = useSession();
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const { fetchData, response, error } = useFetch<any>(
+    "me/",
+    {
+      method: 'GET',
+    }
+  );
+
+  useEffect(() => {
+    if (session) {
+      console.log("in session fetch", session);
+      
+      // fetchData();
+    }
+  }, []);
+
+
+  useEffect(() => {
+    if (session && response) {
+      setSession(prevSession => {
+        if (prevSession) {
+          return {
+            ...prevSession,
+            services: response.services
+          };
+        }
+        return null;
+      });
+    }
+  }, [response])
+
+  useEffect(() => {
+    if (error) {
+      setSession(null);
+      navigate("/");
+    }
+  }, [error])
 
   const callbackURL =
     `?callbackURL=${encodeURIComponent(location.pathname)}`;
