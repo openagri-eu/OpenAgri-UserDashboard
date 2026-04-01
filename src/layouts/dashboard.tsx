@@ -19,6 +19,9 @@ export default function DashLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [pageTitle, setPageTitle] = useState<string | undefined>(undefined);
+  const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[] | undefined>(undefined);
+
   const { fetchData, response, error } = useFetch<any>(
     "me/",
     {
@@ -28,12 +31,9 @@ export default function DashLayout() {
 
   useEffect(() => {
     if (session) {
-      console.log("in session fetch", session);
-      
-      // fetchData();
+      fetchData();
     }
   }, []);
-
 
   useEffect(() => {
     if (session && response) {
@@ -75,9 +75,6 @@ export default function DashLayout() {
       return <Redirect to={'/sign-in' + callbackURL} />;
     }
   }
-
-  const [pageTitle, setPageTitle] = useState<string | undefined>(undefined);
-  const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[] | undefined>(undefined);
 
   return (
     <DashboardLayout
