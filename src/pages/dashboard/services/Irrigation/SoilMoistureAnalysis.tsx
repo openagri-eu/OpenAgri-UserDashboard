@@ -221,6 +221,13 @@ const SoilMoistureAnalysisPage = () => {
                                             {
                                                 backgroundColor: 'transparent'
                                             },
+                                            plotOptions: {
+                                                series: {
+                                                    marker: {
+                                                        enabled: false
+                                                    }
+                                                }
+                                            },
                                             xAxis: { type: 'datetime', plotLines: highDoseDays },
                                             yAxis: {
                                                 title: { text: 'Soil Moisture (%)' },
