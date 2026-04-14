@@ -1,12 +1,13 @@
 import { Outlet, useLocation, useNavigate } from 'react-router';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, DashboardSidebarPageItem } from '@toolpad/core/DashboardLayout';
+import type { NavigationPageItem } from '@toolpad/core/AppProvider';
 import { Breadcrumb, PageContainer } from '@toolpad/core/PageContainer';
 import ToolbarActions from '@components/dashboard/ToolbarActions/ToolbarActions';
 import { useSession } from '@contexts/SessionContext';
 import Redirect from '@components/shared/Redirect/Redirect';
 import { jwtDecode } from 'jwt-decode';
 import Footer from '@components/shared/Footer';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import useFetch from '@hooks/useFetch';
 
 export type DashboardContextType = {
@@ -56,6 +57,16 @@ export default function DashLayout() {
     }
   }, [error])
 
+  const renderPageItem = useCallback(
+    (item: NavigationPageItem) => {
+      if ((item as any).disabled) {
+        return <DashboardSidebarPageItem item={item} disabled />;
+      }
+      return <DashboardSidebarPageItem item={item} />;
+    },
+    [],
+  );
+
   const callbackURL =
     `?callbackURL=${encodeURIComponent(location.pathname)}`;
 
@@ -78,6 +89,7 @@ export default function DashLayout() {
 
   return (
     <DashboardLayout
+      renderPageItem={renderPageItem}
       slots={{
         toolbarActions: ToolbarActions
       }}
