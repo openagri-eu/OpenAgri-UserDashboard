@@ -58,9 +58,11 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let parcelID: string | undefined;
         if ('hasAgriParcel' in formData) {
-            parcelID = (formData as any).hasAgriParcel["@id"];
+            if (formData.hasAgriParcel)
+                parcelID = (formData as any).hasAgriParcel["@id"];
         } else if ('operatedOn' in formData) {
-            parcelID = (formData as any).operatedOn["@id"];
+            if (formData.operatedOn)
+                parcelID = (formData as any).operatedOn["@id"];
         }
         if (parcelID) {
             const idParts = parcelID.split(':');
@@ -82,7 +84,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let cropID: string | undefined;
         if ('hasAgriCrop' in formData) {
-            cropID = (formData as any).hasAgriCrop["@id"];
+            if (formData.hasAgriCrop)
+                cropID = (formData as any).hasAgriCrop["@id"];
         }
         if (cropID) {
             const idParts = cropID.split(':');
@@ -91,7 +94,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let agriMachinesIDs: string[] | undefined;
         if ('usesAgriculturalMachinery' in formData) {
-            agriMachinesIDs = (formData as any).usesAgriculturalMachinery.map((m: any) => { return m["@id"].split(':')[3] });
+            if (formData.usesAgriculturalMachinery)
+                agriMachinesIDs = (formData as any).usesAgriculturalMachinery.map((m: any) => { return m["@id"].split(':')[3] });
         }
         if (agriMachinesIDs) {
             setSelectedAgriMachines(agriMachinesIDs);
@@ -99,7 +103,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let operatedOnCompostPile: string | undefined;
         if ('isOperatedOn' in formData) {
-            operatedOnCompostPile = (formData as any).isOperatedOn["@id"];
+            if (formData.isOperatedOn)
+                operatedOnCompostPile = (formData as any).isOperatedOn["@id"];
         }
         if (operatedOnCompostPile) {
             const idParts = operatedOnCompostPile.split(':');
@@ -108,7 +113,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let pesticideID: string | undefined;
         if ('usesPesticide' in formData) {
-            pesticideID = (formData as any).usesPesticide["@id"];
+            if (formData.usesPesticide)
+                pesticideID = (formData as any).usesPesticide["@id"];
         }
         if (pesticideID) {
             const idParts = pesticideID.split(':');
@@ -117,7 +123,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let fertilizerID: string | undefined;
         if ('usesFertilizer' in formData) {
-            fertilizerID = (formData as any).usesFertilizer["@id"];
+            if (formData.usesFertilizer)
+                fertilizerID = (formData as any).usesFertilizer["@id"];
         }
         if (fertilizerID) {
             const idParts = fertilizerID.split(':');
@@ -126,7 +133,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let severity: string | undefined;
         if ('severity' in formData) {
-            severity = (formData as any).severity;
+            if (formData.severity)
+                severity = (formData as any).severity;
         }
         if (severity) {
             setSeverity(severity);
@@ -134,7 +142,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
         let usesIrrigationSystem: string | undefined;
         if ('usesIrrigationSystem' in formData) {
-            usesIrrigationSystem = (formData as any).usesIrrigationSystem;
+            if (formData.usesIrrigationSystem)
+                usesIrrigationSystem = (formData as any).usesIrrigationSystem;
         }
         if (usesIrrigationSystem) {
             setUsesIrrigationSystem(usesIrrigationSystem);
@@ -683,6 +692,9 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             (body.usesPesticide as { '@id': string })['@id'] = `urn:farmcalendar:Pesticide:${selectedPesticide}`;
         }
         if ('usesFertilizer' in body) {
+            if (!body.usesFertilizer) {
+                body.usesFertilizer = { '@id': '', '@type': 'Fertilizer' };
+            }
             (body.usesFertilizer as { '@id': string })['@id'] = `urn:farmcalendar:Fertilizer:${selectedFertilizer}`;
         }
         if ('severity' in body) {
