@@ -12,6 +12,7 @@ const GenericSelect = <T, R = T[]>({
     selectedValue,
     setSelectedValue,
     transformResponse,
+    canEdit = true,
     data = undefined,
     multiple = false,
 }: GenericSelectProps<T, R>) => {
@@ -56,6 +57,7 @@ const GenericSelect = <T, R = T[]>({
             <FormControl fullWidth>
                 <InputLabel id={`${label}-label`}>{label}</InputLabel>
                 <Select
+                    readOnly={!canEdit}
                     labelId={`${label}-label`}
                     value={valueToRender}
                     label={label}
