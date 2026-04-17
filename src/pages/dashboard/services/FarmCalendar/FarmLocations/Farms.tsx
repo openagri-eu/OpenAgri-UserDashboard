@@ -6,11 +6,15 @@ import useSnackbar from "@hooks/useSnackbar";
 import { FarmModel } from "@models/Farm";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddFarm from "./AddFarm/AddFarm";
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 const FarmsPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canAdd = actions.includes('add');
+
     const [farms, setFarms] = useState<FarmRow[]>([]);
 
     const [expanded, setExpanded] = useState<boolean>(false);
@@ -93,7 +97,7 @@ const FarmsPage = () => {
 
     return (
         <Box display={'flex'} flexDirection={'column'} gap={2}>
-            <Accordion expanded={expanded} onChange={handleAccordionChange}>
+            <Accordion disabled={!canAdd} expanded={expanded} onChange={handleAccordionChange}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography component="span">Add new farm</Typography>
                 </AccordionSummary>
