@@ -8,4 +8,6 @@ export interface ActivityDynamicCRUDActionsProps<T extends BaseActivityModel> {
     onAdd?: (activityToSave: BaseActivityModel) => void;
     onDelete?: () => void;
     loading: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }

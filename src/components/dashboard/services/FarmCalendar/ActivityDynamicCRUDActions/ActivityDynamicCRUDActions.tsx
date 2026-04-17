@@ -22,7 +22,7 @@ import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 import useFetch from "@hooks/useFetch";
 import { useNavigate } from "react-router-dom";
 
-const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, activityTypes, onAdd, onDelete, onSave, loading }: ActivityDynamicCRUDActionsProps<T>) => {
+const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, activityTypes, onAdd, onDelete, onSave, loading, canEdit, canDelete }: ActivityDynamicCRUDActionsProps<T>) => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState<T>(activity);
@@ -268,6 +268,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'hasStartDatetime' in formData && (
                     <DateTimePicker
+                        readOnly={!canEdit}
                         label="Start datetime"
                         value={dayjs(formData.hasStartDatetime as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'hasStartDatetime')}
@@ -275,6 +276,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'phenomenonTime' in formData && (
                     <DateTimePicker
+                        readOnly={!canEdit}
                         label="Start datetime"
                         value={dayjs(formData.phenomenonTime as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'phenomenonTime')}
@@ -282,6 +284,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'validFrom' in formData && (
                     <DateTimePicker
+                        readOnly={!canEdit}
                         label="Start datetime"
                         value={dayjs(formData.validFrom as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'validFrom')}
@@ -289,6 +292,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'hasEndDatetime' in formData && (
                     <DateTimePicker
+                        readOnly={!canEdit}
                         label="End datetime"
                         value={dayjs(formData.hasEndDatetime as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'hasEndDatetime')}
@@ -296,6 +300,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'validTo' in formData && (
                     <DateTimePicker
+                        readOnly={!canEdit}
                         label="Start datetime"
                         value={dayjs(formData.validTo as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'validTo')}
@@ -310,6 +315,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'responsibleAgent' in formData && (
                     <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Responsible agent"
                         name="responsibleAgent"
                         value={formData.responsibleAgent ?? ''}
@@ -318,6 +324,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'usesAgriculturalMachinery' in formData && (
                     <GenericSelect<AgriculturalMachine>
+                        canEdit={canEdit}
                         multiple={true}
                         endpoint='proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json'
                         label='Agricultural machines'
@@ -339,6 +346,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'madeBySensor' in formData && (
                     <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Made by sensor"
                         name="madeBySensor.name"
                         value={(formData.madeBySensor as SensorShape).name ?? ''}
@@ -348,12 +356,14 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 {'hasResult' in formData && (
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                         <TextField
+                            slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Value"
                             name="hasResult.hasValue"
                             value={(formData.hasResult as ResultShape).hasValue ?? ''}
                             onChange={handleChange}
                             error={!(formData.hasResult as ResultShape).hasValue?.trim()} />
                         <TextField
+                            slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Value unit"
                             name="hasResult.unit"
                             value={(formData.hasResult as ResultShape).unit ?? ''}
@@ -363,6 +373,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'observedProperty' in formData && (
                     <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Observed property"
                         name="observedProperty"
                         value={formData.observedProperty ?? ''}
@@ -378,6 +389,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'severity' in formData && (
                     <GenericSelect<GenericAlertOptions['actions']['POST']['severity']['choices'][number], GenericAlertOptions>
+                        canEdit={canEdit}
                         endpoint='proxy/farmcalendar/api/v1/Alerts/?format=json'
                         method="OPTIONS"
                         label='Severity'
@@ -397,6 +409,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'usesIrrigationSystem' in formData && (
                     <GenericSelect<IrrigationOperationOptions['actions']['POST']['usesIrrigationSystem']['choices'][number], IrrigationOperationOptions>
+                        canEdit={canEdit}
                         endpoint='proxy/farmcalendar/api/v1/IrrigationOperations/?format=json'
                         method="OPTIONS"
                         label='Irrigation system'
@@ -417,6 +430,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'hasAgriCrop' in formData && (
                     <GenericSelect<FarmCropModel>
+                        canEdit={canEdit}
                         endpoint='proxy/farmcalendar/api/v1/FarmCrops/?format=json'
                         label='Crop'
                         selectedValue={selectedAgriCrop}
@@ -434,6 +448,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'hasArea' in formData && (
                     <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth
                         label="Has area"
                         name="hasArea"
@@ -451,6 +466,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'isOperatedOn' in formData && (
                     <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Operated on compost pile"
                         name="isOperatedOn.@id"
                         value={operatedOnCompostPile}
@@ -466,6 +482,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'hasApplicationMethod' in formData && (
                     <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Application method"
                         name="hasApplicationMethod"
                         value={formData.hasApplicationMethod}
@@ -484,6 +501,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 {'hasAppliedAmount' in formData && (
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                         <TextField
+                            slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth label="Applied amount"
                             name="hasAppliedAmount.numericValue"
                             type="number"
@@ -492,6 +510,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             onChange={handleChange}
                             error={isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue'])} />
                         <TextField
+                            slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Applied amount unit"
                             name="hasAppliedAmount.unit"
                             value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
@@ -509,6 +528,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'usesPesticide' in formData && (
                     <GenericSelect<PesticideModel>
+                        canEdit={canEdit}
                         endpoint='proxy/farmcalendar/api/v1/Pesticides/?format=json'
                         label='Pesticide'
                         selectedValue={selectedPesticide}
@@ -527,6 +547,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'usesFertilizer' in formData && (
                     <GenericSelect<FertilizerModel>
+                        canEdit={canEdit}
                         endpoint='proxy/farmcalendar/api/v1/Fertilizers/?format=json'
                         label='Fertilizer'
                         selectedValue={selectedFertilizer}
@@ -552,11 +573,13 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                                         <Stack display={'flex'} direction={{ sm: 'column', md: 'row' }} gap={2}>
                                             <Box display={'flex'} gap={2} minWidth={"60%"}>
                                                 <TextField fullWidth label="Material name"
+                                                    slotProps={{ input: { readOnly: !canEdit } }}
                                                     name="typeName"
                                                     value={compMat.typeName ?? ''}
                                                     onChange={handleCompostMaterialChange(compMat["@id"])}
                                                     error={!compMat.typeName?.trim()} />
                                                 <TextField fullWidth label="Quantity"
+                                                    slotProps={{ input: { readOnly: !canEdit } }}
                                                     name="quantityValue.numericValue"
                                                     type="number"
                                                     value={isNaN(compMat.quantityValue.numericValue) ? '' : compMat.quantityValue.numericValue}
@@ -565,11 +588,13 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                                             </Box>
                                             <Box display={'flex'} gap={2} flex={1} minWidth={200}>
                                                 <TextField fullWidth label="Unit"
+                                                    slotProps={{ input: { readOnly: !canEdit } }}
                                                     name="quantityValue.unit"
                                                     value={compMat.quantityValue.unit ?? ''}
                                                     onChange={handleCompostMaterialChange(compMat["@id"])}
                                                     error={!compMat.quantityValue.unit?.trim()} />
                                                 <IconButton aria-label="remove"
+                                                    disabled={!canEdit}
                                                     onClick={handleRemoveCompostMaterial(compMat["@id"])}>
                                                     <RemoveCircleOutlineIcon />
                                                 </IconButton>
@@ -579,14 +604,16 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                                 </Card>
                             );
                         })}
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                            <Button variant="outlined"
-                                startIcon={<AddIcon />}
-                                onClick={handleAddCompostMaterial}
-                            >
-                                Add compost material
-                            </Button>
-                        </Box>
+                        {canEdit &&
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                <Button variant="outlined"
+                                    startIcon={<AddIcon />}
+                                    onClick={handleAddCompostMaterial}
+                                >
+                                    Add compost material
+                                </Button>
+                            </Box>
+                        }
                     </Box>
                 )}
             </>
@@ -733,17 +760,20 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 <CardContent>
                     <Stack direction={'column'} spacing={2}>
                         <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Title" name="title"
                             value={formData.title ?? ''} onChange={handleChange}
                             error={!formData.title?.trim()}
                         />
                         {renderDateFields()}
                         <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" multiline rows={4} label="Details" name="details"
                             value={formData.details ?? ''} onChange={handleChange}
                         />
                         {renderAgentAndMachinery()}
                         <GenericSelect<FarmParcelModel>
+                            canEdit={canEdit}
                             endpoint='proxy/farmcalendar/api/v1/FarmParcels/?format=json'
                             label='Parcel'
                             selectedValue={selectedParcel}
@@ -753,6 +783,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         />
                         {/* NTH: string filtering of the displayed activities */}
                         <GenericSelect<FarmCalendarActivityModel>
+                            canEdit={canEdit}
                             endpoint=''
                             data={allActivities}
                             label='Part of activity'
@@ -792,6 +823,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                     loading={loading}
                     loadingPosition="start"
                     // disabled={isFormInvalid}
+                    disabled={!canEdit}
                     onClick={handlePost}
                 >
                     Add
@@ -802,6 +834,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                     startIcon={<SaveIcon />}
                     loading={loading}
                     loadingPosition="start"
+                    disabled={!canEdit}
                     // disabled={isFormInvalid}
                     onClick={handlePatch}
                 >
@@ -814,6 +847,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                     loading={loading}
                     loadingPosition="start"
                     // disabled={isFormInvalid}
+                    disabled={!canDelete}
                     onClick={() => {
                         showDialog({
                             title: `Are you sure you want to delete this activity?`,

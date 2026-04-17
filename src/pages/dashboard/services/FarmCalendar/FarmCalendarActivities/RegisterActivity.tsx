@@ -22,10 +22,11 @@ import { Box, Typography } from "@mui/material";
 import { activityModelFactory } from "@utils/activityModelFactory";
 import { useEffect, useState } from "react";
 import ActivityDynamicCRUDActions from "@components/dashboard/services/FarmCalendar/ActivityDynamicCRUDActions/ActivityDynamicCRUDActions";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import useFetch from "@hooks/useFetch";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import useSnackbar from "@hooks/useSnackbar";
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
     'AddRawMaterialOperation': (props) => <ActivityDynamicCRUDActions<AddRawMaterialOperationModel> {...props} />,
@@ -101,6 +102,9 @@ const RegisterCalendarActivityPage = () => {
         }
     }, [response]);
 
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canEdit = actions.includes('add');
+
     const renderForm = () => {
         if (!activityData) return null;
 
@@ -117,6 +121,7 @@ const RegisterCalendarActivityPage = () => {
                 activityTypes={activityTypes}
                 onAdd={handlePost}
                 loading={loading}
+                canEdit={canEdit}
             />
         );
     };

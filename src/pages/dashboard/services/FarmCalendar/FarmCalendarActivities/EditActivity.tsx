@@ -3,7 +3,7 @@ import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { Box, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import {
     BaseActivityModel,
@@ -25,6 +25,7 @@ import {
 } from '@models/FarmCalendarActivities';
 import ActivityDynamicCRUDActions from "@components/dashboard/services/FarmCalendar/ActivityDynamicCRUDActions/ActivityDynamicCRUDActions";
 import { FarmCalendarActivityTypeModel } from "@models/FarmCalendarActivityType";
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
     'AddRawMaterialOperation': (props) => <ActivityDynamicCRUDActions<AddRawMaterialOperationModel> {...props} />,
@@ -117,6 +118,10 @@ const EditCalendarActivityPage = () => {
         deleteFetchData();
     };
 
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canEdit = actions.includes('edit');
+    const canDelete = actions.includes('delete');
+
     const renderForm = () => {
         if (!activityData) return null;
 
@@ -134,6 +139,8 @@ const EditCalendarActivityPage = () => {
                 onSave={handlePatch}
                 onDelete={handleDelete}
                 loading={isMutating}
+                canEdit={canEdit}
+                canDelete={canDelete}
             />
         );
     };
