@@ -6,14 +6,18 @@ import { useEffect, useMemo, useState } from "react";
 import { EventInput } from '@fullcalendar/core';
 import useFetch from "@hooks/useFetch";
 import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import StyledFullCalendar from "@components/shared/styled/StyledFullCalendar/StyledFullCalendar";
 import dayjs from "dayjs";
 import { useSession } from "@contexts/SessionContext";
 import ContentGuard from "@components/shared/ContentGuard/ContentGuard";
 import { FarmCalendarActivityTypeModel } from "@models/FarmCalendarActivityType";
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 const FarmCalendarPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canAdd = actions.includes('add');
+
     const navigate = useNavigate();
 
     const [dateRange, setDateRange] = useState<{ start: string | null, end: string | null }>({ start: null, end: null });
@@ -88,7 +92,12 @@ const FarmCalendarPage = () => {
             <ContentGuard condition={session?.farm_parcel}>
                 <>
                     <Box sx={{ marginBottom: 2 }}>
-                        <Button onClick={() => navigate('register-activity', { state: { activityTypes: activityTypes } })} variant="contained">Register new calendar activity</Button>
+                        <Button
+                            onClick={() => navigate('register-activity', { state: { activityTypes: activityTypes } })}
+                            disabled={!canAdd}
+                            variant="contained">
+                            Register new calendar activity
+                        </Button>
                     </Box>
                     <StyledFullCalendar
                         events={calendarEvents}
