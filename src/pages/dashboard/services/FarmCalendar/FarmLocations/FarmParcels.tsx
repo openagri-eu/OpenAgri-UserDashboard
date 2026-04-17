@@ -8,12 +8,16 @@ import { FarmParcelModel } from "@models/FarmParcel";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Skeleton, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import AddFarmParcel from "./AddFarmParcel/AddFarmParcel";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 
 const FarmParcelsPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canAdd = actions.includes('add');
+
     const [parcels, setParcels] = useState<ParcelRow[]>([]);
 
     const [expanded, setExpanded] = useState<boolean>(false);
@@ -95,7 +99,7 @@ const FarmParcelsPage = () => {
 
     return (
         <Box display={'flex'} flexDirection={'column'} gap={2}>
-            <Accordion expanded={expanded} onChange={handleAccordionChange}>
+            <Accordion disabled={!canAdd} expanded={expanded} onChange={handleAccordionChange}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography component="span">Add new farm parcel</Typography>
                 </AccordionSummary>
