@@ -50,6 +50,12 @@ export default function App() {
       return service ? service.actions.includes('view') : false;
     };
 
+    const hasAccessIrriUploadDataset = () => {
+      if (!session || !session.services) return false;
+      const service = session.services.find(s => s.code === 'IRM');
+      return service ? service.actions.includes('add') : false;
+    }
+
     const nav: any[] = [
       {
         kind: 'header',
@@ -130,7 +136,7 @@ export default function App() {
         segment: 'upload-dataset',
         title: 'Upload Dataset',
         icon: <NoteAddIcon />,
-        disabled: !hasAccess('IRM'),
+        disabled: !hasAccess('IRM') || !hasAccessIrriUploadDataset(),
       },
       {
         segment: 'soil-moisture-analysis',

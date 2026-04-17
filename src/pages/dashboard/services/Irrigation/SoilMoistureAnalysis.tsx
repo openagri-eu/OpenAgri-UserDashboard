@@ -19,10 +19,15 @@ import useDialog from '@hooks/useDialog';
 import GenericDialog from '@components/shared/GenericDialog/GenericDialog';
 import GenericSnackbar from '@components/shared/GenericSnackbar/GenericSnackbar';
 import useSnackbar from '@hooks/useSnackbar';
+import { ServiceContextType } from '@layouts/services/IrrigationManagementLayout';
+import { useOutletContext } from 'react-router-dom';
 
 dayjs.extend(utc);
 
 const SoilMoistureAnalysisPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canDelete = actions.includes('delete');
+
     const [selectedDataset, setSelectedDataset] = useState<string>('');
     const [selectedSoil, setSelectedSoil] = useState<string>('');
 
@@ -188,7 +193,7 @@ const SoilMoistureAnalysisPage = () => {
                                         color="error"
                                         startIcon={<DeleteIcon />}
                                         // loading={loading}
-                                        disabled={!selectedDataset}
+                                        disabled={!selectedDataset || !canDelete}
                                         loadingPosition="start"
                                         onClick={() => {
                                             showDialog({
