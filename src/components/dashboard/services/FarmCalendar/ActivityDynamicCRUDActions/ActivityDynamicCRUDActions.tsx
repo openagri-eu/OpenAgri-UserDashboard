@@ -760,14 +760,14 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 <CardContent>
                     <Stack direction={'column'} spacing={2}>
                         <TextField
-                        slotProps={{ input: { readOnly: !canEdit } }}
+                            slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Title" name="title"
                             value={formData.title ?? ''} onChange={handleChange}
                             error={!formData.title?.trim()}
                         />
                         {renderDateFields()}
                         <TextField
-                        slotProps={{ input: { readOnly: !canEdit } }}
+                            slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" multiline rows={4} label="Details" name="details"
                             value={formData.details ?? ''} onChange={handleChange}
                         />
