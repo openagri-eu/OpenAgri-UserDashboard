@@ -10,8 +10,15 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import PublishIcon from '@mui/icons-material/Publish';
 import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
+import { ServiceContextType } from "@layouts/services/PestAndDiseaseLayout";
+import { useOutletContext } from "react-router-dom";
 
 const DiseasesPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canAdd = actions.includes('add');
+    // const canEdit = actions.includes('edit');
+    // const canDelete = actions.includes('delete');
+
     const [diseases, setDiseases] = useState<DiseaseRow[]>([]);
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -101,7 +108,7 @@ const DiseasesPage = () => {
     return (
         <>
             <Box display={'flex'} flexDirection={'column'} gap={2}>
-                <Accordion expanded={expanded} onChange={handleAccordionChange}>
+                <Accordion disabled={!canAdd} expanded={expanded} onChange={handleAccordionChange}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography component="span">Add new disease</Typography>
                     </AccordionSummary>
