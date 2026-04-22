@@ -4,14 +4,19 @@ import useSnackbar from "@hooks/useSnackbar";
 import { FarmModel } from "@models/Farm";
 import { Box, Button, Card, CardContent, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useDialog from "@hooks/useDialog";
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 const FarmPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canEdit = actions.includes('edit');
+    const canDelete = actions.includes('delete');
+
     const [farm, setFarm] = useState<FarmModel>();
     const [title, setTitle] = useState<string>('');
 
@@ -136,26 +141,26 @@ const FarmPage = () => {
                     <Card>
                         <CardContent>
                             <Stack direction={'column'} spacing={2} >
-                                <TextField fullWidth margin="normal" label="Farm name" name="name" value={farm?.name ?? ''} onChange={handleChange} error={!farm?.name.trim()} />
-                                <TextField fullWidth margin="normal" label="administrator" name="administrator" value={farm?.administrator ?? ''} onChange={handleChange} error={!farm?.administrator.trim()} />
-                                <TextField fullWidth margin="normal" multiline rows={3} label="Farm description" name="description" value={farm?.description ?? ''} onChange={handleChange} error={!farm?.description?.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Farm name" name="name" value={farm?.name ?? ''} onChange={handleChange} error={!farm?.name.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="administrator" name="administrator" value={farm?.administrator ?? ''} onChange={handleChange} error={!farm?.administrator.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" multiline rows={3} label="Farm description" name="description" value={farm?.description ?? ''} onChange={handleChange} error={!farm?.description?.trim()} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Contact person first name" name="contactPerson.firstname" value={farm?.contactPerson.firstname ?? ''} onChange={handleChange} error={!farm?.contactPerson.firstname?.trim()} />
-                                    <TextField fullWidth margin="normal" label="Contact person last name" name="contactPerson.lastname" value={farm?.contactPerson.lastname ?? ''} onChange={handleChange} error={!farm?.contactPerson.lastname?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Contact person first name" name="contactPerson.firstname" value={farm?.contactPerson.firstname ?? ''} onChange={handleChange} error={!farm?.contactPerson.firstname?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Contact person last name" name="contactPerson.lastname" value={farm?.contactPerson.lastname ?? ''} onChange={handleChange} error={!farm?.contactPerson.lastname?.trim()} />
                                 </Stack>
-                                <TextField fullWidth margin="normal" label="Contact telephone" name="telephone" value={farm?.telephone ?? ''} onChange={handleChange} error={!farm?.telephone?.trim()} />
-                                <TextField fullWidth margin="normal" label="VAT ID" name="vatID" value={farm?.vatID ?? ''} onChange={handleChange} error={!farm?.vatID?.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Contact telephone" name="telephone" value={farm?.telephone ?? ''} onChange={handleChange} error={!farm?.telephone?.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="VAT ID" name="vatID" value={farm?.vatID ?? ''} onChange={handleChange} error={!farm?.vatID?.trim()} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Region" name="address.adminUnitL1" value={farm?.address.adminUnitL1 ?? ''} onChange={handleChange} error={!farm?.address.adminUnitL1?.trim()} />
-                                    <TextField fullWidth margin="normal" label="Subregion" name="address.adminUnitL2" value={farm?.address.adminUnitL2 ?? ''} onChange={handleChange} error={!farm?.address.adminUnitL2?.trim()} />
-                                </Stack>
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Address area" name="address.addressArea" value={farm?.address.addressArea ?? ''} onChange={handleChange} error={!farm?.address.addressArea?.trim()} />
-                                    <TextField fullWidth margin="normal" label="Municipality" name="address.municipality" value={farm?.address.municipality ?? ''} onChange={handleChange} error={!farm?.address.municipality?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Region" name="address.adminUnitL1" value={farm?.address.adminUnitL1 ?? ''} onChange={handleChange} error={!farm?.address.adminUnitL1?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Subregion" name="address.adminUnitL2" value={farm?.address.adminUnitL2 ?? ''} onChange={handleChange} error={!farm?.address.adminUnitL2?.trim()} />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Community" name="address.community" value={farm?.address.community ?? ''} onChange={handleChange} error={!farm?.address.community?.trim()} />
-                                    <TextField fullWidth margin="normal" label="Locator name" name="address.locatorName" value={farm?.address.locatorName ?? ''} onChange={handleChange} error={!farm?.address.locatorName?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Address area" name="address.addressArea" value={farm?.address.addressArea ?? ''} onChange={handleChange} error={!farm?.address.addressArea?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Municipality" name="address.municipality" value={farm?.address.municipality ?? ''} onChange={handleChange} error={!farm?.address.municipality?.trim()} />
+                                </Stack>
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Community" name="address.community" value={farm?.address.community ?? ''} onChange={handleChange} error={!farm?.address.community?.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Locator name" name="address.locatorName" value={farm?.address.locatorName ?? ''} onChange={handleChange} error={!farm?.address.locatorName?.trim()} />
                                 </Stack>
                             </Stack>
                         </CardContent>
@@ -167,7 +172,7 @@ const FarmPage = () => {
                             startIcon={<SaveIcon />}
                             loading={loading}
                             loadingPosition="start"
-                            disabled={isFormInvalid}
+                            disabled={isFormInvalid || !canEdit}
                             onClick={handleEdit}
                         >
                             Save Changes
@@ -178,6 +183,7 @@ const FarmPage = () => {
                             startIcon={<DeleteIcon />}
                             loading={loading}
                             loadingPosition="start"
+                            disabled={!canDelete}
                             onClick={() => {
                                 showDialog({
                                     title: `Are you sure you want to delete this farm?`,

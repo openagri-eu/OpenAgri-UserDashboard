@@ -3,6 +3,7 @@ interface GenericSelectPropsBase<T, R = T[]> {
     data?: R;
     label: string;
     method?: "GET" | "OPTIONS";
+    canEdit?: boolean;
     getOptionLabel: (item: T) => string;
     getOptionValue: (item: T) => string;
     transformResponse?: (response: R) => T[];

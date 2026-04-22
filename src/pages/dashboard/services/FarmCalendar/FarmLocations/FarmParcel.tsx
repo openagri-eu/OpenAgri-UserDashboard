@@ -6,14 +6,19 @@ import { FarmModel } from "@models/Farm";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { Box, Button, Card, CardContent, Checkbox, FormControlLabel, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import useDialog from "@hooks/useDialog";
+import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 
 const FarmParcelPage = () => {
+    const { actions } = useOutletContext<ServiceContextType>();
+    const canEdit = actions.includes('edit');
+    const canDelete = actions.includes('delete');
+
     const [parcel, setParcel] = useState<FarmParcelModel>();
     const [title, setTitle] = useState<string>('');
 
@@ -146,6 +151,7 @@ const FarmParcelPage = () => {
                         <CardContent>
                             <Stack direction={'column'} spacing={2} >
                                 {parcel && <GenericSelect<FarmModel>
+                                    canEdit={canEdit}
                                     endpoint='proxy/farmcalendar/api/v1/Farm/?format=json'
                                     label='Selected farm *'
                                     selectedValue={selectedFarm}
@@ -154,34 +160,34 @@ const FarmParcelPage = () => {
                                     getOptionValue={item => item["@id"].split(':')[3]}>
                                 </GenericSelect>}
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Parcel identifier" name="identifier" value={parcel?.identifier ?? ''} required onChange={handleChange} error={!parcel?.identifier.trim()} />
-                                    <TextField fullWidth margin="normal" label="Parcel type" name="category" value={parcel?.category ?? ''} required onChange={handleChange} error={!parcel?.category.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Parcel identifier" name="identifier" value={parcel?.identifier ?? ''} required onChange={handleChange} error={!parcel?.identifier.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Parcel type" name="category" value={parcel?.category ?? ''} required onChange={handleChange} error={!parcel?.category.trim()} />
                                 </Stack>
-                                <TextField fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={parcel?.description ?? ''} onChange={handleChange} error={!parcel?.description?.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={parcel?.description ?? ''} onChange={handleChange} error={!parcel?.description?.trim()} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Valid from" name="validFrom" value={parcel?.validFrom ?? ''} onChange={handleChange} disabled />
-                                    <TextField fullWidth margin="normal" label="Valid to" name="validTo" value={parcel?.validTo ?? ''} onChange={handleChange} disabled />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid from" name="validFrom" value={parcel?.validFrom ?? ''} onChange={handleChange} disabled />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid to" name="validTo" value={parcel?.validTo ?? ''} onChange={handleChange} disabled />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Region" name="inRegion" value={parcel?.inRegion ?? ''} onChange={handleChange} />
-                                    <TextField fullWidth margin="normal" label="Toponym" name="hasToponym" value={parcel?.hasToponym ?? ''} onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Region" name="inRegion" value={parcel?.inRegion ?? ''} onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Toponym" name="hasToponym" value={parcel?.hasToponym ?? ''} onChange={handleChange} />
                                 </Stack>
                                 <Stack flexWrap={"wrap"} direction={'row'} spacing={3} alignItems="center">
-                                    <FormControlLabel control={<Checkbox name="isNitroArea" checked={!!parcel?.isNitroArea} onChange={handleChange} />} label="Nitro area" />
-                                    <FormControlLabel control={<Checkbox name="isNatura2000Area" checked={!!parcel?.isNatura2000Area} onChange={handleChange} />} label="Natura 2000 area" />
-                                    <FormControlLabel control={<Checkbox name="isPdopgArea" checked={!!parcel?.isPdopgArea} onChange={handleChange} />} label="PDOPG area" />
-                                    <FormControlLabel control={<Checkbox name="isIrrigated" checked={!!parcel?.isIrrigated} onChange={handleChange} />} label="Irrigated" />
-                                    <FormControlLabel control={<Checkbox name="isCultivatedInLevels" checked={!!parcel?.isCultivatedInLevels} onChange={handleChange} />} label="Cultivated in levels" />
-                                    <FormControlLabel control={<Checkbox name="isGroundSlope" checked={!!parcel?.isGroundSlope} onChange={handleChange} />} label="Ground slope" />
+                                    <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isNitroArea" checked={!!parcel?.isNitroArea} onChange={canEdit ? handleChange : () => {}} />} label="Nitro area" />
+                                    <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isNatura2000Area" checked={!!parcel?.isNatura2000Area} onChange={canEdit ? handleChange : () => {}} />} label="Natura 2000 area" />
+                                    <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isPdopgArea" checked={!!parcel?.isPdopgArea} onChange={canEdit ? handleChange : () => {}} />} label="PDOPG area" />
+                                    <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isIrrigated" checked={!!parcel?.isIrrigated} onChange={canEdit ? handleChange : () => {}} />} label="Irrigated" />
+                                    <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isCultivatedInLevels" checked={!!parcel?.isCultivatedInLevels} onChange={canEdit ? handleChange : () => {}} />} label="Cultivated in levels" />
+                                    <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isGroundSlope" checked={!!parcel?.isGroundSlope} onChange={canEdit ? handleChange : () => {}} />} label="Ground slope" />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} />
-                                    <TextField fullWidth margin="normal" label="Image or map URL" name="depiction" value={parcel?.depiction ?? ''} onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Image or map URL" name="depiction" value={parcel?.depiction ?? ''} onChange={handleChange} />
                                 </Stack>
-                                <TextField fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={parcel?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={parcel?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField fullWidth margin="normal" label="Latitude" name="location.lat" value={parcel?.location.lat ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.lat} />
-                                    <TextField fullWidth margin="normal" label="Longitude" name="location.long" value={parcel?.location.long ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.long} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Latitude" name="location.lat" value={parcel?.location.lat ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.lat} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Longitude" name="location.long" value={parcel?.location.long ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.long} />
                                 </Stack>
                             </Stack>
                         </CardContent>
@@ -193,7 +199,7 @@ const FarmParcelPage = () => {
                             startIcon={<SaveIcon />}
                             loading={loading}
                             loadingPosition="start"
-                            disabled={isFormInvalid}
+                            disabled={isFormInvalid || !canEdit}
                             onClick={handleEdit}
                         >
                             Save Changes
@@ -204,6 +210,7 @@ const FarmParcelPage = () => {
                             startIcon={<DeleteIcon />}
                             loading={loading}
                             loadingPosition="start"
+                            disabled={!canDelete}
                             onClick={() => {
                                 showDialog({
                                     title: `Are you sure you want to delete this parcel?`,
