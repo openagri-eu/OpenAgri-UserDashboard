@@ -167,8 +167,8 @@ export default function App() {
         disabled: !hasAccess('PDM'),
       },
       {
-        segment: 'risk-index',
-        title: 'Risk index',
+        segment: 'risk-forecast',
+        title: 'Risk forecast',
         icon: <ReportIcon />,
         disabled: !hasAccess('PDM'),
       },

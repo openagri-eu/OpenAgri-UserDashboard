@@ -32,7 +32,7 @@ import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalend
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
 import DiseasesPage from '@pages/dashboard/services/PestAndDisease/Diseases.tsx';
-import RiskIndexPage from '@pages/dashboard/services/PestAndDisease/RiskIndex.tsx';
+import RiskForecastPage from '@pages/dashboard/services/PestAndDisease/RiskForecast.tsx';
 
 import FarmCalendarLayout from './layouts/services/FarmCalendarLayout.tsx';
 import IrrigationManagementLayout from './layouts/services/IrrigationManagementLayout.tsx';
@@ -155,8 +155,8 @@ const router = createBrowserRouter([
                 Component: DiseasesPage
               },
               {
-                path: 'risk-index',
-                Component: RiskIndexPage
+                path: 'risk-forecast',
+                Component: RiskForecastPage
               },
             ]
           },
