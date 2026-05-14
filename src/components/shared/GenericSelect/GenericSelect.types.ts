@@ -7,6 +7,9 @@ interface GenericSelectPropsBase<T, R = T[]> {
     getOptionLabel: (item: T) => string;
     getOptionValue: (item: T) => string;
     transformResponse?: (response: R) => T[];
+    error?: boolean;
+    required?: boolean;
+    helperText?: string;
 }
 
 // Props for a SINGLE select (multiple is false or undefined)
