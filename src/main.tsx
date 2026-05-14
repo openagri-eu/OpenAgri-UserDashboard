@@ -31,7 +31,7 @@ import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilM
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
-import DiseasesPage from '@pages/dashboard/services/PestAndDisease/Diseases.tsx';
+import ThreatModelsPage from '@pages/dashboard/services/PestAndDisease/ThreatModels.tsx';
 import RiskForecastPage from '@pages/dashboard/services/PestAndDisease/RiskForecast.tsx';
 
 import FarmCalendarLayout from './layouts/services/FarmCalendarLayout.tsx';
@@ -151,8 +151,8 @@ const router = createBrowserRouter([
                 Component: GrowingDegreeDaysPage
               },
               {
-                path: 'diseases',
-                Component: DiseasesPage
+                path: 'threat-models',
+                Component: ThreatModelsPage
               },
               {
                 path: 'risk-forecast',
