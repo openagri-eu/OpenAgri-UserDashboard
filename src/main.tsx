@@ -24,6 +24,9 @@ import FarmPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farm.
 import TokenRefreshPage from '@pages/auth/TokenRefresh/TokenRefresh.tsx';
 import RegisterCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/RegisterActivity.tsx';
 import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity.tsx';
+import ActivityTypesPage from '@pages/dashboard/services/FarmCalendar/ActivityTypes/ActivityTypes.tsx';
+import AddActivityTypePage from '@pages/dashboard/services/FarmCalendar/ActivityTypes/AddActivityType.tsx';
+import EditActivityTypePage from '@pages/dashboard/services/FarmCalendar/ActivityTypes/EditActivityType.tsx';
 import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.tsx';
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
@@ -67,6 +70,18 @@ const router = createBrowserRouter([
               {
                 path: 'farm-calendar/edit-activity/:id',
                 Component: EditCalendarActivityPage
+              },
+              {
+                path: 'farm-calendar/activity-types',
+                Component: ActivityTypesPage
+              },
+              {
+                path: 'farm-calendar/activity-types/add',
+                Component: AddActivityTypePage
+              },
+              {
+                path: 'farm-calendar/activity-types/edit/:id',
+                Component: EditActivityTypePage
               },
               {
                 path: 'farm-locations',
