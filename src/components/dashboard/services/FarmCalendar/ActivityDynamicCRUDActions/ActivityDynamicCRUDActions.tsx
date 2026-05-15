@@ -44,7 +44,7 @@ const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
         'title', 'phenomenonTime', 'madeBySensor.name', 'hasAgriCrop',
         'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
     ]),
-    DiseaseDetectionObservation: new Set([
+    DiseaseDetection: new Set([
         'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
         'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
     ]),
@@ -67,15 +67,15 @@ const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
         'title', 'responsibleAgent', 'hasStartDatetime', 'operatedOn',
         'hasAppliedAmount.numericValue', 'hasAppliedAmount.unit', 'usesIrrigationSystem',
     ]),
-    SprayingRecommendationObservation: new Set([
+    SprayingRecommendation: new Set([
         'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
         'hasResult.hasValue', 'hasResult.unit', 'observedProperty', 'usesPesticide',
     ]),
-    VigorEstimationObservation: new Set([
+    VigorEstimation: new Set([
         'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
         'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
     ]),
-    YieldPredictionObservation: new Set([
+    YieldPrediction: new Set([
         'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
         'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
     ]),
@@ -818,7 +818,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         },
     };
 
-    const isFormInvalid = Array.from(requiredKeys).some(k => {
+    const isFormInvalid = !selectedParcel || Array.from(requiredKeys).some(k => {
         const fn = fieldValidators[k];
         return fn ? !fn() : false;
     });
@@ -926,8 +926,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             setSelectedValue={setSelectedParcel}
                             getOptionLabel={item => `${item.identifier} (${item.category})`}
                             getOptionValue={item => item["@id"].split(':')[3]}
-                            required={isReq('operatedOn')}
-                            error={isReq('operatedOn') && !selectedParcel}
+                            required
+                            error={!selectedParcel}
                         />
                         {/* NTH: string filtering of the displayed activities */}
                         <GenericSelect<FarmCalendarActivityModel>
