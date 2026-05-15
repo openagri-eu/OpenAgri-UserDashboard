@@ -57,7 +57,7 @@ const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
         'title', 'responsibleAgent', 'hasStartDatetime',
     ]),
     Alert: new Set([
-        'title', 'validFrom', 'validTo', 'relatedObservation',
+        'title', 'validFrom', 'validTo', 'relatedObservation', 'severity',
     ]),
     Observation: new Set([
         'title', 'phenomenonTime', 'madeBySensor.name',
@@ -99,9 +99,17 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
     /** All calendar activities section start */
     const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
+    const [allObservations, setAllObservations] = useState<FarmCalendarActivityModel[]>([]);
 
     const { fetchData: fetchDataAllActivities, response: responseAllActivities } = useFetch<FarmCalendarActivityModel[]>(
         `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json`,
+        {
+            method: 'GET',
+        }
+    );
+
+    const { fetchData: fetchDataAllObservations, response: responseAllObservations } = useFetch<FarmCalendarActivityModel[]>(
+        `proxy/farmcalendar/api/v1/Observations/?format=json`,
         {
             method: 'GET',
         }
@@ -112,10 +120,19 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             setAllActivities(responseAllActivities);
         }
     }, [responseAllActivities])
+
+    useEffect(() => {
+        if (responseAllObservations) {
+            setAllObservations(responseAllObservations);
+        }
+    }, [responseAllObservations])
     /** All calendar activities section end */
 
     useEffect(() => {
         fetchDataAllActivities();
+        if ('relatedObservation' in formData) {
+            fetchDataAllObservations();
+        }
 
         let parcelID: string | undefined;
         if ('hasAgriParcel' in formData) {
@@ -490,6 +507,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         transformResponse={a => a.actions.POST.severity.choices}
                         getOptionLabel={item => item.display_name}
                         getOptionValue={item => item.value}
+                        required={isReq('severity')}
+                        error={isReq('severity') && !severity}
                     />
                 )}
             </>
@@ -807,6 +826,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         'observedProperty': () => !!((formData as any).observedProperty ?? '').toString().trim(),
         'madeBySensor.name': () => !!((formData as any).madeBySensor?.name ?? '').toString().trim(),
         'hasApplicationMethod': () => !!((formData as any).hasApplicationMethod ?? '').toString().trim(),
+        'severity': () => !!severity,
         'hasCompostMaterial': () => {
             const arr = (formData as any).hasCompostMaterial;
             if (!Array.isArray(arr) || arr.length === 0) return false;
@@ -933,7 +953,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         <GenericSelect<FarmCalendarActivityModel>
                             canEdit={canEdit}
                             endpoint=''
-                            data={allActivities}
+                            data={'relatedObservation' in formData ? allObservations : allActivities}
                             label={'relatedObservation' in formData ? 'Related observation' : 'Part of activity'}
                             // Filtering out the current activity to avoid recursive links
                             transformResponse={resp => {
@@ -943,9 +963,11 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             }}
                             selectedValue={parentActivity}
                             setSelectedValue={setParentActivity}
-                            getOptionLabel={
-                                item => `${item.title} (${dayjs(item.hasStartDatetime).format('YYYY-MM-DD HH:mm')} - ${dayjs(item.hasEndDatetime).format('YYYY-MM-DD HH:mm')})`
-                            }
+                            getOptionLabel={item => {
+                                const start = (item as any).hasStartDatetime ?? (item as any).phenomenonTime;
+                                const end = (item as any).hasEndDatetime;
+                                return `${item.title} (${dayjs(start).format('YYYY-MM-DD HH:mm')}${end ? ` - ${dayjs(end).format('YYYY-MM-DD HH:mm')}` : ''})`;
+                            }}
                             getOptionValue={item => item["@id"].split(':')[3]}
                             required={isReq('relatedObservation')}
                             error={isReq('relatedObservation') && !parentActivity}
