@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Chip } from '@mui/material';
+import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, Chip } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { GenericSelectProps } from './GenericSelect.types';
 import useFetch from '@hooks/useFetch';
@@ -15,6 +15,9 @@ const GenericSelect = <T, R = T[]>({
     canEdit = true,
     data = undefined,
     multiple = false,
+    error = false,
+    required = false,
+    helperText,
 }: GenericSelectProps<T, R>) => {
     const { fetchData, response, loading } = useFetch<R>(endpoint, { method: method });
 
@@ -54,7 +57,7 @@ const GenericSelect = <T, R = T[]>({
 
     return (
         <Box flex={1}>
-            <FormControl fullWidth>
+            <FormControl fullWidth error={error} required={required}>
                 <InputLabel id={`${label}-label`}>{label}</InputLabel>
                 <Select
                     readOnly={!canEdit}
@@ -64,6 +67,7 @@ const GenericSelect = <T, R = T[]>({
                     disabled={loading}
                     onChange={handleChange}
                     multiple={multiple}
+                    error={error}
                     renderValue={multiple ? (selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {(selected as string[]).map((value) => {
@@ -93,6 +97,7 @@ const GenericSelect = <T, R = T[]>({
                             );
                         })}
                 </Select>
+                {helperText && <FormHelperText>{helperText}</FormHelperText>}
             </FormControl>
         </Box>
     );
