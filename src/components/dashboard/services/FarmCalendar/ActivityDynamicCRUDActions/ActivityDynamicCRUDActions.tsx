@@ -22,10 +22,71 @@ import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 import useFetch from "@hooks/useFetch";
 import { useNavigate } from "react-router-dom";
 
+const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
+    AddRawMaterialOperation: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'operatedOn', 'hasCompostMaterial',
+    ]),
+    CompostOperation: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'isOperatedOn',
+    ]),
+    CompostTurningOperation: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'operatedOn',
+    ]),
+    CropGrowthStageObservation: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name', 'hasAgriCrop',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
+    ]),
+    CropProtectionOperation: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'operatedOn',
+        'hasAppliedAmount.numericValue', 'hasAppliedAmount.unit', 'usesPesticide',
+    ]),
+    CropStressIndicatorObservation: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name', 'hasAgriCrop',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
+    ]),
+    DiseaseDetection: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
+    ]),
+    FertilizationOperation: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'operatedOn',
+        'hasAppliedAmount.numericValue', 'hasAppliedAmount.unit',
+        'hasApplicationMethod', 'usesFertilizer',
+    ]),
+    FarmCalendarActivity: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime',
+    ]),
+    Alert: new Set([
+        'title', 'validFrom', 'validTo', 'relatedObservation', 'severity',
+    ]),
+    Observation: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
+    ]),
+    IrrigationOperation: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'operatedOn',
+        'hasAppliedAmount.numericValue', 'hasAppliedAmount.unit', 'usesIrrigationSystem',
+    ]),
+    SprayingRecommendation: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty', 'usesPesticide',
+    ]),
+    VigorEstimation: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
+    ]),
+    YieldPrediction: new Set([
+        'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
+        'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
+    ]),
+};
+
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, activityTypes, onAdd, onDelete, onSave, loading, canEdit, canDelete }: ActivityDynamicCRUDActionsProps<T>) => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState<T>(activity);
+    const requiredKeys = REQUIRED_KEYS_BY_TYPE[formData['@type']] ?? new Set<string>();
+    const isReq = (key: string) => requiredKeys.has(key);
     const [selectedParcel, setSelectedParcel] = useState<string>('');
     const [selectedAgriCrop, setSelectedAgriCrop] = useState<string>('');
     const [selectedAgriMachines, setSelectedAgriMachines] = useState<string[]>([]);
@@ -38,9 +99,17 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
     /** All calendar activities section start */
     const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
+    const [allObservations, setAllObservations] = useState<FarmCalendarActivityModel[]>([]);
 
     const { fetchData: fetchDataAllActivities, response: responseAllActivities } = useFetch<FarmCalendarActivityModel[]>(
         `proxy/farmcalendar/api/v1/FarmCalendarActivities/?format=json`,
+        {
+            method: 'GET',
+        }
+    );
+
+    const { fetchData: fetchDataAllObservations, response: responseAllObservations } = useFetch<FarmCalendarActivityModel[]>(
+        `proxy/farmcalendar/api/v1/Observations/?format=json`,
         {
             method: 'GET',
         }
@@ -51,10 +120,19 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             setAllActivities(responseAllActivities);
         }
     }, [responseAllActivities])
+
+    useEffect(() => {
+        if (responseAllObservations) {
+            setAllObservations(responseAllObservations);
+        }
+    }, [responseAllObservations])
     /** All calendar activities section end */
 
     useEffect(() => {
         fetchDataAllActivities();
+        if ('relatedObservation' in formData) {
+            fetchDataAllObservations();
+        }
 
         let parcelID: string | undefined;
         if ('hasAgriParcel' in formData) {
@@ -262,6 +340,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
     /** -------------------------------------------------------------------------- */
 
+    const isDateInvalid = (v: any) => !(v && dayjs(v).isValid());
+
     /** Field rendering helpers start */
     const renderDateFields = () => {
         return (
@@ -272,6 +352,12 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         label="Start datetime"
                         value={dayjs(formData.hasStartDatetime as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'hasStartDatetime')}
+                        slotProps={{
+                            textField: {
+                                required: isReq('hasStartDatetime'),
+                                error: isReq('hasStartDatetime') && isDateInvalid(formData.hasStartDatetime),
+                            },
+                        }}
                     />
                 )}
                 {'phenomenonTime' in formData && (
@@ -280,14 +366,26 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         label="Start datetime"
                         value={dayjs(formData.phenomenonTime as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'phenomenonTime')}
+                        slotProps={{
+                            textField: {
+                                required: isReq('phenomenonTime'),
+                                error: isReq('phenomenonTime') && isDateInvalid(formData.phenomenonTime),
+                            },
+                        }}
                     />
                 )}
                 {'validFrom' in formData && (
                     <DateTimePicker
                         readOnly={!canEdit}
-                        label="Start datetime"
+                        label="Valid from"
                         value={dayjs(formData.validFrom as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'validFrom')}
+                        slotProps={{
+                            textField: {
+                                required: isReq('validFrom'),
+                                error: isReq('validFrom') && isDateInvalid(formData.validFrom),
+                            },
+                        }}
                     />
                 )}
                 {'hasEndDatetime' in formData && (
@@ -301,9 +399,15 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 {'validTo' in formData && (
                     <DateTimePicker
                         readOnly={!canEdit}
-                        label="Start datetime"
+                        label="Valid to"
                         value={dayjs(formData.validTo as string | Date | null)}
                         onChange={(val) => handleDateChange(val, 'validTo')}
+                        slotProps={{
+                            textField: {
+                                required: isReq('validTo'),
+                                error: isReq('validTo') && isDateInvalid(formData.validTo),
+                            },
+                        }}
                     />
                 )}
             </>
@@ -318,9 +422,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Responsible agent"
                         name="responsibleAgent"
+                        required={isReq('responsibleAgent')}
                         value={formData.responsibleAgent ?? ''}
                         onChange={handleChange}
-                        error={!(formData.responsibleAgent ? formData.responsibleAgent as string : '').trim()} />
+                        error={isReq('responsibleAgent') && !(formData.responsibleAgent ? formData.responsibleAgent as string : '').trim()} />
                 )}
                 {'usesAgriculturalMachinery' in formData && (
                     <GenericSelect<AgriculturalMachine>
@@ -349,9 +454,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Made by sensor"
                         name="madeBySensor.name"
+                        required={isReq('madeBySensor.name')}
                         value={(formData.madeBySensor as SensorShape).name ?? ''}
                         onChange={handleChange}
-                        error={!(formData.madeBySensor as SensorShape).name?.trim()} />
+                        error={isReq('madeBySensor.name') && !(formData.madeBySensor as SensorShape).name?.trim()} />
                 )}
                 {'hasResult' in formData && (
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -359,16 +465,18 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Value"
                             name="hasResult.hasValue"
+                            required={isReq('hasResult.hasValue')}
                             value={(formData.hasResult as ResultShape).hasValue ?? ''}
                             onChange={handleChange}
-                            error={!(formData.hasResult as ResultShape).hasValue?.trim()} />
+                            error={isReq('hasResult.hasValue') && !(formData.hasResult as ResultShape).hasValue?.trim()} />
                         <TextField
                             slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Value unit"
                             name="hasResult.unit"
+                            required={isReq('hasResult.unit')}
                             value={(formData.hasResult as ResultShape).unit ?? ''}
                             onChange={handleChange}
-                            error={!(formData.hasResult as ResultShape).unit?.trim()} />
+                            error={isReq('hasResult.unit') && !(formData.hasResult as ResultShape).unit?.trim()} />
                     </Stack>
                 )}
                 {'observedProperty' in formData && (
@@ -376,9 +484,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Observed property"
                         name="observedProperty"
+                        required={isReq('observedProperty')}
                         value={formData.observedProperty ?? ''}
                         onChange={handleChange}
-                        error={!(formData.observedProperty as string).trim()} />
+                        error={isReq('observedProperty') && !(formData.observedProperty as string).trim()} />
                 )}
             </>
         )
@@ -398,6 +507,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         transformResponse={a => a.actions.POST.severity.choices}
                         getOptionLabel={item => item.display_name}
                         getOptionValue={item => item.value}
+                        required={isReq('severity')}
+                        error={isReq('severity') && !severity}
                     />
                 )}
             </>
@@ -418,6 +529,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         transformResponse={a => a.actions.POST.usesIrrigationSystem.choices}
                         getOptionLabel={item => item.display_name}
                         getOptionValue={item => item.value}
+                        required={isReq('usesIrrigationSystem')}
+                        error={isReq('usesIrrigationSystem') && !usesIrrigationSystem}
                     />
                 )}
             </>
@@ -437,6 +550,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         setSelectedValue={setSelectedAgriCrop}
                         getOptionLabel={item => `${item.name} - ${item.cropSpecies.name} - ${item.growth_stage}`}
                         getOptionValue={item => item["@id"].split(':')[3]}
+                        required={isReq('hasAgriCrop')}
+                        error={isReq('hasAgriCrop') && !selectedAgriCrop}
                     />
                 )}
             </>
@@ -453,9 +568,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         label="Has area"
                         name="hasArea"
                         type="number"
+                        required={isReq('hasArea')}
                         value={isNaN(formData.hasArea as number) ? '' : formData.hasArea}
                         onChange={handleChange}
-                        error={isNaN(formData.hasArea as number)} />
+                        error={isReq('hasArea') && isNaN(formData.hasArea as number)} />
                 )}
             </>
         )
@@ -469,9 +585,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Operated on compost pile"
                         name="isOperatedOn.@id"
+                        required={isReq('isOperatedOn')}
                         value={operatedOnCompostPile}
                         onChange={handleOperatedOnCompostPile}
-                        error={!operatedOnCompostPile.trim()} />
+                        error={isReq('isOperatedOn') && !operatedOnCompostPile.trim()} />
                 )}
             </>
         )
@@ -485,9 +602,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         slotProps={{ input: { readOnly: !canEdit } }}
                         fullWidth margin="normal" label="Application method"
                         name="hasApplicationMethod"
+                        required={isReq('hasApplicationMethod')}
                         value={formData.hasApplicationMethod}
                         onChange={handleChange}
-                        error={!(formData.hasApplicationMethod as string).trim()} />
+                        error={isReq('hasApplicationMethod') && !(formData.hasApplicationMethod as string).trim()} />
                 )}
             </>
         )
@@ -505,17 +623,19 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             fullWidth label="Applied amount"
                             name="hasAppliedAmount.numericValue"
                             type="number"
+                            required={isReq('hasAppliedAmount.numericValue')}
                             value={isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue']) ?
                                 '' : (formData.hasAppliedAmount as AppliedAmountShape)["numericValue"]}
                             onChange={handleChange}
-                            error={isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue'])} />
+                            error={isReq('hasAppliedAmount.numericValue') && isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue'])} />
                         <TextField
                             slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Applied amount unit"
                             name="hasAppliedAmount.unit"
+                            required={isReq('hasAppliedAmount.unit')}
                             value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
                             onChange={handleChange}
-                            error={!(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()} />
+                            error={isReq('hasAppliedAmount.unit') && !(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()} />
                     </Stack>
                 )}
             </>
@@ -535,6 +655,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         setSelectedValue={setSelectedPesticide}
                         getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasPreharvestInterval}`}
                         getOptionValue={item => item["@id"].split(':')[3]}
+                        required={isReq('usesPesticide')}
+                        error={isReq('usesPesticide') && !selectedPesticide}
                     />
                 )}
             </>
@@ -554,6 +676,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         setSelectedValue={setSelectedFertilizer}
                         getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasNutrientConcentration}`}
                         getOptionValue={item => item["@id"].split(':')[3]}
+                        required={isReq('usesFertilizer')}
+                        error={isReq('usesFertilizer') && !selectedFertilizer}
                     />
                 )}
             </>
@@ -679,6 +803,47 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
 
     /** -------------------------------------------------------------------------- */
 
+    /** Validation start */
+    const fieldValidators: Record<string, () => boolean> = {
+        'title': () => !!formData.title?.trim(),
+        'responsibleAgent': () => !!((formData as any).responsibleAgent ?? '').toString().trim(),
+        'hasStartDatetime': () => !isDateInvalid((formData as any).hasStartDatetime),
+        'phenomenonTime': () => !isDateInvalid((formData as any).phenomenonTime),
+        'validFrom': () => !isDateInvalid((formData as any).validFrom),
+        'validTo': () => !isDateInvalid((formData as any).validTo),
+        'operatedOn': () => !!selectedParcel,
+        'hasAgriCrop': () => !!selectedAgriCrop,
+        'usesPesticide': () => !!selectedPesticide,
+        'usesFertilizer': () => !!selectedFertilizer,
+        'usesIrrigationSystem': () => !!usesIrrigationSystem,
+        'relatedObservation': () => !!parentActivity,
+        'isOperatedOn': () => !!operatedOnCompostPile.trim(),
+        'hasArea': () => !isNaN((formData as any).hasArea as number),
+        'hasAppliedAmount.numericValue': () => !isNaN(((formData as any).hasAppliedAmount?.numericValue) as number),
+        'hasAppliedAmount.unit': () => !!((formData as any).hasAppliedAmount?.unit ?? '').toString().trim(),
+        'hasResult.hasValue': () => !!((formData as any).hasResult?.hasValue ?? '').toString().trim(),
+        'hasResult.unit': () => !!((formData as any).hasResult?.unit ?? '').toString().trim(),
+        'observedProperty': () => !!((formData as any).observedProperty ?? '').toString().trim(),
+        'madeBySensor.name': () => !!((formData as any).madeBySensor?.name ?? '').toString().trim(),
+        'hasApplicationMethod': () => !!((formData as any).hasApplicationMethod ?? '').toString().trim(),
+        'severity': () => !!severity,
+        'hasCompostMaterial': () => {
+            const arr = (formData as any).hasCompostMaterial;
+            if (!Array.isArray(arr) || arr.length === 0) return false;
+            return arr.every((m: any) =>
+                !!m.typeName?.trim()
+                && !isNaN(m.quantityValue?.numericValue)
+                && !!m.quantityValue?.unit?.trim()
+            );
+        },
+    };
+
+    const isFormInvalid = !selectedParcel || Array.from(requiredKeys).some(k => {
+        const fn = fieldValidators[k];
+        return fn ? !fn() : false;
+    });
+    /** Validation end */
+
     /** Button handler functions start */
     const prepPostAndPatch = () => {
         let body = { ...formData };
@@ -762,8 +927,9 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         <TextField
                             slotProps={{ input: { readOnly: !canEdit } }}
                             fullWidth margin="normal" label="Title" name="title"
+                            required={isReq('title')}
                             value={formData.title ?? ''} onChange={handleChange}
-                            error={!formData.title?.trim()}
+                            error={isReq('title') && !formData.title?.trim()}
                         />
                         {renderDateFields()}
                         <TextField
@@ -780,13 +946,15 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             setSelectedValue={setSelectedParcel}
                             getOptionLabel={item => `${item.identifier} (${item.category})`}
                             getOptionValue={item => item["@id"].split(':')[3]}
+                            required
+                            error={!selectedParcel}
                         />
                         {/* NTH: string filtering of the displayed activities */}
                         <GenericSelect<FarmCalendarActivityModel>
                             canEdit={canEdit}
                             endpoint=''
-                            data={allActivities}
-                            label='Part of activity'
+                            data={'relatedObservation' in formData ? allObservations : allActivities}
+                            label={'relatedObservation' in formData ? 'Related observation' : 'Part of activity'}
                             // Filtering out the current activity to avoid recursive links
                             transformResponse={resp => {
                                 return resp.filter(fa => {
@@ -795,10 +963,14 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                             }}
                             selectedValue={parentActivity}
                             setSelectedValue={setParentActivity}
-                            getOptionLabel={
-                                item => `${item.title} (${dayjs(item.hasStartDatetime).format('YYYY-MM-DD HH:mm')} - ${dayjs(item.hasEndDatetime).format('YYYY-MM-DD HH:mm')})`
-                            }
+                            getOptionLabel={item => {
+                                const start = (item as any).hasStartDatetime ?? (item as any).phenomenonTime;
+                                const end = (item as any).hasEndDatetime;
+                                return `${item.title} (${dayjs(start).format('YYYY-MM-DD HH:mm')}${end ? ` - ${dayjs(end).format('YYYY-MM-DD HH:mm')}` : ''})`;
+                            }}
                             getOptionValue={item => item["@id"].split(':')[3]}
+                            required={isReq('relatedObservation')}
+                            error={isReq('relatedObservation') && !parentActivity}
                         />
                         {renderSeverity()}
                         {renderSensorResultAndObservedProperty()}
@@ -822,8 +994,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                     startIcon={<AddIcon />}
                     loading={loading}
                     loadingPosition="start"
-                    // disabled={isFormInvalid}
-                    disabled={!canEdit}
+                    disabled={!canEdit || isFormInvalid}
                     onClick={handlePost}
                 >
                     Add
@@ -834,8 +1005,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                     startIcon={<SaveIcon />}
                     loading={loading}
                     loadingPosition="start"
-                    disabled={!canEdit}
-                    // disabled={isFormInvalid}
+                    disabled={!canEdit || isFormInvalid}
                     onClick={handlePatch}
                 >
                     Save Changes
