@@ -27,11 +27,16 @@ export default defineConfig({
       clientsClaim: true,
       // also make sure it's not pre-cached
       globIgnores: ['**/env-config.js'],
+      navigateFallbackDenylist: [/^\/examples\//],
       // NEVER cache the runtime env file
       runtimeCaching: [
         {
           urlPattern: /\/env-config\.js$/,
           handler: 'NetworkOnly', // or 'NetworkFirst' with low cache
+        },
+        {
+          urlPattern: /^\/examples\//,
+          handler: 'NetworkOnly',
         },
       ],
 
@@ -43,5 +48,17 @@ export default defineConfig({
       suppressWarnings: true,
       type: 'module',
     },
-  })],
+  }),
+    // {
+    //   name: 'inject-env-config',
+    //   transformIndexHtml(html, ctx) {
+    //     if (ctx.bundle) {
+    //       return html.replace(
+    //         '</head>',
+    //         '  <script src="/env-config.js"></script>\n</head>'
+    //       )
+    //     }
+    //   },
+    // }
+  ],
 })
