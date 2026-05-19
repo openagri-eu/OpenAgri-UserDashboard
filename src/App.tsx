@@ -161,8 +161,8 @@ export default function App() {
         disabled: !hasAccess('PDM'),
       },
       {
-        segment: 'diseases',
-        title: 'Diseases',
+        segment: 'threat-models',
+        title: 'Threat models',
         icon: <CoronavirusIcon />,
         disabled: !hasAccess('PDM'),
       },
