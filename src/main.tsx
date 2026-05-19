@@ -16,7 +16,6 @@ import GrowingDegreeDaysPage from '@pages/dashboard/services/PestAndDisease/Grow
 import CompostOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/CompostOperations.tsx';
 import AuthLayout from '@layouts/auth.tsx';
 import SignInPage from '@pages/auth/SignIn/SignInPage.tsx';
-import SignUpPage from '@pages/auth/SignUp/SignUpPage.tsx';
 import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcel.tsx';
 import FarmParcelsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcels.tsx';
 import FarmsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farms.tsx';
@@ -193,10 +192,6 @@ const router = createBrowserRouter([
           {
             path: 'sign-in',
             Component: SignInPage
-          },
-          {
-            path: 'sign-up',
-            Component: SignUpPage
           },
           {
             path: 'session-refresh',

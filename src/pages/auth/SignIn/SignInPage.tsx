@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, InputAdornment, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import LoginIcon from '@mui/icons-material/Login';
@@ -118,11 +118,6 @@ const SignInPage = () => {
                         variant="contained">
                         Sign In
                     </Button>
-                    <Box display={"flex"}>
-                        <Link textAlign={"center"} href="/sign-up" underline="none">
-                            {'Don\'t have an account yet? Register for free'}
-                        </Link>
-                    </Box>
                 </Box>
             </Box>
             <GenericSnackbar
