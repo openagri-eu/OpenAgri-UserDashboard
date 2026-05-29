@@ -47,3 +47,30 @@ docker run --rm -it -p 80:80 openagri-dashboard
 ```
 
 You can now visit the page [http://127.0.0.1](http://127.0.0.1) to access the WEB Dashboard
+
+# Using as a PWA
+The dashboard is a Progressive Web App, so it can be installed and run like a native app on desktop and mobile, with offline support for the app shell.
+
+A service worker is registered automatically (`registerType: 'autoUpdate'`), so an installed app silently updates to the latest version on the next launch.
+
+> **Note:** Installing requires a secure context — HTTPS, or `localhost` during local development. Plain `http://<ip>` over the LAN will not offer installation.
+
+### Install
+- **Desktop (Chrome/Edge):** click the install icon at the right of the address bar, or open the ⋮ menu → *Install OpenAgri-UserDashboard…*
+- **Android (Chrome):** ⋮ menu → *Install app* / *Add to Home screen*
+- **iOS (Safari):** Share → *Add to Home Screen*
+
+The installed app launches in its own standalone window using the OpenAgri logo as its icon.
+
+### Regenerating icons
+App icons (favicon, Apple touch icon, and the `pwa-*`/`maskable` PNGs) are generated from `public/logo.png`. After changing that image, regenerate them with:
+
+```
+npm run generate-pwa-assets
+```
+
+### Testing on a mobile device
+The production build (`npm run build` + `npm run preview`) serves the service worker reliably (the dev server's is best-effort). To install on a phone you need an HTTPS origin:
+
+- **Android:** Chrome `chrome://inspect` → *Port forwarding* maps the phone's `localhost:4173` to your machine — this counts as a secure context and keeps the same origin the backend expects.
+- **Any device:** expose the preview over an HTTPS tunnel, e.g. `npx cloudflared tunnel --url http://localhost:4173`. Tunnel hostnames are already allowed in `vite.config.ts` (`preview.allowedHosts`). Note that API calls still require the tunnel origin to be on the backend's CORS allow-list.
