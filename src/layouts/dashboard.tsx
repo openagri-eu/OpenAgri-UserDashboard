@@ -9,6 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 import Footer from '@components/shared/Footer';
 import { useEffect, useState, useCallback } from 'react';
 import useFetch from '@hooks/useFetch';
+import { clearUserCaches } from '@utils/pwaCache';
 
 export type DashboardContextType = {
   setPageTitle: (title: string | undefined) => void;
@@ -52,8 +53,10 @@ export default function DashLayout() {
 
   useEffect(() => {
     if (error) {
-      setSession(null);
-      navigate("/");
+      clearUserCaches().finally(() => {
+        setSession(null);
+        navigate("/");
+      });
     }
   }, [error])
 

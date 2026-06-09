@@ -53,6 +53,22 @@ The dashboard is a Progressive Web App, so it can be installed and run like a na
 
 A service worker is registered automatically (`registerType: 'autoUpdate'`), so an installed app silently updates to the latest version on the next launch.
 
+### Runtime caching
+The service worker also caches API responses to keep the dashboard usable on poor or absent network. Strategies per endpoint group:
+
+| Cache | Strategy | TTL | Scope |
+|---|---|---|---|
+| `oa-reference` | StaleWhileRevalidate | 7 days | Global catalogs (activity types, crops, diseases, threat models, soil types, ETo option types) |
+| `oa-user-semi` | NetworkFirst (5s timeout) | 1 day | User-scoped semi-static (Farm, FarmParcels, FarmAnimals, AgriculturalMachines, Pesticides, Fertilizers, `me/`) |
+| `oa-user-live` | NetworkFirst (3s timeout) | 1 hour | User-scoped live data (FarmCalendarActivities, Observations, Alerts, CompostOperations, IrrigationOperations, irrigation datasets/calculations) |
+| `oa-forecast` | CacheFirst | 30 min | Weather/risk forecasts |
+
+User-scoped caches (`oa-user-*`) are wiped on sign-out to prevent cross-user data leak on the same device. Reference and forecast caches survive.
+
+> **Offline writes are NOT supported yet.** Mutations (POST/PATCH/DELETE) bypass the service worker entirely — they fail without a live connection. A future round will add Workbox Background Sync to queue mutations and replay them on reconnect.
+
+An `OfflineChip` appears in the toolbar whenever `navigator.onLine` reports offline, with a tooltip explaining that data shown may be stale and submissions will fail.
+
 > **Note:** Installing requires a secure context — HTTPS, or `localhost` during local development. Plain `http://<ip>` over the LAN will not offer installation.
 
 ### Install

@@ -63,6 +63,49 @@ export default defineConfig({
           urlPattern: /^\/examples\//,
           handler: 'NetworkOnly',
         },
+        {
+          urlPattern: ({ request }) =>
+            request.method === 'GET' &&
+            /\/proxy\/(farmcalendar\/api\/v1\/FarmCalendarActivityTypes\/|pdm\/api\/v1\/(crop|disease|model|threat-model)\/?|irrigation\/api\/v1\/(dataset\/soil-types|eto\/option-types)\/?)/.test(request.url),
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'oa-reference',
+            expiration: { maxEntries: 100, maxAgeSeconds: 7 * 24 * 60 * 60 },
+          },
+        },
+        {
+          urlPattern: ({ request }) =>
+            request.method === 'GET' &&
+            (/\/proxy\/farmcalendar\/api\/v1\/(Farm|FarmParcels|FarmAnimals|AgriculturalMachines|Pesticides|Fertilizers)\//.test(request.url)
+              || /\/me\/?(\?|$)/.test(request.url)),
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'oa-user-semi',
+            networkTimeoutSeconds: 5,
+            expiration: { maxEntries: 100, maxAgeSeconds: 24 * 60 * 60 },
+          },
+        },
+        {
+          urlPattern: ({ request }) =>
+            request.method === 'GET' &&
+            /\/proxy\/(farmcalendar\/api\/v1\/(FarmCalendarActivities|Observations|Alerts|CompostOperations|IrrigationOperations)\/|irrigation\/api\/v1\/(dataset|eto\/get-calculations)\/)/.test(request.url),
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'oa-user-live',
+            networkTimeoutSeconds: 3,
+            expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 },
+          },
+        },
+        {
+          urlPattern: ({ request }) =>
+            request.method === 'GET' &&
+            /\/proxy\/(weather_data\/api\/data\/(forecast5|flight-forecast5|spray-forecast)\/?|pdm\/api\/v1\/risk-forecast)/.test(request.url),
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'oa-forecast',
+            expiration: { maxEntries: 50, maxAgeSeconds: 30 * 60 },
+          },
+        },
       ],
 
     },
