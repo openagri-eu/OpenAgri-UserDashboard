@@ -53,6 +53,7 @@ export default function DashLayout() {
 
   useEffect(() => {
     if (error) {
+      if (!navigator.onLine) return;
       clearUserCaches().finally(() => {
         setSession(null);
         navigate("/");
@@ -80,9 +81,10 @@ export default function DashLayout() {
       // Decode the token to get its payload
       const decodedToken = jwtDecode(session.user.token);
 
-      // Check if the token has expired
       if ((decodedToken.exp ?? 0) < Date.now() / 1000) {
-        return <Redirect to={'/session-refresh' + callbackURL} />;
+        if (navigator.onLine) {
+          return <Redirect to={'/session-refresh' + callbackURL} />;
+        }
       }
     } catch (error) {
       // Token is invalid; redirect to sign-in
