@@ -26,12 +26,42 @@ const FarmCalendarPage = () => {
 
     const { session } = useSession();
 
-    const { fetchData, response, error } = useFetch<FarmCalendarActivityModel[]>(
-        `proxy/farmcalendar/api/v1/FarmCalendarActivities/?parcel=${session?.farm_parcel?.["@id"].split(':')[3]}&format=json&fromDate=${dayjs(dateRange.start).format('YYYY-MM-DD')}&toDate=${dayjs(dateRange.end).format('YYYY-MM-DD')}`,
-        {
-            method: 'GET',
+    const [activities, setActivities] = useState<FarmCalendarActivityModel[]>([]);
+    const [activitiesError, setActivitiesError] = useState<Error | null>(null);
+
+    const fetchActivitiesByMonth = async () => {
+        if (!dateRange.start || !dateRange.end || !session?.farm_parcel || !session.user.token) return;
+        const parcelId = session.farm_parcel["@id"].split(':')[3];
+        const apiUrl = (window as any).env?.VITE_API_URL ?? import.meta.env.VITE_API_URL;
+        const months: { from: string; to: string }[] = [];
+        let cursor = dayjs(dateRange.start).startOf('month');
+        const end = dayjs(dateRange.end).endOf('month');
+        while (cursor.isBefore(end) || cursor.isSame(end, 'month')) {
+            months.push({
+                from: cursor.startOf('month').format('YYYY-MM-DD'),
+                to: cursor.endOf('month').format('YYYY-MM-DD'),
+            });
+            cursor = cursor.add(1, 'month');
         }
-    );
+        setActivitiesError(null);
+        try {
+            const responses = await Promise.all(months.map(m =>
+                fetch(`${apiUrl}proxy/farmcalendar/api/v1/FarmCalendarActivities/?parcel=${parcelId}&format=json&fromDate=${m.from}&toDate=${m.to}`, {
+                    headers: { Authorization: `Bearer ${session.user.token}` },
+                }).then(r => r.ok ? r.json() as Promise<FarmCalendarActivityModel[]> : Promise.reject(new Error(`HTTP ${r.status}`)))
+            ));
+            const merged = responses.flat();
+            const seen = new Set<string>();
+            const deduped = merged.filter(a => {
+                if (seen.has(a["@id"])) return false;
+                seen.add(a["@id"]);
+                return true;
+            });
+            setActivities(deduped);
+        } catch (err) {
+            setActivitiesError(err as Error);
+        }
+    };
 
     const { fetchData: activityTypesFetchData, response: activityTypesResponse, error: activityTypesError } = useFetch<FarmCalendarActivityTypeModel[]>(
         `proxy/farmcalendar/api/v1/FarmCalendarActivityTypes/?format=json`,
@@ -60,21 +90,18 @@ const FarmCalendarPage = () => {
 
     useEffect(() => {
         if (dateRange.start && dateRange.end && session?.farm_parcel) {
-            fetchData();
+            fetchActivitiesByMonth();
         }
     }, [session?.farm_parcel, dateRange])
 
     useEffect(() => {
-        if (error) {
+        if (activitiesError) {
             showSnackbar('error', 'Error loading activities');
         }
-    }, [error])
+    }, [activitiesError])
 
     const calendarEvents = useMemo(() => {
-        if (!Array.isArray(response)) {
-            return [];
-        }
-        return response.map((event): EventInput => ({
+        return activities.map((event): EventInput => ({
             id: event['@id'],
             title: event.title,
             start: event.hasStartDatetime,
@@ -84,7 +111,7 @@ const FarmCalendarPage = () => {
                 activityType: event.activityType,
             }
         }));
-    }, [response]);
+    }, [activities]);
 
     return (
         <>

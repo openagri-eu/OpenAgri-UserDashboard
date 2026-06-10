@@ -8,6 +8,7 @@ import { useSession } from "@contexts/SessionContext";
 import useFetch from "@hooks/useFetch";
 import { clearUserCaches } from "@utils/pwaCache";
 import OfflineChip from "@components/shared/OfflineChip/OfflineChip";
+import PrepareOfflineButton from "@components/dashboard/PrepareOffline/PrepareOfflineButton";
 
 const ToolbarActions = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,6 +50,7 @@ const ToolbarActions = () => {
     return (
         <Stack direction="row" alignItems="center" spacing={1}>
             <OfflineChip />
+            <PrepareOfflineButton />
             <Tooltip title="Settings" enterDelay={1000}>
                 <div>
                     <IconButton type="button" aria-label="settings" onClick={toggleMenu}>
