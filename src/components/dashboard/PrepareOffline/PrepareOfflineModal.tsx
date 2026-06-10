@@ -27,6 +27,7 @@ import {
     defaultDateRange,
     MAX_RANGE_DAYS,
     runPrefetch,
+    statusText,
 } from "@utils/prefetchOffline";
 
 interface PrepareOfflineModalProps {
@@ -156,6 +157,28 @@ const PrepareOfflineModal: React.FC<PrepareOfflineModalProps> = ({ open, onClose
         setProgress({ done: results.length - failed, total: results.length });
     };
 
+    const retryFailed = async () => {
+        if (!session?.user.token || failures.length === 0) return;
+        const urlsToRetry = failures.map(f => f.url);
+        const baseSuccess = progress.total - failures.length;
+        setRunning(true);
+        setDone(false);
+        setFailures([]);
+        setProgress(p => ({ done: baseSuccess, total: p.total }));
+
+        const newFailures: { url: string; status: number }[] = [];
+        let successCount = 0;
+        await runPrefetch(urlsToRetry, session.user.token, CONCURRENCY, (_d, _t, fail) => {
+            if (fail) newFailures.push({ url: fail.url, status: fail.status });
+            else successCount++;
+            setProgress(p => ({ done: baseSuccess + successCount, total: p.total }));
+            setFailures([...newFailures]);
+        });
+
+        setRunning(false);
+        setDone(true);
+    };
+
     const handleClose = () => {
         if (running) return;
         setDone(false);
@@ -257,7 +280,7 @@ const PrepareOfflineModal: React.FC<PrepareOfflineModalProps> = ({ open, onClose
                                     <ListItem key={i}>
                                         <ListItemText
                                             primary={f.url}
-                                            secondary={`Status: ${f.status || 'network error'}`}
+                                            secondary={statusText(f.status)}
                                             slotProps={{ primary: { sx: { wordBreak: 'break-all', fontSize: '0.8rem' } } }}
                                         />
                                     </ListItem>
@@ -271,6 +294,11 @@ const PrepareOfflineModal: React.FC<PrepareOfflineModalProps> = ({ open, onClose
                 <Button onClick={handleClose} disabled={running}>
                     {done ? 'Done' : 'Cancel'}
                 </Button>
+                {done && failures.length > 0 && (
+                    <Button variant="outlined" color="warning" onClick={retryFailed} disabled={running}>
+                        Retry failed ({failures.length})
+                    </Button>
+                )}
                 {!done && (
                     <Button variant="contained" onClick={startPrefetch} disabled={!canStart}>
                         Start

@@ -102,6 +102,25 @@ export const runPrefetch = async (
     return results;
 };
 
+export const statusText = (status: number): string => {
+    if (status === 0) return 'Network error (no response)';
+    switch (status) {
+        case 400: return 'Bad request';
+        case 401: return 'Unauthorized';
+        case 403: return 'Forbidden';
+        case 404: return 'Not found';
+        case 408: return 'Request timeout';
+        case 429: return 'Too many requests';
+        case 500: return 'Internal server error';
+        case 502: return 'Bad gateway';
+        case 503: return 'Service unavailable';
+        case 504: return 'Gateway timeout';
+    }
+    if (status >= 400 && status < 500) return `Client error (${status})`;
+    if (status >= 500 && status < 600) return `Server error (${status})`;
+    return `Status ${status}`;
+};
+
 export const DEFAULT_FROM_OFFSET_DAYS = 30;
 export const DEFAULT_TO_OFFSET_DAYS = 300;
 export const MAX_RANGE_DAYS = 365;
