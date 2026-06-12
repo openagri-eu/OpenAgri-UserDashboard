@@ -13,6 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import useDialog from "@hooks/useDialog";
 import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
+import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
 
 const FarmParcelPage = () => {
     const { actions } = useOutletContext<ServiceContextType>();
@@ -133,11 +134,19 @@ const FarmParcelPage = () => {
         });
     };
 
+    const handleGeometryChange = (wkt: string) => {
+        setParcel(prev => {
+            if (!prev) return undefined;
+            return { ...prev, hasGeometry: { ...prev.hasGeometry, asWKT: wkt } };
+        });
+    };
+
     const isFormInvalid =
         !parcel?.identifier?.trim() ||
         !parcel.category ||
         !parcel.location.lat ||
         !parcel.location.long ||
+        !parcel?.hasGeometry?.asWKT ||
         !selectedFarm
 
     return (
@@ -188,6 +197,15 @@ const FarmParcelPage = () => {
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Latitude" name="location.lat" value={parcel?.location.lat ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.lat} />
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Longitude" name="location.long" value={parcel?.location.long ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.long} />
+                                </Stack>
+                                <Stack direction={'column'} spacing={1}>
+                                    <Typography variant="subtitle2">Parcel boundary *</Typography>
+                                    <WKTPolygonMap
+                                        value={parcel?.hasGeometry?.asWKT ?? ''}
+                                        onChange={handleGeometryChange}
+                                        readOnly={!canEdit}
+                                        center={parcel?.location}
+                                    />
                                 </Stack>
                             </Stack>
                         </CardContent>

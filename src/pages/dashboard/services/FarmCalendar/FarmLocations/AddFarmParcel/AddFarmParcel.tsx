@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, FormControlLabel, Stack, TextField } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Stack, TextField, Typography } from "@mui/material";
 import { AddFarmParcelProps } from "./AddFarmParcel.types";
 import { useEffect, useState } from "react";
 import { FarmParcelModel } from "@models/FarmParcel";
@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
+import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
 
 const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
 
@@ -39,7 +40,7 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
         'hasGeometry': {
             '@id': '',
             '@type': '',
-            'asWKT': 'POLYGON((0 0, 0 0))'
+            'asWKT': ''
         },
         'location': {
             '@id': '',
@@ -117,11 +118,19 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
         });
     };
 
+    const handleGeometryChange = (wkt: string) => {
+        setFormData(prev => {
+            if (!prev) return undefined;
+            return { ...prev, hasGeometry: { ...prev.hasGeometry, asWKT: wkt } };
+        });
+    };
+
     const isFormInvalid =
         !formData?.identifier?.trim() ||
         !formData.category ||
         !formData.location.lat ||
         !formData.location.long ||
+        !formData?.hasGeometry?.asWKT ||
         !selectedFarm
 
     return (
@@ -166,6 +175,14 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                         <TextField fullWidth margin="normal" label="Latitude" name="location.lat" value={formData?.location.lat ?? ''} type="number" onChange={handleChange} required error={!formData?.location.lat} />
                         <TextField fullWidth margin="normal" label="Longitude" name="location.long" value={formData?.location.long ?? ''} type="number" onChange={handleChange} required error={!formData?.location.long} />
+                    </Stack>
+                    <Stack direction={'column'} spacing={1}>
+                        <Typography variant="subtitle2">Parcel boundary *</Typography>
+                        <WKTPolygonMap
+                            value={formData?.hasGeometry?.asWKT ?? ''}
+                            onChange={handleGeometryChange}
+                            center={formData?.location}
+                        />
                     </Stack>
                 </Stack>
 

@@ -30,6 +30,7 @@
     "highcharts": "^12.4.0",
     "jwt-decode": "^4.0.0",
     "mui-color-input": "^9.0.0",
+    "ol": "^10.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.6.3",
