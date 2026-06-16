@@ -7,8 +7,8 @@ const themeOptions: ThemeOptions = {
     palette: {
         mode: 'light',
         background: {
-            default: '#fffdf5',
-            paper: '#fffbeb'
+            default: colors.background.default,
+            paper: colors.background.paper,
         },
         primary: {
             main: colors.primary.main,
