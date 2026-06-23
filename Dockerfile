@@ -20,10 +20,28 @@ ARG VITE_PRIMARY_COLOR
 ARG VITE_SECONDARY_COLOR
 ARG VITE_BACKGROUND_DEFAULT
 ARG VITE_BACKGROUND_PAPER
+ARG VITE_APP_NAME
+ARG VITE_APP_SHORT_NAME
+ARG VITE_APP_DESCRIPTION
 ENV VITE_PRIMARY_COLOR=${VITE_PRIMARY_COLOR}
 ENV VITE_SECONDARY_COLOR=${VITE_SECONDARY_COLOR}
 ENV VITE_BACKGROUND_DEFAULT=${VITE_BACKGROUND_DEFAULT}
 ENV VITE_BACKGROUND_PAPER=${VITE_BACKGROUND_PAPER}
+ENV VITE_APP_NAME=${VITE_APP_NAME}
+ENV VITE_APP_SHORT_NAME=${VITE_APP_SHORT_NAME}
+ENV VITE_APP_DESCRIPTION=${VITE_APP_DESCRIPTION}
+
+# optional logo override: if LOGO_URL is set, fetch and overwrite public/logo.png
+ARG LOGO_URL
+RUN if [ -n "$LOGO_URL" ]; then \
+        curl -fsSL "$LOGO_URL" -o public/logo.png \
+        && echo "Logo replaced from $LOGO_URL"; \
+    else \
+        echo "Using default public/logo.png"; \
+    fi
+
+# regenerate favicon + PWA icons from current public/logo.png
+RUN npm run generate-pwa-assets
 
 # build react app
 RUN npm run build
