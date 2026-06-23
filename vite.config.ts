@@ -1,10 +1,16 @@
 import { VitePWA } from 'vite-plugin-pwa';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, (globalThis as any).process?.cwd?.() ?? '.', '');
+  const appName = env.VITE_APP_NAME || 'OpenAgri-UserDashboard';
+  const appShortName = env.VITE_APP_SHORT_NAME || 'OAUserDash';
+  const appDescription = env.VITE_APP_DESCRIPTION || 'Dashboard for all OpenAgri services';
+  const themeColor = env.VITE_PRIMARY_COLOR || '#558bc9';
+  return {
   preview: {
     // allow cloudflared/ngrok tunnel hosts for mobile PWA testing
     allowedHosts: ['.trycloudflare.com', '.ngrok-free.app'],
@@ -20,10 +26,10 @@ export default defineConfig({
 
     manifest: {
       id: '/',
-      name: 'OpenAgri-UserDashboard',
-      short_name: 'OAUserDash',
-      description: 'Dashboard for all OpenAgri services',
-      theme_color: '#558bc9',
+      name: appName,
+      short_name: appShortName,
+      description: appDescription,
+      theme_color: themeColor,
       background_color: '#ffffff',
       display: 'standalone',
       orientation: 'portrait',
@@ -130,4 +136,5 @@ export default defineConfig({
     //   },
     // }
   ],
+  };
 })
