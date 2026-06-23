@@ -10,6 +10,19 @@ import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
 
+const REQUIRED_KEYS = new Set<string>([
+    'identifier',
+    'category',
+    'farm',
+    'hasGeometry.asWKT',
+    'location.lat',
+    'location.long',
+    'validFrom',
+    'validTo',
+]);
+
+const isReq = (key: string) => REQUIRED_KEYS.has(key);
+
 const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
 
     const [selectedFarm, setSelectedFarm] = useState<string>('');
@@ -63,21 +76,20 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
     );
 
     const handlePost = () => {
-        let body = { ...formData };
+        const body = JSON.parse(JSON.stringify(formData)) as FarmParcelModel;
         (body.farm as { '@id': string })['@id'] = `urn:farmcalendar:Farm:${selectedFarm}`;
 
-        console.log("Form Data:", body);
+        if (typeof body.depiction === 'string' && !body.depiction.trim()) body.depiction = null;
 
-        fetchData({ body: body });
+        fetchData({ body });
     };
 
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
-
     useEffect(() => {
         if (response) {
             onAction && onAction();
-            showSnackbar('success', "Pest added successfully");
+            showSnackbar('success', "Farm parcel added successfully");
         }
     }, [response]);
 
@@ -107,9 +119,9 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                 currentLevel = currentLevel[keys[i]];
             }
 
-            let finalValue: string | number | boolean = type === 'checkbox' ? checked : value;
+            let finalValue: string | number | boolean | null = type === 'checkbox' ? checked : value;
             if (isNumericField) {
-                finalValue = parseFloat(value);
+                finalValue = value === '' ? null : parseFloat(value);
             }
 
             currentLevel[keys[keys.length - 1]] = finalValue;
@@ -125,13 +137,22 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
         });
     };
 
-    const isFormInvalid =
-        !formData?.identifier?.trim() ||
-        !formData.category ||
-        !formData.location.lat ||
-        !formData.location.long ||
-        !formData?.hasGeometry?.asWKT ||
-        !selectedFarm
+    const fieldEmpty = (key: string): boolean => {
+        if (!formData) return true;
+        switch (key) {
+            case 'identifier': return !formData.identifier?.trim();
+            case 'category': return !formData.category?.trim();
+            case 'farm': return !selectedFarm;
+            case 'hasGeometry.asWKT': return !formData.hasGeometry?.asWKT;
+            case 'location.lat': return formData.location.lat == null || Number.isNaN(formData.location.lat);
+            case 'location.long': return formData.location.long == null || Number.isNaN(formData.location.long);
+            case 'validFrom': return !formData.validFrom;
+            case 'validTo': return !formData.validTo;
+            default: return false;
+        }
+    };
+
+    const isFormInvalid = Array.from(REQUIRED_KEYS).some(k => fieldEmpty(k));
 
     return (
         <>
@@ -140,20 +161,22 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                 <Stack direction={'column'} spacing={2} >
                     {<GenericSelect<FarmModel>
                         endpoint='proxy/farmcalendar/api/v1/Farm/?format=json'
-                        label='Selected farm *'
+                        label='Selected farm'
+                        required={isReq('farm')}
+                        error={isReq('farm') && fieldEmpty('farm')}
                         selectedValue={selectedFarm}
                         setSelectedValue={setSelectedFarm}
                         getOptionLabel={item => `${item.name}`}
                         getOptionValue={item => item["@id"].split(':')[3]}>
                     </GenericSelect>}
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Parcel identifier" name="identifier" value={formData?.identifier ?? ''} required onChange={handleChange} error={!formData?.identifier.trim()} />
-                        <TextField fullWidth margin="normal" label="Parcel type" name="category" value={formData?.category ?? ''} required onChange={handleChange} error={!formData?.category.trim()} />
+                        <TextField fullWidth margin="normal" label="Parcel identifier" name="identifier" value={formData?.identifier ?? ''} onChange={handleChange} required={isReq('identifier')} error={isReq('identifier') && fieldEmpty('identifier')} />
+                        <TextField fullWidth margin="normal" label="Parcel type" name="category" value={formData?.category ?? ''} onChange={handleChange} required={isReq('category')} error={isReq('category') && fieldEmpty('category')} />
                     </Stack>
-                    <TextField fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={formData?.description ?? ''} onChange={handleChange} error={!formData?.description?.trim()} />
+                    <TextField fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={formData?.description ?? ''} onChange={handleChange} />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Valid from" name="validFrom" value={formData?.validFrom ?? ''} onChange={handleChange} disabled />
-                        <TextField fullWidth margin="normal" label="Valid to" name="validTo" value={formData?.validTo ?? ''} onChange={handleChange} disabled />
+                        <TextField fullWidth margin="normal" label="Valid from" name="validFrom" value={formData?.validFrom ?? ''} onChange={handleChange} disabled required={isReq('validFrom')} error={isReq('validFrom') && fieldEmpty('validFrom')} />
+                        <TextField fullWidth margin="normal" label="Valid to" name="validTo" value={formData?.validTo ?? ''} onChange={handleChange} disabled required={isReq('validTo')} error={isReq('validTo') && fieldEmpty('validTo')} />
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                         <TextField fullWidth margin="normal" label="Region" name="inRegion" value={formData?.inRegion ?? ''} onChange={handleChange} />
@@ -168,16 +191,18 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                         <FormControlLabel control={<Checkbox name="isGroundSlope" checked={!!formData?.isGroundSlope} onChange={handleChange} />} label="Ground slope" />
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Area (sq. meters)" name="area" value={formData?.area ?? ''} type="number" onChange={handleChange} />
+                        <TextField fullWidth margin="normal" label="Area (sq. meters)" name="area" value={formData?.area ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} />
                         <TextField fullWidth margin="normal" label="Image or map URL" name="depiction" value={formData?.depiction ?? ''} onChange={handleChange} />
                     </Stack>
-                    <TextField fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={formData?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
+                    <TextField fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={formData?.hasIrrigationFlow ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Latitude" name="location.lat" value={formData?.location.lat ?? ''} type="number" onChange={handleChange} required error={!formData?.location.lat} />
-                        <TextField fullWidth margin="normal" label="Longitude" name="location.long" value={formData?.location.long ?? ''} type="number" onChange={handleChange} required error={!formData?.location.long} />
+                        <TextField fullWidth margin="normal" label="Latitude" name="location.lat" value={formData?.location.lat ?? ''} type="number" onChange={handleChange} required={isReq('location.lat')} error={isReq('location.lat') && fieldEmpty('location.lat')} />
+                        <TextField fullWidth margin="normal" label="Longitude" name="location.long" value={formData?.location.long ?? ''} type="number" onChange={handleChange} required={isReq('location.long')} error={isReq('location.long') && fieldEmpty('location.long')} />
                     </Stack>
                     <Stack direction={'column'} spacing={1}>
-                        <Typography variant="subtitle2">Parcel boundary *</Typography>
+                        <Typography variant="subtitle2" color={isReq('hasGeometry.asWKT') && fieldEmpty('hasGeometry.asWKT') ? 'error' : undefined}>
+                            Parcel boundary{isReq('hasGeometry.asWKT') ? ' *' : ''}
+                        </Typography>
                         <WKTPolygonMap
                             value={formData?.hasGeometry?.asWKT ?? ''}
                             onChange={handleGeometryChange}

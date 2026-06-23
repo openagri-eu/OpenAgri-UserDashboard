@@ -15,6 +15,19 @@ import useDialog from "@hooks/useDialog";
 import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
 
+const REQUIRED_KEYS = new Set<string>([
+    'identifier',
+    'category',
+    'farm',
+    'hasGeometry.asWKT',
+    'location.lat',
+    'location.long',
+    'validFrom',
+    'validTo',
+]);
+
+const isReq = (key: string) => REQUIRED_KEYS.has(key);
+
 const FarmParcelPage = () => {
     const { actions } = useOutletContext<ServiceContextType>();
     const canEdit = actions.includes('edit');
@@ -98,9 +111,10 @@ const FarmParcelPage = () => {
     };
 
     const handleEdit = () => {
-        editFetchData({
-            body: parcel
-        });
+        if (!parcel) return;
+        const body = JSON.parse(JSON.stringify(parcel)) as FarmParcelModel;
+        if (typeof body.depiction === 'string' && !body.depiction.trim()) body.depiction = null;
+        editFetchData({ body });
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -123,9 +137,9 @@ const FarmParcelPage = () => {
                 currentLevel = currentLevel[keys[i]];
             }
 
-            let finalValue: string | number | boolean = type === 'checkbox' ? checked : value;
+            let finalValue: string | number | boolean | null = type === 'checkbox' ? checked : value;
             if (isNumericField) {
-                finalValue = parseFloat(value);
+                finalValue = value === '' ? null : parseFloat(value);
             }
 
             currentLevel[keys[keys.length - 1]] = finalValue;
@@ -141,13 +155,22 @@ const FarmParcelPage = () => {
         });
     };
 
-    const isFormInvalid =
-        !parcel?.identifier?.trim() ||
-        !parcel.category ||
-        !parcel.location.lat ||
-        !parcel.location.long ||
-        !parcel?.hasGeometry?.asWKT ||
-        !selectedFarm
+    const fieldEmpty = (key: string): boolean => {
+        if (!parcel) return true;
+        switch (key) {
+            case 'identifier': return !parcel.identifier?.trim();
+            case 'category': return !parcel.category?.trim();
+            case 'farm': return !selectedFarm;
+            case 'hasGeometry.asWKT': return !parcel.hasGeometry?.asWKT;
+            case 'location.lat': return parcel.location.lat == null || Number.isNaN(parcel.location.lat);
+            case 'location.long': return parcel.location.long == null || Number.isNaN(parcel.location.long);
+            case 'validFrom': return !parcel.validFrom;
+            case 'validTo': return !parcel.validTo;
+            default: return false;
+        }
+    };
+
+    const isFormInvalid = Array.from(REQUIRED_KEYS).some(k => fieldEmpty(k));
 
     return (
         <>
@@ -162,20 +185,22 @@ const FarmParcelPage = () => {
                                 {parcel && <GenericSelect<FarmModel>
                                     canEdit={canEdit}
                                     endpoint='proxy/farmcalendar/api/v1/Farm/?format=json'
-                                    label='Selected farm *'
+                                    label='Selected farm'
+                                    required={isReq('farm')}
+                                    error={isReq('farm') && fieldEmpty('farm')}
                                     selectedValue={selectedFarm}
                                     setSelectedValue={setSelectedFarm}
                                     getOptionLabel={item => `${item.name}`}
                                     getOptionValue={item => item["@id"].split(':')[3]}>
                                 </GenericSelect>}
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Parcel identifier" name="identifier" value={parcel?.identifier ?? ''} required onChange={handleChange} error={!parcel?.identifier.trim()} />
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Parcel type" name="category" value={parcel?.category ?? ''} required onChange={handleChange} error={!parcel?.category.trim()} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Parcel identifier" name="identifier" value={parcel?.identifier ?? ''} onChange={handleChange} required={isReq('identifier')} error={isReq('identifier') && fieldEmpty('identifier')} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Parcel type" name="category" value={parcel?.category ?? ''} onChange={handleChange} required={isReq('category')} error={isReq('category') && fieldEmpty('category')} />
                                 </Stack>
-                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={parcel?.description ?? ''} onChange={handleChange} error={!parcel?.description?.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={parcel?.description ?? ''} onChange={handleChange} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid from" name="validFrom" value={parcel?.validFrom ?? ''} onChange={handleChange} disabled />
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid to" name="validTo" value={parcel?.validTo ?? ''} onChange={handleChange} disabled />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid from" name="validFrom" value={parcel?.validFrom ?? ''} onChange={handleChange} disabled required={isReq('validFrom')} error={isReq('validFrom') && fieldEmpty('validFrom')} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid to" name="validTo" value={parcel?.validTo ?? ''} onChange={handleChange} disabled required={isReq('validTo')} error={isReq('validTo') && fieldEmpty('validTo')} />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Region" name="inRegion" value={parcel?.inRegion ?? ''} onChange={handleChange} />
@@ -190,16 +215,18 @@ const FarmParcelPage = () => {
                                     <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isGroundSlope" checked={!!parcel?.isGroundSlope} onChange={canEdit ? handleChange : () => {}} />} label="Ground slope" />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} />
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Image or map URL" name="depiction" value={parcel?.depiction ?? ''} onChange={handleChange} />
                                 </Stack>
-                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={parcel?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={parcel?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Latitude" name="location.lat" value={parcel?.location.lat ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.lat} />
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Longitude" name="location.long" value={parcel?.location.long ?? ''} type="number" onChange={handleChange} required error={!parcel?.location.long} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Latitude" name="location.lat" value={parcel?.location.lat ?? ''} type="number" onChange={handleChange} required={isReq('location.lat')} error={isReq('location.lat') && fieldEmpty('location.lat')} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Longitude" name="location.long" value={parcel?.location.long ?? ''} type="number" onChange={handleChange} required={isReq('location.long')} error={isReq('location.long') && fieldEmpty('location.long')} />
                                 </Stack>
                                 <Stack direction={'column'} spacing={1}>
-                                    <Typography variant="subtitle2">Parcel boundary *</Typography>
+                                    <Typography variant="subtitle2" color={isReq('hasGeometry.asWKT') && fieldEmpty('hasGeometry.asWKT') ? 'error' : undefined}>
+                                        Parcel boundary{isReq('hasGeometry.asWKT') ? ' *' : ''}
+                                    </Typography>
                                     <WKTPolygonMap
                                         value={parcel?.hasGeometry?.asWKT ?? ''}
                                         onChange={handleGeometryChange}
