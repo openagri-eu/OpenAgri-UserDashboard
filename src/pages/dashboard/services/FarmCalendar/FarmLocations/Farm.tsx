@@ -2,12 +2,14 @@ import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar"
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import { FarmModel } from "@models/Farm";
-import { Box, Button, Card, CardContent, Skeleton, Stack, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { FarmParcelModel } from "@models/FarmParcel";
+import { Box, Button, Card, CardActionArea, CardContent, Chip, Grid, Skeleton, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PolylineIcon from '@mui/icons-material/Polyline';
 import useDialog from "@hooks/useDialog";
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
@@ -42,6 +44,11 @@ const FarmPage = () => {
         }
     );
 
+    const { fetchData: fetchParcels, response: parcelsResponse, loading: parcelsLoading, error: parcelsError } = useFetch<FarmParcelModel[]>(
+        `proxy/farmcalendar/api/v1/FarmParcels/?format=json`,
+        { method: 'GET' },
+    );
+
     const { dialogProps, showDialog } = useDialog();
 
     const handleCloseDialog = () => {
@@ -52,7 +59,19 @@ const FarmPage = () => {
 
     useEffect(() => {
         fetchData();
+        fetchParcels();
     }, [])
+
+    useEffect(() => {
+        if (parcelsError) {
+            showSnackbar('error', 'Error loading parcels');
+        }
+    }, [parcelsError])
+
+    const farmParcels = useMemo(() => {
+        if (!Array.isArray(parcelsResponse) || !farm) return [];
+        return parcelsResponse.filter(p => p.farm?.["@id"] === farm["@id"]);
+    }, [parcelsResponse, farm])
 
     useEffect(() => {
         if (error) {
@@ -117,19 +136,19 @@ const FarmPage = () => {
 
 
     const isFormInvalid =
-        !farm?.name.trim() ||
-        !farm.administrator ||
-        !farm.description ||
-        !farm.contactPerson.firstname ||
-        !farm.contactPerson.lastname ||
-        !farm.telephone ||
-        !farm.vatID ||
-        !farm.address.adminUnitL1 ||
-        !farm.address.adminUnitL2 ||
-        !farm.address.addressArea ||
-        !farm.address.municipality ||
-        !farm.address.community ||
-        !farm.address.locatorName;
+        !farm?.name?.trim() ||
+        !farm.administrator?.trim() ||
+        !farm.description?.trim() ||
+        !farm.contactPerson?.firstname?.trim() ||
+        !farm.contactPerson?.lastname?.trim() ||
+        !farm.telephone?.trim() ||
+        !farm.vatID?.trim() ||
+        !farm.address?.adminUnitL1?.trim() ||
+        !farm.address?.adminUnitL2?.trim() ||
+        !farm.address?.addressArea?.trim() ||
+        !farm.address?.municipality?.trim() ||
+        !farm.address?.community?.trim() ||
+        !farm.address?.locatorName?.trim();
 
     return (
         <>
@@ -141,8 +160,8 @@ const FarmPage = () => {
                     <Card>
                         <CardContent>
                             <Stack direction={'column'} spacing={2} >
-                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Farm name" name="name" value={farm?.name ?? ''} onChange={handleChange} error={!farm?.name.trim()} />
-                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="administrator" name="administrator" value={farm?.administrator ?? ''} onChange={handleChange} error={!farm?.administrator.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Farm name" name="name" value={farm?.name ?? ''} onChange={handleChange} error={!farm?.name?.trim()} />
+                                <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="administrator" name="administrator" value={farm?.administrator ?? ''} onChange={handleChange} error={!farm?.administrator?.trim()} />
                                 <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" multiline rows={3} label="Farm description" name="description" value={farm?.description ?? ''} onChange={handleChange} error={!farm?.description?.trim()} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Contact person first name" name="contactPerson.firstname" value={farm?.contactPerson.firstname ?? ''} onChange={handleChange} error={!farm?.contactPerson.firstname?.trim()} />
@@ -194,6 +213,78 @@ const FarmPage = () => {
                         >
                             Delete
                         </Button>
+                    </Box>
+                    <Box sx={{ mt: 2 }}>
+                        <Typography variant="h5" gutterBottom>
+                            Parcels ({farmParcels.length})
+                        </Typography>
+                        {parcelsLoading && (
+                            <Grid container spacing={2}>
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
+                                        <Skeleton variant="rectangular" height={160} />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        )}
+                        {!parcelsLoading && farmParcels.length === 0 && (
+                            <Typography color="text.secondary">No parcels assigned to this farm.</Typography>
+                        )}
+                        {!parcelsLoading && farmParcels.length > 0 && (
+                            <Grid container spacing={2}>
+                                {farmParcels.map(p => {
+                                    const parcelId = p["@id"].split(':').pop() ?? '';
+                                    const hasPolygon = !!p.hasGeometry?.asWKT?.trim();
+                                    return (
+                                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={p["@id"]}>
+                                            <Card variant="outlined" sx={{ height: '100%' }}>
+                                                <CardActionArea
+                                                    onClick={() => navigate(`/farm-locations/farm-parcel/${parcelId}`)}
+                                                    sx={{ height: '100%' }}
+                                                >
+                                                    <CardContent>
+                                                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
+                                                            <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
+                                                                {p.identifier || 'Unnamed parcel'}
+                                                            </Typography>
+                                                            {hasPolygon && (
+                                                                <Tooltip title="Has polygon">
+                                                                    <PolylineIcon fontSize="small" color="primary" />
+                                                                </Tooltip>
+                                                            )}
+                                                        </Stack>
+                                                        <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {p.category && <Chip size="small" label={p.category} />}
+                                                            {p.area && <Chip size="small" variant="outlined" label={`${p.area} ha`} />}
+                                                        </Stack>
+                                                        <Stack spacing={0.5} sx={{ mt: 1.5 }}>
+                                                            {p.inRegion && (
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Region: {p.inRegion}
+                                                                </Typography>
+                                                            )}
+                                                            {p.hasToponym && (
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Toponym: {p.hasToponym}
+                                                                </Typography>
+                                                            )}
+                                                            {p.description && (
+                                                                <Typography variant="body2" color="text.secondary" sx={{
+                                                                    overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box',
+                                                                    WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                                                                }}>
+                                                                    {p.description}
+                                                                </Typography>
+                                                            )}
+                                                        </Stack>
+                                                    </CardContent>
+                                                </CardActionArea>
+                                            </Card>
+                                        </Grid>
+                                    );
+                                })}
+                            </Grid>
+                        )}
                     </Box>
                 </Box>
             }
