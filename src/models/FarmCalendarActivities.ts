@@ -418,3 +418,47 @@ export interface YieldPredictionModel extends BaseActivityModel {
     };
     observedProperty: string;
 }
+
+interface AnimalActivityBase extends BaseActivityModel {
+    hasStartDatetime: string;
+    hasEndDatetime: string;
+    hasAgriParcel: {
+        "@id": string;
+        "@type": string;
+    };
+    hasAnimal: {
+        "@id": string;
+        "@type": string;
+    };
+    responsibleAgent: string | null;
+    usesAgriculturalMachinery: {
+        "@id": string;
+        "@type": string;
+    }[];
+    isPartOfActivity: {
+        "@id": string;
+        "@type": string;
+    } | null;
+}
+
+export interface AnimalActivityModel extends AnimalActivityBase {}
+
+interface MeasurementValue {
+    "@id": string;
+    "@type": string;
+    unit: string;
+    hasValue: string;
+}
+
+export interface AnimalLactatingActivityModel extends AnimalActivityBase {
+    hasDaysInMilk: string;
+    hasLactationNumber: string;
+    hasControl: string;
+    hasTotalMilkYield: MeasurementValue;
+    hasMilkYield: MeasurementValue;
+    hasRCS: MeasurementValue;
+    hasUrea: MeasurementValue;
+    hasFat: MeasurementValue;
+    hasProtein: MeasurementValue;
+    hasDryMatter: MeasurementValue;
+}

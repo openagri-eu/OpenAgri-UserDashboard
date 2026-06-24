@@ -7,6 +7,7 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { FarmCropModel } from "@models/FarmCrop";
+import { FarmAnimalModel } from "@models/FarmAnimalModel";
 
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
@@ -79,6 +80,20 @@ const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
         'title', 'phenomenonTime', 'madeBySensor.name', 'hasArea',
         'hasResult.hasValue', 'hasResult.unit', 'observedProperty',
     ]),
+    AnimalActivity: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'hasAnimal',
+    ]),
+    AnimalLactatingActivity: new Set([
+        'title', 'responsibleAgent', 'hasStartDatetime', 'hasAnimal',
+        'hasDaysInMilk', 'hasLactationNumber', 'hasControl',
+        'hasTotalMilkYield.hasValue', 'hasTotalMilkYield.unit',
+        'hasMilkYield.hasValue', 'hasMilkYield.unit',
+        'hasRCS.hasValue', 'hasRCS.unit',
+        'hasUrea.hasValue', 'hasUrea.unit',
+        'hasFat.hasValue', 'hasFat.unit',
+        'hasProtein.hasValue', 'hasProtein.unit',
+        'hasDryMatter.hasValue', 'hasDryMatter.unit',
+    ]),
 };
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, activityTypes, onAdd, onDelete, onSave, loading, canEdit, canDelete }: ActivityDynamicCRUDActionsProps<T>) => {
@@ -96,6 +111,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
     const [parentActivity, setParentActivity] = useState<string>('');
     const [severity, setSeverity] = useState<string>('');
     const [usesIrrigationSystem, setUsesIrrigationSystem] = useState<string>('');
+    const [selectedAnimal, setSelectedAnimal] = useState<string>('');
 
     /** All calendar activities section start */
     const [allActivities, setAllActivities] = useState<FarmCalendarActivityModel[]>([]);
@@ -168,6 +184,16 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         if (cropID) {
             const idParts = cropID.split(':');
             setSelectedAgriCrop(idParts[idParts.length - 1]);
+        }
+
+        let animalID: string | undefined;
+        if ('hasAnimal' in formData) {
+            if ((formData as any).hasAnimal)
+                animalID = (formData as any).hasAnimal["@id"];
+        }
+        if (animalID) {
+            const idParts = animalID.split(':');
+            setSelectedAnimal(idParts[idParts.length - 1]);
         }
 
         let agriMachinesIDs: string[] | undefined;
@@ -558,6 +584,94 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         )
     }
 
+    const renderSelectedAnimal = () => {
+        return (
+            <>
+                {'hasAnimal' in formData && (
+                    <GenericSelect<FarmAnimalModel>
+                        canEdit={canEdit}
+                        endpoint='proxy/farmcalendar/api/v1/FarmAnimals/?format=json'
+                        label='Animal'
+                        selectedValue={selectedAnimal}
+                        setSelectedValue={setSelectedAnimal}
+                        getOptionLabel={item => `${item.name || item.nationalID} - ${item.species} ${item.breed ? '(' + item.breed + ')' : ''}`}
+                        getOptionValue={item => item["@id"].split(':')[3]}
+                        required={isReq('hasAnimal')}
+                        error={isReq('hasAnimal') && !selectedAnimal}
+                    />
+                )}
+            </>
+        )
+    }
+
+    const renderLactationFields = () => {
+        if (!('hasDaysInMilk' in formData)) return null;
+        const measurements: { key: string; label: string }[] = [
+            { key: 'hasTotalMilkYield', label: 'Total milk yield' },
+            { key: 'hasMilkYield', label: 'Milk yield' },
+            { key: 'hasRCS', label: 'RCS' },
+            { key: 'hasUrea', label: 'Urea' },
+            { key: 'hasFat', label: 'Fat' },
+            { key: 'hasProtein', label: 'Protein' },
+            { key: 'hasDryMatter', label: 'Dry matter' },
+        ];
+        return (
+            <>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                    <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
+                        fullWidth margin="normal" label="Days in milk"
+                        name="hasDaysInMilk"
+                        required={isReq('hasDaysInMilk')}
+                        value={(formData as any).hasDaysInMilk ?? ''}
+                        onChange={handleChange}
+                        error={isReq('hasDaysInMilk') && !((formData as any).hasDaysInMilk ?? '').toString().trim()}
+                    />
+                    <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
+                        fullWidth margin="normal" label="Lactation number"
+                        name="hasLactationNumber"
+                        required={isReq('hasLactationNumber')}
+                        value={(formData as any).hasLactationNumber ?? ''}
+                        onChange={handleChange}
+                        error={isReq('hasLactationNumber') && !((formData as any).hasLactationNumber ?? '').toString().trim()}
+                    />
+                    <TextField
+                        slotProps={{ input: { readOnly: !canEdit } }}
+                        fullWidth margin="normal" label="Control"
+                        name="hasControl"
+                        required={isReq('hasControl')}
+                        value={(formData as any).hasControl ?? ''}
+                        onChange={handleChange}
+                        error={isReq('hasControl') && !((formData as any).hasControl ?? '').toString().trim()}
+                    />
+                </Stack>
+                {measurements.map(m => (
+                    <Stack key={m.key} direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                        <TextField
+                            slotProps={{ input: { readOnly: !canEdit } }}
+                            fullWidth margin="normal" label={`${m.label} value`}
+                            name={`${m.key}.hasValue`}
+                            required={isReq(`${m.key}.hasValue`)}
+                            value={(formData as any)[m.key]?.hasValue ?? ''}
+                            onChange={handleChange}
+                            error={isReq(`${m.key}.hasValue`) && !((formData as any)[m.key]?.hasValue ?? '').toString().trim()}
+                        />
+                        <TextField
+                            slotProps={{ input: { readOnly: !canEdit } }}
+                            fullWidth margin="normal" label={`${m.label} unit`}
+                            name={`${m.key}.unit`}
+                            required={isReq(`${m.key}.unit`)}
+                            value={(formData as any)[m.key]?.unit ?? ''}
+                            onChange={handleChange}
+                            error={isReq(`${m.key}.unit`) && !((formData as any)[m.key]?.unit ?? '').toString().trim()}
+                        />
+                    </Stack>
+                ))}
+            </>
+        )
+    }
+
     const renderHasArea = () => {
         return (
             <>
@@ -827,6 +941,24 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         'madeBySensor.name': () => !!((formData as any).madeBySensor?.name ?? '').toString().trim(),
         'hasApplicationMethod': () => !!((formData as any).hasApplicationMethod ?? '').toString().trim(),
         'severity': () => !!severity,
+        'hasAnimal': () => !!selectedAnimal,
+        'hasDaysInMilk': () => !!((formData as any).hasDaysInMilk ?? '').toString().trim(),
+        'hasLactationNumber': () => !!((formData as any).hasLactationNumber ?? '').toString().trim(),
+        'hasControl': () => !!((formData as any).hasControl ?? '').toString().trim(),
+        'hasTotalMilkYield.hasValue': () => !!((formData as any).hasTotalMilkYield?.hasValue ?? '').toString().trim(),
+        'hasTotalMilkYield.unit': () => !!((formData as any).hasTotalMilkYield?.unit ?? '').toString().trim(),
+        'hasMilkYield.hasValue': () => !!((formData as any).hasMilkYield?.hasValue ?? '').toString().trim(),
+        'hasMilkYield.unit': () => !!((formData as any).hasMilkYield?.unit ?? '').toString().trim(),
+        'hasRCS.hasValue': () => !!((formData as any).hasRCS?.hasValue ?? '').toString().trim(),
+        'hasRCS.unit': () => !!((formData as any).hasRCS?.unit ?? '').toString().trim(),
+        'hasUrea.hasValue': () => !!((formData as any).hasUrea?.hasValue ?? '').toString().trim(),
+        'hasUrea.unit': () => !!((formData as any).hasUrea?.unit ?? '').toString().trim(),
+        'hasFat.hasValue': () => !!((formData as any).hasFat?.hasValue ?? '').toString().trim(),
+        'hasFat.unit': () => !!((formData as any).hasFat?.unit ?? '').toString().trim(),
+        'hasProtein.hasValue': () => !!((formData as any).hasProtein?.hasValue ?? '').toString().trim(),
+        'hasProtein.unit': () => !!((formData as any).hasProtein?.unit ?? '').toString().trim(),
+        'hasDryMatter.hasValue': () => !!((formData as any).hasDryMatter?.hasValue ?? '').toString().trim(),
+        'hasDryMatter.unit': () => !!((formData as any).hasDryMatter?.unit ?? '').toString().trim(),
         'hasCompostMaterial': () => {
             const arr = (formData as any).hasCompostMaterial;
             if (!Array.isArray(arr) || arr.length === 0) return false;
@@ -873,6 +1005,9 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         }
         if ('hasAgriCrop' in body) {
             (body.hasAgriCrop as { '@id': string })['@id'] = `urn:farmcalendar:FarmCrop:${selectedAgriCrop}`;
+        }
+        if ('hasAnimal' in body) {
+            (body.hasAnimal as { '@id': string })['@id'] = `urn:farmcalendar:Animal:${selectedAnimal}`;
         }
         if ('usesAgriculturalMachinery' in body) {
             (body.usesAgriculturalMachinery as string[]) = selectedAgriMachines;
@@ -975,6 +1110,8 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                         {renderSeverity()}
                         {renderSensorResultAndObservedProperty()}
                         {renderSelectedCrop()}
+                        {renderSelectedAnimal()}
+                        {renderLactationFields()}
                         {renderHasArea()}
                         {renderOperatedOnCompostPile()}
                         {renderAppliedAmount()}

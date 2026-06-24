@@ -1,6 +1,8 @@
 import {
     BaseActivityModel,
     AddRawMaterialOperationModel,
+    AnimalActivityModel,
+    AnimalLactatingActivityModel,
     CompostOperationModel,
     CompostTurningOperationModel,
     CropGrowthStageObservationModel,
@@ -363,6 +365,59 @@ const getEmptyYieldPrediction = (id: string): YieldPredictionModel => ({
 });
 
 
+const emptyMeasurement = () => ({
+    "@id": "",
+    "@type": "",
+    unit: "",
+    hasValue: "",
+});
+
+const getEmptyAnimalActivity = (id: string): AnimalActivityModel => ({
+    ...getEmptyBaseActivity(id),
+    "@type": "AnimalActivity",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
+    hasAgriParcel: {
+        "@id": "",
+        "@type": "Parcel"
+    },
+    hasAnimal: {
+        "@id": "",
+        "@type": "Animal"
+    },
+    responsibleAgent: null,
+    usesAgriculturalMachinery: [],
+    isPartOfActivity: null,
+});
+
+const getEmptyAnimalLactatingActivity = (id: string): AnimalLactatingActivityModel => ({
+    ...getEmptyBaseActivity(id),
+    "@type": "AnimalLactatingActivity",
+    hasStartDatetime: dayjs().toISOString(),
+    hasEndDatetime: dayjs().toISOString(),
+    hasAgriParcel: {
+        "@id": "",
+        "@type": "Parcel"
+    },
+    hasAnimal: {
+        "@id": "",
+        "@type": "Animal"
+    },
+    responsibleAgent: null,
+    usesAgriculturalMachinery: [],
+    isPartOfActivity: null,
+    hasDaysInMilk: "",
+    hasLactationNumber: "",
+    hasControl: "",
+    hasTotalMilkYield: emptyMeasurement(),
+    hasMilkYield: emptyMeasurement(),
+    hasRCS: emptyMeasurement(),
+    hasUrea: emptyMeasurement(),
+    hasFat: emptyMeasurement(),
+    hasProtein: emptyMeasurement(),
+    hasDryMatter: emptyMeasurement(),
+});
+
 export const activityModelFactory: Record<string, (id: string) => BaseActivityModel> = {
     "/api/v1/YieldPrediction/": getEmptyYieldPrediction,
     "/api/v1/VigorEstimation/": getEmptyVigorEstimation,
@@ -379,4 +434,6 @@ export const activityModelFactory: Record<string, (id: string) => BaseActivityMo
     "/api/v1/CompostTurningOperations/": getEmptyCompostTurningOperation,
     "/api/v1/CompostOperations/": getEmptyCompostOperation,
     "/api/v1/AddRawMaterialOperations/": getEmptyAddRawMaterialOperation,
+    "/api/v1/AnimalActivities/": getEmptyAnimalActivity,
+    "/api/v1/AnimalLactatingActivities/": getEmptyAnimalLactatingActivity,
 };
