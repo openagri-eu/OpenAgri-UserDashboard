@@ -188,7 +188,7 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction, canEd
                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Pest description" name="description" value={formData.description ?? ''} onChange={handleChange} error={!formData.description?.trim()} />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                         <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="EPPO code" name="eppo_code" value={formData.eppo_code ?? ''} onChange={handleChange} error={!formData.eppo_code?.trim()} />
-                        <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Base GDD" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
+                        <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Base GDD °C" name="base_gdd" type="number" value={isNaN(formData.base_gdd) ? '' : formData.base_gdd} onChange={handleChange} error={isNaN(formData.base_gdd)} />
                     </Stack>
                 </Stack>
 
