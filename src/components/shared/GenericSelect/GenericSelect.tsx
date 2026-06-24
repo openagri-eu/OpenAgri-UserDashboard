@@ -75,7 +75,18 @@ const GenericSelect = <T, R = T[]>({
                                     ? items.find(i => getOptionValue(i) === value)
                                     : null;
                                 const itemLabel = item ? getOptionLabel(item) : value;
-                                return <Chip key={value} label={itemLabel} />;
+                                return (
+                                    <Chip
+                                        key={value}
+                                        label={itemLabel}
+                                        onMouseDown={canEdit ? (e) => e.stopPropagation() : undefined}
+                                        onDelete={canEdit ? () => {
+                                            (setSelectedValue as React.Dispatch<React.SetStateAction<string[]>>)(prev =>
+                                                (prev ?? []).filter(v => v !== value)
+                                            );
+                                        } : undefined}
+                                    />
+                                );
                             })}
                         </Box>
                     ) : undefined}
