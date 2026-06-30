@@ -68,7 +68,7 @@ const PestsPage = () => {
     const pestsHeadCells: readonly HeadCell<PestRow>[] = [
         { id: 'name', numeric: false, label: 'Name' },
         { id: 'eppoCode', numeric: false, label: 'EPPO code' },
-        { id: 'baseGDD', numeric: false, label: 'Base GDD °C' },
+        { id: 'baseGDD', numeric: false, label: 'Base GDD (°C)' },
     ];
 
     const handleRowClick = (pest: PestRow) => {

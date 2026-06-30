@@ -204,8 +204,8 @@ const PestCRUDActions: React.FC<PestCRUDActionsProps> = ({ pest, onAction, canEd
                             <CardContent>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <Box sx={{ display: 'flex', gap: 2 }}>
-                                        <TextField slotProps={{ input: { readOnly: !canEdit } }} label="From" name="start" type="number" value={isNaN(gddp.start) ? '' : gddp.start} onChange={(e) => handleGddPointChange(index, e)} disabled={index > 0 || formData.gdd_points.length > 1} error={isNaN(gddp.start) || gddp.start < 0} />
-                                        <TextField slotProps={{ input: { readOnly: !canEdit } }} label="To" name="end" type="number" value={isNaN(gddp.end) ? '' : gddp.end} onChange={(e) => handleGddPointChange(index, e)} disabled={!isLastPoint} error={isNaN(gddp.end) || isEndValueError} />
+                                        <TextField slotProps={{ input: { readOnly: !canEdit } }} label="From (°C·h)" name="start" type="number" value={isNaN(gddp.start) ? '' : gddp.start} onChange={(e) => handleGddPointChange(index, e)} disabled={index > 0 || formData.gdd_points.length > 1} error={isNaN(gddp.start) || gddp.start < 0} />
+                                        <TextField slotProps={{ input: { readOnly: !canEdit } }} label="To (°C·h)" name="end" type="number" value={isNaN(gddp.end) ? '' : gddp.end} onChange={(e) => handleGddPointChange(index, e)} disabled={!isLastPoint} error={isNaN(gddp.end) || isEndValueError} />
                                     </Box>
                                     <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
                                         <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth label="Descriptor" name="descriptor" value={gddp.descriptor ?? ''} onChange={(e) => handleGddPointChange(index, e)} sx={{ flexGrow: 1 }} error={!gddp.descriptor?.trim()} />
