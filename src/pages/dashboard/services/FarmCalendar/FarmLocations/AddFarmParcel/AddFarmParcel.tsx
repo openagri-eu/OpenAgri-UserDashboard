@@ -19,6 +19,9 @@ const REQUIRED_KEYS = new Set<string>([
     'location.long',
     'validFrom',
     'validTo',
+    'inRegion',
+    'hasToponym',
+    'area',
 ]);
 
 const isReq = (key: string) => REQUIRED_KEYS.has(key);
@@ -148,6 +151,9 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
             case 'location.long': return formData.location.long == null || Number.isNaN(formData.location.long);
             case 'validFrom': return !formData.validFrom;
             case 'validTo': return !formData.validTo;
+            case 'inRegion': return !formData.inRegion?.trim();
+            case 'hasToponym': return !formData.hasToponym?.trim();
+            case 'area': return formData.area == null || formData.area === '' || Number.isNaN(formData.area as any);
             default: return false;
         }
     };
@@ -179,8 +185,8 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                         <TextField fullWidth margin="normal" label="Valid to" name="validTo" value={formData?.validTo ?? ''} onChange={handleChange} disabled required={isReq('validTo')} error={isReq('validTo') && fieldEmpty('validTo')} />
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Region" name="inRegion" value={formData?.inRegion ?? ''} onChange={handleChange} />
-                        <TextField fullWidth margin="normal" label="Toponym" name="hasToponym" value={formData?.hasToponym ?? ''} onChange={handleChange} />
+                        <TextField fullWidth margin="normal" label="Region" name="inRegion" value={formData?.inRegion ?? ''} onChange={handleChange} required={isReq('inRegion')} error={isReq('inRegion') && fieldEmpty('inRegion')} />
+                        <TextField fullWidth margin="normal" label="Toponym" name="hasToponym" value={formData?.hasToponym ?? ''} onChange={handleChange} required={isReq('hasToponym')} error={isReq('hasToponym') && fieldEmpty('hasToponym')} />
                     </Stack>
                     <Stack flexWrap={"wrap"} direction={'row'} spacing={3} alignItems="center">
                         <FormControlLabel control={<Checkbox name="isNitroArea" checked={!!formData?.isNitroArea} onChange={handleChange} />} label="Nitro area" />
@@ -191,7 +197,7 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                         <FormControlLabel control={<Checkbox name="isGroundSlope" checked={!!formData?.isGroundSlope} onChange={handleChange} />} label="Ground slope" />
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Area (sq. meters)" name="area" value={formData?.area ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} />
+                        <TextField fullWidth margin="normal" label="Area (sq. meters)" name="area" value={formData?.area ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} required={isReq('area')} error={isReq('area') && fieldEmpty('area')} />
                         <TextField fullWidth margin="normal" label="Image or map URL" name="depiction" value={formData?.depiction ?? ''} onChange={handleChange} />
                     </Stack>
                     <TextField fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={formData?.hasIrrigationFlow ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} />

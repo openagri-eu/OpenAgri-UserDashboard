@@ -24,6 +24,9 @@ const REQUIRED_KEYS = new Set<string>([
     'location.long',
     'validFrom',
     'validTo',
+    'inRegion',
+    'hasToponym',
+    'area',
 ]);
 
 const isReq = (key: string) => REQUIRED_KEYS.has(key);
@@ -166,6 +169,9 @@ const FarmParcelPage = () => {
             case 'location.long': return parcel.location.long == null || Number.isNaN(parcel.location.long);
             case 'validFrom': return !parcel.validFrom;
             case 'validTo': return !parcel.validTo;
+            case 'inRegion': return !parcel.inRegion?.trim();
+            case 'hasToponym': return !parcel.hasToponym?.trim();
+            case 'area': return parcel.area == null || parcel.area === '' || Number.isNaN(parcel.area as any);
             default: return false;
         }
     };
@@ -203,8 +209,8 @@ const FarmParcelPage = () => {
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid to" name="validTo" value={parcel?.validTo ?? ''} onChange={handleChange} disabled required={isReq('validTo')} error={isReq('validTo') && fieldEmpty('validTo')} />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Region" name="inRegion" value={parcel?.inRegion ?? ''} onChange={handleChange} />
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Toponym" name="hasToponym" value={parcel?.hasToponym ?? ''} onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Region" name="inRegion" value={parcel?.inRegion ?? ''} onChange={handleChange} required={isReq('inRegion')} error={isReq('inRegion') && fieldEmpty('inRegion')} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Toponym" name="hasToponym" value={parcel?.hasToponym ?? ''} onChange={handleChange} required={isReq('hasToponym')} error={isReq('hasToponym') && fieldEmpty('hasToponym')} />
                                 </Stack>
                                 <Stack flexWrap={"wrap"} direction={'row'} spacing={3} alignItems="center">
                                     <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isNitroArea" checked={!!parcel?.isNitroArea} onChange={canEdit ? handleChange : () => {}} />} label="Nitro area" />
@@ -215,7 +221,7 @@ const FarmParcelPage = () => {
                                     <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isGroundSlope" checked={!!parcel?.isGroundSlope} onChange={canEdit ? handleChange : () => {}} />} label="Ground slope" />
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} required={isReq('area')} error={isReq('area') && fieldEmpty('area')} />
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Image or map URL" name="depiction" value={parcel?.depiction ?? ''} onChange={handleChange} />
                                 </Stack>
                                 <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={parcel?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
