@@ -3,6 +3,8 @@ import { FarmCalendarActivityTypeModel } from "@models/FarmCalendarActivityType"
 import {
     BaseActivityModel,
     AddRawMaterialOperationModel,
+    AnimalActivityModel,
+    AnimalLactatingActivityModel,
     CompostOperationModel,
     CompostTurningOperationModel,
     CropGrowthStageObservationModel,
@@ -44,6 +46,8 @@ const ActivityFormComponentMap: { [key: string]: React.FC<any> } = {
     'SprayingRecommendation': (props) => <ActivityDynamicCRUDActions<SprayingRecommendationModel> {...props} />,
     'VigorEstimation': (props) => <ActivityDynamicCRUDActions<VigorEstimationModel> {...props} />,
     'YieldPrediction': (props) => <ActivityDynamicCRUDActions<YieldPredictionModel> {...props} />,
+    'AnimalActivity': (props) => <ActivityDynamicCRUDActions<AnimalActivityModel> {...props} />,
+    'AnimalLactatingActivity': (props) => <ActivityDynamicCRUDActions<AnimalLactatingActivityModel> {...props} />,
 };
 interface LocationState {
     activityTypes: FarmCalendarActivityTypeModel[] | undefined;
