@@ -145,6 +145,18 @@ export default function App() {
         disabled: !hasAccess('IRM'),
       },
       {
+        segment: 'crop-types',
+        title: 'Crop types',
+        icon: <GrassIcon />,
+        disabled: !hasAccess('IRM'),
+      },
+      {
+        segment: 'soil-types',
+        title: 'Soil types',
+        icon: <Folder />,
+        disabled: !hasAccess('IRM'),
+      },
+      {
         kind: 'header',
         title: 'Pest and disease management',
       },

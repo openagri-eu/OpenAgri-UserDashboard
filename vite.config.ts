@@ -67,7 +67,7 @@ export default defineConfig({
         {
           urlPattern: ({ request }) =>
             request.method === 'GET' &&
-            /\/proxy\/(farmcalendar\/api\/v1\/FarmCalendarActivityTypes\/|pdm\/api\/v1\/(crop|disease|model|threat-model)\/?|irrigation\/api\/v1\/(dataset\/soil-types|eto\/option-types)\/?)/.test(request.url),
+            /\/proxy\/(farmcalendar\/api\/v1\/FarmCalendarActivityTypes\/|pdm\/api\/v1\/(crop|disease|model|threat-model)\/?)/.test(request.url),
           handler: 'StaleWhileRevalidate',
           options: {
             cacheName: 'oa-reference',

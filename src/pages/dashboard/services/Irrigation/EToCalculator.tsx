@@ -15,6 +15,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import { useSession } from "@contexts/SessionContext";
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
+import { CropTypeModel } from "@models/CropType";
 
 
 const EToCalculatorPage = () => {
@@ -79,25 +80,27 @@ const EToCalculatorPage = () => {
                         <Typography variant="body1">
                             Select a location and a time frame to view its ETo calculation. Additionally select the crop type and growth stage for finer tuning.
                         </Typography>
-                        <GenericSelect<string, { crops: string[], stages: string[] }>
+                        <GenericSelect<CropTypeModel, CropTypeModel[]>
                             endpoint='proxy/irrigation/api/v1/eto/option-types/'
                             method="GET"
                             label='Crop type'
                             selectedValue={selectedCropType}
-                            transformResponse={response => response.crops}
                             setSelectedValue={setSelectedCropType}
-                            getOptionLabel={item => item}
-                            getOptionValue={item => item}
+                            getOptionLabel={item => item.crop}
+                            getOptionValue={item => item.id}
                         />
-                        <GenericSelect<string, { crops: string[], stages: string[] }>
-                            endpoint='proxy/irrigation/api/v1/eto/option-types/'
-                            method="GET"
+                        <GenericSelect<{ value: string; label: string }, { value: string; label: string }[]>
+                            endpoint=''
+                            data={[
+                                { value: 'KC_INIT', label: 'Init' },
+                                { value: 'KC_MID', label: 'Mid' },
+                                { value: 'KC_END', label: 'End' },
+                            ]}
                             label='Stages'
                             selectedValue={selectedCropStage}
-                            transformResponse={response => response.stages}
                             setSelectedValue={setSelectedCropStage}
-                            getOptionLabel={item => item}
-                            getOptionValue={item => item}
+                            getOptionLabel={item => item.label}
+                            getOptionValue={item => item.value}
                         />
                         <DateRangeSelect
                             fromDate={fromDate}

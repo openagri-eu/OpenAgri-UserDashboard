@@ -8,6 +8,7 @@ import {
 import * as Highcharts from 'highcharts';
 
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
+import { SoilTypeModel } from "@models/SoilType";
 import useFetch from "@hooks/useFetch";
 import { DatasetResponse, DatasetRow } from "@models/SoilMoisture";
 import { Box, Button, Card, CardContent, Skeleton, Typography } from "@mui/material";
@@ -206,14 +207,14 @@ const SoilMoistureAnalysisPage = () => {
                                         Delete
                                     </Button>
                                 </Box>
-                                <GenericSelect<string>
+                                <GenericSelect<SoilTypeModel, SoilTypeModel[]>
                                     endpoint='proxy/irrigation/api/v1/dataset/soil-types/'
                                     method="GET"
                                     label='Soil type'
                                     selectedValue={selectedSoil}
                                     setSelectedValue={setSelectedSoil}
-                                    getOptionLabel={item => item}
-                                    getOptionValue={item => item}
+                                    getOptionLabel={item => item.soil_type}
+                                    getOptionValue={item => item.id}
                                 />
                             </Box>
                             <Box width={'100%'}>

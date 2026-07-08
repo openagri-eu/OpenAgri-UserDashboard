@@ -30,6 +30,10 @@ import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.t
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
 import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
+import CropTypesPage from '@pages/dashboard/services/Irrigation/CropTypes.tsx';
+import EditCropTypePage from '@pages/dashboard/services/Irrigation/EditCropType.tsx';
+import SoilTypesPage from '@pages/dashboard/services/Irrigation/SoilTypes.tsx';
+import EditSoilTypePage from '@pages/dashboard/services/Irrigation/EditSoilType.tsx';
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
@@ -150,6 +154,22 @@ const router = createBrowserRouter([
               {
                 path: 'soil-moisture-analysis',
                 Component: SoilMoistureAnalysisPage
+              },
+              {
+                path: 'crop-types',
+                Component: CropTypesPage
+              },
+              {
+                path: 'crop-types/:id',
+                Component: EditCropTypePage
+              },
+              {
+                path: 'soil-types',
+                Component: SoilTypesPage
+              },
+              {
+                path: 'soil-types/:id',
+                Component: EditSoilTypePage
               },
             ]
           },
