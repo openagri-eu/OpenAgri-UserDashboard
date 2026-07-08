@@ -23,6 +23,8 @@ import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
 import ReportIcon from '@mui/icons-material/Report';
 import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 import GrassIcon from '@mui/icons-material/Grass';
+import YardIcon from '@mui/icons-material/Yard';
+import TerrainIcon from '@mui/icons-material/Terrain';
 
 const BRANDING = {
   logo: <img className='' src="/logo-color.png" alt="" />,
@@ -147,13 +149,13 @@ export default function App() {
       {
         segment: 'crop-types',
         title: 'Crop types',
-        icon: <GrassIcon />,
+        icon: <YardIcon />,
         disabled: !hasAccess('IRM'),
       },
       {
         segment: 'soil-types',
         title: 'Soil types',
-        icon: <Folder />,
+        icon: <TerrainIcon />,
         disabled: !hasAccess('IRM'),
       },
       {
