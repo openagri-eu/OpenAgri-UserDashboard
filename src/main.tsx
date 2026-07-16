@@ -26,6 +26,10 @@ import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/Far
 import ActivityTypesPage from '@pages/dashboard/services/FarmCalendar/ActivityTypes/ActivityTypes.tsx';
 import AddActivityTypePage from '@pages/dashboard/services/FarmCalendar/ActivityTypes/AddActivityType.tsx';
 import EditActivityTypePage from '@pages/dashboard/services/FarmCalendar/ActivityTypes/EditActivityType.tsx';
+import FarmAnimalsPage from '@pages/dashboard/services/FarmCalendar/FarmAnimals/FarmAnimals.tsx';
+import EditFarmAnimalPage from '@pages/dashboard/services/FarmCalendar/FarmAnimals/EditFarmAnimal.tsx';
+import AgriculturalMachinesPage from '@pages/dashboard/services/FarmCalendar/AgriculturalMachines/AgriculturalMachines.tsx';
+import EditAgriculturalMachinePage from '@pages/dashboard/services/FarmCalendar/AgriculturalMachines/EditAgriculturalMachine.tsx';
 import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.tsx';
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
@@ -85,6 +89,22 @@ const router = createBrowserRouter([
               {
                 path: 'farm-calendar/activity-types/edit/:id',
                 Component: EditActivityTypePage
+              },
+              {
+                path: 'farm-animals',
+                Component: FarmAnimalsPage
+              },
+              {
+                path: 'farm-animals/:id',
+                Component: EditFarmAnimalPage
+              },
+              {
+                path: 'agricultural-machines',
+                Component: AgriculturalMachinesPage
+              },
+              {
+                path: 'agricultural-machines/:id',
+                Component: EditAgriculturalMachinePage
               },
               {
                 path: 'farm-locations',

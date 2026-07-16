@@ -25,6 +25,8 @@ import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 import GrassIcon from '@mui/icons-material/Grass';
 import YardIcon from '@mui/icons-material/Yard';
 import TerrainIcon from '@mui/icons-material/Terrain';
+import PetsIcon from '@mui/icons-material/Pets';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
 
 const BRANDING = {
   logo: <img className='' src="/logo-color.png" alt="" />,
@@ -99,6 +101,18 @@ export default function App() {
         ]
       },
       {
+        segment: 'farm-animals',
+        title: 'Farm animals',
+        icon: <PetsIcon />,
+        disabled: !hasAccess('FC'),
+      },
+      {
+        segment: 'agricultural-machines',
+        title: 'Agricultural machines',
+        icon: <AgricultureIcon />,
+        disabled: !hasAccess('FC'),
+      },
+      {
         segment: 'reporting-service',
         title: 'Reporting service',
         icon: <AssessmentIcon />,
@@ -112,7 +126,7 @@ export default function App() {
           },
           {
             segment: 'farm-animals',
-            title: 'Farm animals',
+            title: 'Farm animals report',
             icon: <CrueltyFreeIcon />,
             disabled: !hasAccess('RP'),
           },

@@ -2,7 +2,7 @@ import { AddRawMaterialOperationModel, BaseActivityModel, GenericAlertOptions, I
 import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions.types";
 import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemButton, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import { FarmParcelModel } from "@models/FarmParcel";
@@ -143,6 +143,42 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
         }
     }, [responseAllObservations])
     /** All calendar activities section end */
+
+    /** Parcel-scoped machines section start */
+    const [parcelMachines, setParcelMachines] = useState<AgriculturalMachine[]>([]);
+    const prevParcelForMachines = useRef<string>('');
+
+    const { fetchData: fetchParcelMachines, response: parcelMachinesResponse } = useFetch<AgriculturalMachine[]>(
+        '',
+        { method: 'GET' }
+    );
+
+    useEffect(() => {
+        if (Array.isArray(parcelMachinesResponse)) {
+            setParcelMachines(parcelMachinesResponse);
+        }
+    }, [parcelMachinesResponse]);
+
+    useEffect(() => {
+        if (!('usesAgriculturalMachinery' in formData)) return;
+        const prev = prevParcelForMachines.current;
+        prevParcelForMachines.current = selectedParcel;
+
+        if (!selectedParcel) {
+            setParcelMachines([]);
+            if (prev) setSelectedAgriMachines([]);
+            return;
+        }
+        // Clear saved selection only on user-initiated switch, not on hydration
+        if (prev && prev !== selectedParcel) {
+            setSelectedAgriMachines([]);
+            setParcelMachines([]);
+        }
+        fetchParcelMachines({
+            url: `proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json&parcel=${selectedParcel}`
+        });
+    }, [selectedParcel]);
+    /** Parcel-scoped machines section end */
 
     useEffect(() => {
         fetchDataAllActivities();
@@ -455,10 +491,11 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                 )}
                 {'usesAgriculturalMachinery' in formData && (
                     <GenericSelect<AgriculturalMachine>
-                        canEdit={canEdit}
+                        canEdit={canEdit && !!selectedParcel}
                         multiple={true}
-                        endpoint='proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json'
-                        label='Agricultural machines'
+                        endpoint=''
+                        data={parcelMachines}
+                        label={selectedParcel ? 'Agricultural machines' : 'Agricultural machines (select a parcel first)'}
                         getOptionLabel={item => `${item.name} (${item.model})`}
                         getOptionValue={item => item["@id"].split(':')[3]}
                         setSelectedValue={setSelectedAgriMachines}
