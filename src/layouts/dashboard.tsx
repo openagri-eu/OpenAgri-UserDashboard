@@ -16,6 +16,134 @@ export type DashboardContextType = {
   setBreadcrumbs: (breadcrumbs: Breadcrumb[] | undefined) => void;
 };
 
+const MOCK_SERVICES_RESPONSE = [
+  {
+    "code": "FC",
+    "name": "Farm Calendar",
+    "roles": [
+      "admin"
+    ],
+    "actions": [
+      "add",
+      "delete",
+      "edit",
+      "view"
+    ],
+    "scopes": {
+      "farm": [
+        "00000000-0000-0000-0000-000000000001"
+      ],
+      "parcel": [
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+        "00000000-0000-0000-0000-000000000003"
+      ]
+    },
+    "assignments": [
+      {
+        "role": "admin",
+        "actions": [
+          "add",
+          "delete",
+          "edit",
+          "view"
+        ],
+        "scope_type": "farm",
+        "scope_id": "00000000-0000-0000-0000-000000000001",
+        "source": "superuser"
+      },
+      {
+        "role": "admin",
+        "actions": [
+          "add",
+          "delete",
+          "edit",
+          "view"
+        ],
+        "scope_type": "parcel",
+        "scope_id": "00000000-0000-0000-0000-000000000001",
+        "source": "superuser"
+      },
+      {
+        "role": "admin",
+        "actions": [
+          "add",
+          "delete",
+          "edit",
+          "view"
+        ],
+        "scope_type": "parcel",
+        "scope_id": "00000000-0000-0000-0000-000000000002",
+        "source": "superuser"
+      },
+      {
+        "role": "admin",
+        "actions": [
+          "add",
+          "delete",
+          "edit",
+          "view"
+        ],
+        "scope_type": "parcel",
+        "scope_id": "00000000-0000-0000-0000-000000000003",
+        "source": "superuser"
+      }
+    ],
+    "unrestricted": true
+  },
+  {
+    "code": "IRM",
+    "name": "Irrigation Management",
+    "roles": [],
+    "actions": [
+      "add",
+      "delete",
+      "edit",
+      "view"
+    ],
+    "scopes": {},
+    "assignments": [],
+    "unrestricted": true
+  },
+  {
+    "code": "PDM",
+    "name": "Pest & Disease Management",
+    "roles": [],
+    "actions": [
+      "add",
+      "delete",
+      // "edit",
+      "view"
+    ],
+    "scopes": {},
+    "assignments": [],
+    "unrestricted": true
+  },
+  {
+    "code": "RP",
+    "name": "Reporting",
+    "roles": [],
+    "actions": [
+      "add",
+      "delete",
+      "edit",
+      "view"
+    ],
+    "scopes": {},
+    "assignments": [],
+    "unrestricted": true
+  },
+  {
+    "code": "WD",
+    "name": "Weather Data",
+    "roles": [],
+    "actions": [],
+    "scopes": {},
+    "assignments": [],
+    "unrestricted": true
+  }
+];
+
 export default function DashLayout() {
   const { session, setSession } = useSession();
   const navigate = useNavigate();
@@ -43,7 +171,8 @@ export default function DashLayout() {
         if (prevSession) {
           return {
             ...prevSession,
-            services: response.services
+            services: MOCK_SERVICES_RESPONSE as any
+            // services: response.services
           };
         }
         return null;

@@ -40,6 +40,7 @@ import SoilTypesPage from '@pages/dashboard/services/Irrigation/SoilTypes.tsx';
 import EditSoilTypePage from '@pages/dashboard/services/Irrigation/EditSoilType.tsx';
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
+import FieldNotebookReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FieldNotebook.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
 import ThreatModelsPage from '@pages/dashboard/services/PestAndDisease/ThreatModels.tsx';
 import RiskForecastPage from '@pages/dashboard/services/PestAndDisease/RiskForecast.tsx';
@@ -155,6 +156,10 @@ const router = createBrowserRouter([
                   {
                     path: 'irrigation-operations',
                     Component: IrrigationOperationsReportPage
+                  },
+                  {
+                    path: 'field-notebook',
+                    Component: FieldNotebookReportPage
                   },
                 ]
               },

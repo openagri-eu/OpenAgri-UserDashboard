@@ -136,6 +136,12 @@ export default function App() {
             icon: <WaterDropIcon />,
             disabled: !hasAccess('RP'),
           },
+          {
+            segment: 'field-notebook',
+            title: 'Field notebook',
+            icon: <NoteAddIcon />,
+            disabled: !hasAccess('RP'),
+          },
         ]
       },
       {

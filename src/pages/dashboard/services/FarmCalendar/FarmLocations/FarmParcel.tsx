@@ -10,10 +10,13 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import useDialog from "@hooks/useDialog";
 import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
+import { useSession } from "@contexts/SessionContext";
+import { generateFieldNotebook } from "@utils/generateReport";
 
 const REQUIRED_KEYS = new Set<string>([
     'identifier',
@@ -36,10 +39,13 @@ const FarmParcelPage = () => {
     const canEdit = actions.includes('edit');
     const canDelete = actions.includes('delete');
 
+    const { session } = useSession();
+
     const [parcel, setParcel] = useState<FarmParcelModel>();
     const [title, setTitle] = useState<string>('');
 
     const [selectedFarm, setSelectedFarm] = useState<string>('');
+    const [notebookLoading, setNotebookLoading] = useState<boolean>(false);
 
     const { id } = useParams();
     const { fetchData, loading, response, error } = useFetch<FarmParcelModel>(
@@ -271,6 +277,26 @@ const FarmParcelPage = () => {
                             }}
                         >
                             Delete
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<InsertDriveFileIcon />}
+                            loading={notebookLoading}
+                            loadingPosition="start"
+                            disabled={!id || !session?.user?.token}
+                            onClick={async () => {
+                                if (!session?.user?.token || !id) return;
+                                setNotebookLoading(true);
+                                try {
+                                    await generateFieldNotebook(session.user.token, { parcel_id: id }, null);
+                                } catch (e: any) {
+                                    showSnackbar('error', e?.message ?? 'Error generating field notebook');
+                                } finally {
+                                    setNotebookLoading(false);
+                                }
+                            }}
+                        >
+                            Download field notebook
                         </Button>
                     </Box>
                 </Box>
