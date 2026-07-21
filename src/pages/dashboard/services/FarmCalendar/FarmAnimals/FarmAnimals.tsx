@@ -3,8 +3,8 @@ import GenericSortableTable from "@components/shared/GenericSortableTable/Generi
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
-import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Skeleton, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, IconButton, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,6 +14,7 @@ import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import useDialog from "@hooks/useDialog";
 import { FarmAnimalModel } from "@models/FarmAnimalModel";
 import AddFarmAnimal from "./AddFarmAnimal/AddFarmAnimal";
+import { FarmParcelModel } from "@models/FarmParcel";
 
 interface AnimalRow {
     id: string;
@@ -21,6 +22,7 @@ interface AnimalRow {
     nationalID: string;
     species: string;
     breed: string;
+    parcel: string;
     actions: string;
 }
 
@@ -34,10 +36,29 @@ const FarmAnimalsPage = () => {
     const [pendingDelete, setPendingDelete] = useState<{ id: string; label: string } | null>(null);
     const [expanded, setExpanded] = useState<boolean>(false);
 
+    const [filterParcel, setFilterParcel] = useState<FarmParcelModel | null>(null);
+    const selectedParcelId = filterParcel?.["@id"].split(':').pop() ?? '';
+
     const { fetchData, loading, response, error } = useFetch<FarmAnimalModel[]>(
         'proxy/farmcalendar/api/v1/FarmAnimals/?format=json',
         { method: 'GET' }
     );
+
+    const { fetchData: fetchParcels, response: parcelsResponse } = useFetch<FarmParcelModel[]>(
+        'proxy/farmcalendar/api/v1/FarmParcels/?format=json',
+        { method: 'GET' }
+    );
+
+    const parcelLabelById = useMemo(() => {
+        const map: Record<string, string> = {};
+        if (Array.isArray(parcelsResponse)) {
+            for (const p of parcelsResponse) {
+                const uuid = p["@id"].split(':').pop();
+                if (uuid) map[uuid] = p.identifier;
+            }
+        }
+        return map;
+    }, [parcelsResponse]);
 
     const { fetchData: deleteFetchData, response: deleteResponse, error: deleteError } = useFetch<any>(
         '',
@@ -47,7 +68,14 @@ const FarmAnimalsPage = () => {
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
     const { dialogProps, showDialog } = useDialog();
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { fetchParcels(); }, []);
+
+    useEffect(() => {
+        const url = selectedParcelId
+            ? `proxy/farmcalendar/api/v1/FarmAnimals/?format=json&parcel=${selectedParcelId}`
+            : 'proxy/farmcalendar/api/v1/FarmAnimals/?format=json';
+        fetchData({ url });
+    }, [selectedParcelId]);
 
     useEffect(() => {
         if (error) showSnackbar('error', 'Error loading animals');
@@ -57,10 +85,17 @@ const FarmAnimalsPage = () => {
         if (deleteError) showSnackbar('error', 'Error deleting animal');
     }, [deleteError]);
 
+    const refetchAnimals = () => {
+        const url = selectedParcelId
+            ? `proxy/farmcalendar/api/v1/FarmAnimals/?format=json&parcel=${selectedParcelId}`
+            : 'proxy/farmcalendar/api/v1/FarmAnimals/?format=json';
+        fetchData({ url });
+    };
+
     useEffect(() => {
         if (deleteResponse) {
             showSnackbar('success', 'Animal deleted');
-            fetchData();
+            refetchAnimals();
         }
     }, [deleteResponse]);
 
@@ -72,10 +107,11 @@ const FarmAnimalsPage = () => {
                 nationalID: a.nationalID,
                 species: a.species,
                 breed: a.breed,
+                parcel: parcelLabelById[a.hasAgriParcel?.["@id"]?.split(':').pop() ?? ''] ?? '',
                 actions: '',
             })));
         }
-    }, [response]);
+    }, [response, parcelLabelById]);
 
     const navigate = useNavigate();
 
@@ -84,6 +120,7 @@ const FarmAnimalsPage = () => {
         { id: 'nationalID', numeric: false, label: 'National ID' },
         { id: 'species', numeric: false, label: 'Species' },
         { id: 'breed', numeric: false, label: 'Breed' },
+        { id: 'parcel', numeric: false, label: 'Parcel' },
         {
             id: 'actions', numeric: false, label: 'Actions', disableSort: true, renderCell: (row) => (
                 <Stack direction={'row'} spacing={1}>
@@ -122,7 +159,7 @@ const FarmAnimalsPage = () => {
     };
 
     const onAddNew = () => {
-        fetchData();
+        refetchAnimals();
         setExpanded(false);
     };
 
@@ -136,6 +173,16 @@ const FarmAnimalsPage = () => {
                     <AddFarmAnimal onAction={onAddNew} />
                 </AccordionDetails>
             </Accordion>
+            <Autocomplete
+                size="small"
+                sx={{ maxWidth: 360 }}
+                options={Array.isArray(parcelsResponse) ? parcelsResponse : []}
+                value={filterParcel}
+                onChange={(_, v) => setFilterParcel(v)}
+                getOptionLabel={p => `${p.identifier}${p.category ? ` (${p.category})` : ''}`}
+                isOptionEqualToValue={(a, b) => a["@id"] === b["@id"]}
+                renderInput={(params) => <TextField {...params} label="Filter by parcel" placeholder="All parcels" />}
+            />
             {loading && <Skeleton variant="rectangular" height={48} />}
             {!(loading) && !error && (
                 <GenericSortableTable data={rows} headCells={headCells} />

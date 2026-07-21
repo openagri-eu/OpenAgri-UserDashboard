@@ -3,8 +3,8 @@ import GenericSortableTable from "@components/shared/GenericSortableTable/Generi
 import { HeadCell } from "@components/shared/GenericSortableTable/GenericSortableTable.types";
 import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
-import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Skeleton, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, IconButton, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,6 +14,7 @@ import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import useDialog from "@hooks/useDialog";
 import { AgriculturalMachine } from "@models/AgriculturalMachine";
 import AddAgriculturalMachine from "./AddAgriculturalMachine/AddAgriculturalMachine";
+import { FarmParcelModel } from "@models/FarmParcel";
 
 interface MachineRow {
     id: string;
@@ -22,6 +23,7 @@ interface MachineRow {
     model: string;
     seria_number: string;
     purchase_date: string;
+    parcel: string;
     actions: string;
 }
 
@@ -35,10 +37,29 @@ const AgriculturalMachinesPage = () => {
     const [pendingDelete, setPendingDelete] = useState<{ id: string; label: string } | null>(null);
     const [expanded, setExpanded] = useState<boolean>(false);
 
+    const [filterParcel, setFilterParcel] = useState<FarmParcelModel | null>(null);
+    const selectedParcelId = filterParcel?.["@id"].split(':').pop() ?? '';
+
     const { fetchData, loading, response, error } = useFetch<AgriculturalMachine[]>(
         'proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json',
         { method: 'GET' }
     );
+
+    const { fetchData: fetchParcels, response: parcelsResponse } = useFetch<FarmParcelModel[]>(
+        'proxy/farmcalendar/api/v1/FarmParcels/?format=json',
+        { method: 'GET' }
+    );
+
+    const parcelLabelById = useMemo(() => {
+        const map: Record<string, string> = {};
+        if (Array.isArray(parcelsResponse)) {
+            for (const p of parcelsResponse) {
+                const uuid = p["@id"].split(':').pop();
+                if (uuid) map[uuid] = p.identifier;
+            }
+        }
+        return map;
+    }, [parcelsResponse]);
 
     const { fetchData: deleteFetchData, response: deleteResponse, error: deleteError } = useFetch<any>(
         '',
@@ -48,7 +69,18 @@ const AgriculturalMachinesPage = () => {
     const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
     const { dialogProps, showDialog } = useDialog();
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { fetchParcels(); }, []);
+
+    const refetchMachines = () => {
+        const url = selectedParcelId
+            ? `proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json&parcel=${selectedParcelId}`
+            : 'proxy/farmcalendar/api/v1/AgriculturalMachines/?format=json';
+        fetchData({ url });
+    };
+
+    useEffect(() => {
+        refetchMachines();
+    }, [selectedParcelId]);
 
     useEffect(() => {
         if (error) showSnackbar('error', 'Error loading machines');
@@ -61,7 +93,7 @@ const AgriculturalMachinesPage = () => {
     useEffect(() => {
         if (deleteResponse) {
             showSnackbar('success', 'Machine deleted');
-            fetchData();
+            refetchMachines();
         }
     }, [deleteResponse]);
 
@@ -74,10 +106,11 @@ const AgriculturalMachinesPage = () => {
                 model: m.model,
                 seria_number: m.seria_number,
                 purchase_date: m.purchase_date,
+                parcel: parcelLabelById[m.hasAgriParcel?.["@id"]?.split(':').pop() ?? ''] ?? '',
                 actions: '',
             })));
         }
-    }, [response]);
+    }, [response, parcelLabelById]);
 
     const navigate = useNavigate();
 
@@ -87,6 +120,7 @@ const AgriculturalMachinesPage = () => {
         { id: 'model', numeric: false, label: 'Model' },
         { id: 'seria_number', numeric: false, label: 'Serial number' },
         { id: 'purchase_date', numeric: false, label: 'Purchase date' },
+        { id: 'parcel', numeric: false, label: 'Parcel' },
         {
             id: 'actions', numeric: false, label: 'Actions', disableSort: true, renderCell: (row) => (
                 <Stack direction={'row'} spacing={1}>
@@ -139,6 +173,16 @@ const AgriculturalMachinesPage = () => {
                     <AddAgriculturalMachine onAction={onAddNew} />
                 </AccordionDetails>
             </Accordion>
+            <Autocomplete
+                size="small"
+                sx={{ maxWidth: 360 }}
+                options={Array.isArray(parcelsResponse) ? parcelsResponse : []}
+                value={filterParcel}
+                onChange={(_, v) => setFilterParcel(v)}
+                getOptionLabel={p => `${p.identifier}${p.category ? ` (${p.category})` : ''}`}
+                isOptionEqualToValue={(a, b) => a["@id"] === b["@id"]}
+                renderInput={(params) => <TextField {...params} label="Filter by parcel" placeholder="All parcels" />}
+            />
             {loading && <Skeleton variant="rectangular" height={48} />}
             {!(loading) && !error && (
                 <GenericSortableTable data={rows} headCells={headCells} />
