@@ -265,9 +265,9 @@ const FarmParcelPage = () => {
                                     <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isCultivatedInLevels" checked={!!parcel?.isCultivatedInLevels} onChange={canEdit ? handleChange : () => {}} />} label="Cultivated in levels" />
                                     <FormControlLabel control={<Checkbox disableRipple={!canEdit} name="isGroundSlope" checked={!!parcel?.isGroundSlope} onChange={canEdit ? handleChange : () => {}} />} label="Ground slope" />
                                 </Stack>
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
                                     <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Area (sq. meters)" name="area" value={parcel?.area ?? ''} type="number" onChange={handleChange} required={isReq('area')} error={isReq('area') && fieldEmpty('area')} />
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Image or map URL" name="depiction" value={parcel?.depiction ?? ''} onChange={handleChange} />
+                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Image URL (override)" name="depiction" value={parcel?.depiction ?? ''} onChange={handleChange} helperText="If empty, the parcel boundary polygon is rendered as the thumbnail." />
                                 </Stack>
                                 <TextField slotProps={{ input: { readOnly: !canEdit }, htmlInput: { step: 0.01 } }} fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={parcel?.hasIrrigationFlow ?? ''} type="number" onChange={handleChange} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">

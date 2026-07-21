@@ -13,6 +13,7 @@ import PolylineIcon from '@mui/icons-material/Polyline';
 import useDialog from "@hooks/useDialog";
 import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
+import ParcelThumbnail from "@components/shared/ParcelThumbnail/ParcelThumbnail";
 
 const FarmPage = () => {
     const { actions } = useOutletContext<ServiceContextType>();
@@ -235,6 +236,7 @@ const FarmPage = () => {
                                 {farmParcels.map(p => {
                                     const parcelId = p["@id"].split(':').pop() ?? '';
                                     const hasPolygon = !!p.hasGeometry?.asWKT?.trim();
+                                    const depictionUrl = (p.depiction || '').trim();
                                     return (
                                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={p["@id"]}>
                                             <Card variant="outlined" sx={{ height: '100%' }}>
@@ -243,15 +245,25 @@ const FarmPage = () => {
                                                     sx={{ height: '100%' }}
                                                 >
                                                     <CardContent>
-                                                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
-                                                            <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
-                                                                {p.identifier || 'Unnamed parcel'}
-                                                            </Typography>
-                                                            {hasPolygon && (
-                                                                <Tooltip title="Has polygon">
-                                                                    <PolylineIcon fontSize="small" color="primary" />
-                                                                </Tooltip>
-                                                            )}
+                                                        <Stack direction="row" alignItems="flex-start" spacing={1.5}>
+                                                            <ParcelThumbnail
+                                                                depictionUrl={depictionUrl}
+                                                                wkt={p.hasGeometry?.asWKT}
+                                                                identifier={p.identifier}
+                                                                size={64}
+                                                            />
+                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
+                                                                    <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
+                                                                        {p.identifier || 'Unnamed parcel'}
+                                                                    </Typography>
+                                                                    {hasPolygon && (
+                                                                        <Tooltip title="Has polygon">
+                                                                            <PolylineIcon fontSize="small" color="primary" />
+                                                                        </Tooltip>
+                                                                    )}
+                                                                </Stack>
+                                                            </Box>
                                                         </Stack>
                                                         <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 0.5 }}>
                                                             {p.category && <Chip size="small" label={p.category} />}

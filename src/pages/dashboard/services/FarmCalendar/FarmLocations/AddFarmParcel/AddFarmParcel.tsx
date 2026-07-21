@@ -233,9 +233,9 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                         <FormControlLabel control={<Checkbox name="isCultivatedInLevels" checked={!!formData?.isCultivatedInLevels} onChange={handleChange} />} label="Cultivated in levels" />
                         <FormControlLabel control={<Checkbox name="isGroundSlope" checked={!!formData?.isGroundSlope} onChange={handleChange} />} label="Ground slope" />
                     </Stack>
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
                         <TextField fullWidth margin="normal" label="Area (sq. meters)" name="area" value={formData?.area ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} required={isReq('area')} error={isReq('area') && fieldEmpty('area')} />
-                        <TextField fullWidth margin="normal" label="Image or map URL" name="depiction" value={formData?.depiction ?? ''} onChange={handleChange} />
+                        <TextField fullWidth margin="normal" label="Image URL (override)" name="depiction" value={formData?.depiction ?? ''} onChange={handleChange} helperText="If empty, the parcel boundary polygon is rendered as the thumbnail." />
                     </Stack>
                     <TextField fullWidth margin="normal" label="Irrigation flow (units)" name="hasIrrigationFlow" value={formData?.hasIrrigationFlow ?? ''} type="number" slotProps={{ htmlInput: { step: 0.01 } }} onChange={handleChange} />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">

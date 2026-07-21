@@ -10,7 +10,7 @@ import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import { FarmParcelModel } from "@models/FarmParcel";
 import { ParcelSelectionListProps } from "./ParcelSelectionList.types";
 
-import placeholder from '/parcel-placeholder.png';
+import ParcelThumbnail from "@components/shared/ParcelThumbnail/ParcelThumbnail";
 
 interface FarmHeaderItem {
     type: 'farm-header';
@@ -140,7 +140,9 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
 
         const p = item.parcel;
         const isSelected = p["@id"] === selectedParcelId;
-        const parcelImage = (p.depiction || '').trim() || placeholder;
+        const depictionUrl = (p.depiction || '').trim();
+        const wkt = p.hasGeometry?.asWKT || '';
+        const thumbSize = isMobile ? 56 : 80;
         return (
             <Box style={style} sx={{ padding: 0.5, boxSizing: 'border-box', width: '100%' }}>
                 <Box
@@ -163,17 +165,12 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
                         }
                     }}
                 >
-                    <Box
-                        component="img"
-                        src={parcelImage}
-                        alt={`Image of ${p.identifier}`}
-                        sx={{
-                            width: { xs: 56, sm: 80 },
-                            height: { xs: 56, sm: 80 },
-                            borderRadius: 1,
-                            marginRight: { xs: 1, sm: 2 },
-                            flexShrink: 0,
-                        }}
+                    <ParcelThumbnail
+                        depictionUrl={depictionUrl}
+                        wkt={wkt}
+                        identifier={p.identifier}
+                        size={thumbSize}
+                        sx={{ marginRight: { xs: 1, sm: 2 } }}
                     />
                     <Box sx={{ overflow: 'hidden', minWidth: 0, flex: 1 }}>
                         <Typography variant="body1" sx={{ fontWeight: 'bold' }} noWrap>
