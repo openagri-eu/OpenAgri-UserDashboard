@@ -101,7 +101,6 @@ const WKTPolygonMap: React.FC<WKTPolygonMapProps> = ({
             return;
         }
         const features = readPolygonFeatures(next);
-        // Typed input remains strict: exactly one Polygon.
         if (features.length !== 1) {
             setInputError(true);
             return;
