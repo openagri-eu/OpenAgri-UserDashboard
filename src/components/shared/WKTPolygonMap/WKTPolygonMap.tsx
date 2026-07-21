@@ -1,8 +1,9 @@
 import 'ol/ol.css';
 
 import { useEffect, useRef, useState } from 'react';
-import { Box, Button, Stack, TextField } from '@mui/material';
+import { Box, Button, Stack, TextField, Tooltip } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -14,6 +15,11 @@ import VectorSource from 'ol/source/Vector';
 import { Draw, Modify, Snap } from 'ol/interaction';
 import WKT from 'ol/format/WKT';
 import { fromLonLat } from 'ol/proj';
+import Polygon from 'ol/geom/Polygon';
+import MultiPolygon from 'ol/geom/MultiPolygon';
+import GeometryCollection from 'ol/geom/GeometryCollection';
+import Geometry from 'ol/geom/Geometry';
+import { createEmpty, extend, isEmpty, Extent } from 'ol/extent';
 
 import { WKTPolygonMapProps } from './WKTPolygonMap.types';
 
@@ -23,18 +29,34 @@ const FEATURE_PROJ = 'EPSG:3857';
 const DEFAULT_CENTER: [number, number] = [15, 45];
 const DEFAULT_ZOOM = 5;
 
-const readWKTFeature = (wkt: string): Feature | null => {
-    if (!wkt?.trim()) return null;
+const geometryToPolygons = (geom: Geometry): Polygon[] => {
+    const type = geom.getType();
+    if (type === 'Polygon') return [geom as Polygon];
+    if (type === 'MultiPolygon') return (geom as MultiPolygon).getPolygons();
+    if (type === 'GeometryCollection') {
+        const out: Polygon[] = [];
+        for (const inner of (geom as GeometryCollection).getGeometries()) {
+            out.push(...geometryToPolygons(inner));
+        }
+        return out;
+    }
+    return [];
+};
+
+// Returns polygon features. Handles POLYGON, MULTIPOLYGON, and GEOMETRYCOLLECTION-wrapped variants.
+const readPolygonFeatures = (wkt: string): Feature[] => {
+    if (!wkt?.trim()) return [];
     try {
         const feature = wktFormat.readFeature(wkt, {
             dataProjection: DATA_PROJ,
             featureProjection: FEATURE_PROJ,
         }) as Feature;
         const geom = feature.getGeometry();
-        if (!geom || geom.getType() !== 'Polygon') return null;
-        return feature;
+        if (!geom) return [];
+        const polygons = geometryToPolygons(geom);
+        return polygons.map(p => new Feature({ geometry: p }));
     } catch {
-        return null;
+        return [];
     }
 };
 
@@ -77,13 +99,14 @@ const WKTPolygonMap: React.FC<WKTPolygonMapProps> = ({
             onChange('');
             return;
         }
-        const feature = readWKTFeature(next);
-        if (!feature) {
+        const features = readPolygonFeatures(next);
+        // Typed input remains strict: exactly one Polygon.
+        if (features.length !== 1) {
             setInputError(true);
             return;
         }
         setInputError(false);
-        const canonical = writeWKTFromFeature(feature);
+        const canonical = writeWKTFromFeature(features[0]);
         onChange(canonical);
     };
 
@@ -122,21 +145,30 @@ const WKTPolygonMap: React.FC<WKTPolygonMapProps> = ({
         };
     }, []);
 
-    useEffect(() => {
+    const fitToSource = () => {
         const source = sourceRef.current;
         const map = mapRef.current;
         if (!source || !map) return;
+        const features = source.getFeatures();
+        if (!features.length) return;
+        const combined: Extent = createEmpty();
+        for (const f of features) {
+            const ext = f.getGeometry()?.getExtent();
+            if (ext) extend(combined, ext);
+        }
+        if (isEmpty(combined)) return;
+        map.getView().fit(combined, { padding: [40, 40, 40, 40], maxZoom: 18 });
+    };
+
+    useEffect(() => {
+        const source = sourceRef.current;
+        if (!source) return;
         if (value === lastSourceWKTRef.current) return;
 
         source.clear();
-        const feature = readWKTFeature(value);
-        if (feature) {
-            source.addFeature(feature);
-            const ext = feature.getGeometry()?.getExtent();
-            if (ext) {
-                map.getView().fit(ext, { padding: [40, 40, 40, 40], maxZoom: 18 });
-            }
-        }
+        const features = readPolygonFeatures(value);
+        for (const f of features) source.addFeature(f);
+        if (features.length) fitToSource();
         lastSourceWKTRef.current = value ?? '';
     }, [value]);
 
@@ -197,8 +229,20 @@ const WKTPolygonMap: React.FC<WKTPolygonMapProps> = ({
                     borderColor: 'divider',
                 }}
             />
-            {!readOnly && (
-                <Box>
+            <Stack direction="row" spacing={1}>
+                <Tooltip title="Center map on polygon">
+                    <span>
+                        <Button
+                            size="small"
+                            startIcon={<CenterFocusStrongIcon />}
+                            onClick={fitToSource}
+                            disabled={!value}
+                        >
+                            Center on polygon
+                        </Button>
+                    </span>
+                </Tooltip>
+                {!readOnly && (
                     <Button
                         size="small"
                         startIcon={<ClearIcon />}
@@ -207,8 +251,8 @@ const WKTPolygonMap: React.FC<WKTPolygonMapProps> = ({
                     >
                         Clear polygon
                     </Button>
-                </Box>
-            )}
+                )}
+            </Stack>
             <TextField
                 label="WKT"
                 value={inputValue}
