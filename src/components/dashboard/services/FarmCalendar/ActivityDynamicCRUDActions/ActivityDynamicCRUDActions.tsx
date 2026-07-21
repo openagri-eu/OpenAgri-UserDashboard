@@ -180,6 +180,41 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
     }, [selectedParcel]);
     /** Parcel-scoped machines section end */
 
+    /** Parcel-scoped animals section start */
+    const [parcelAnimals, setParcelAnimals] = useState<FarmAnimalModel[]>([]);
+    const prevParcelForAnimals = useRef<string>('');
+
+    const { fetchData: fetchParcelAnimals, response: parcelAnimalsResponse } = useFetch<FarmAnimalModel[]>(
+        '',
+        { method: 'GET' }
+    );
+
+    useEffect(() => {
+        if (Array.isArray(parcelAnimalsResponse)) {
+            setParcelAnimals(parcelAnimalsResponse);
+        }
+    }, [parcelAnimalsResponse]);
+
+    useEffect(() => {
+        if (!('hasAnimal' in formData)) return;
+        const prev = prevParcelForAnimals.current;
+        prevParcelForAnimals.current = selectedParcel;
+
+        if (!selectedParcel) {
+            setParcelAnimals([]);
+            if (prev) setSelectedAnimal('');
+            return;
+        }
+        if (prev && prev !== selectedParcel) {
+            setSelectedAnimal('');
+            setParcelAnimals([]);
+        }
+        fetchParcelAnimals({
+            url: `proxy/farmcalendar/api/v1/FarmAnimals/?format=json&parcel=${selectedParcel}`
+        });
+    }, [selectedParcel]);
+    /** Parcel-scoped animals section end */
+
     useEffect(() => {
         fetchDataAllActivities();
         if ('relatedObservation' in formData) {
@@ -626,9 +661,10 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
             <>
                 {'hasAnimal' in formData && (
                     <GenericSelect<FarmAnimalModel>
-                        canEdit={canEdit}
-                        endpoint='proxy/farmcalendar/api/v1/FarmAnimals/?format=json'
-                        label='Animal'
+                        canEdit={canEdit && !!selectedParcel}
+                        endpoint=''
+                        data={parcelAnimals}
+                        label={selectedParcel ? 'Animal' : 'Animal (select a parcel first)'}
                         selectedValue={selectedAnimal}
                         setSelectedValue={setSelectedAnimal}
                         getOptionLabel={item => `${item.name || item.nationalID} - ${item.species} ${item.breed ? '(' + item.breed + ')' : ''}`}
