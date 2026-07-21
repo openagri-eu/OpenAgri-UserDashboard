@@ -8,7 +8,7 @@ import { Box, Button, Card, CardContent, Checkbox, FormControlLabel, Skeleton, S
 import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -110,15 +110,18 @@ const FarmParcelPage = () => {
     }, [response])
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const returnTo = (location.state as { from?: string } | null)?.from || "/farm-locations/farm-parcels";
+
     useEffect(() => {
         if (editResponse) {
-            navigate("/farm-locations/farm-parcels");
+            navigate(returnTo);
         }
     }, [editResponse])
 
     const handleDelete = async () => {
         await deleteFetchData();
-        navigate("/farm-locations/farm-parcels");
+        navigate(returnTo);
     };
 
     const handleEdit = () => {

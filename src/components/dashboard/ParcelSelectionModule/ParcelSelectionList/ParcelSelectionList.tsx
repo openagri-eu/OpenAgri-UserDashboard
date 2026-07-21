@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import { FarmParcelModel } from "@models/FarmParcel";
 import { ParcelSelectionListProps } from "./ParcelSelectionList.types";
@@ -52,6 +52,7 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
     const [collapsedFarms, setCollapsedFarms] = useState<Set<string>>(new Set());
     const listRef = useRef<VariableSizeList>(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const toggleFarm = (id: string) => {
         setCollapsedFarms(prev => {
@@ -187,7 +188,9 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const parcelId = p["@id"].split(':')[3];
-                                if (parcelId) navigate(`/farm-locations/farm-parcel/${parcelId}`);
+                                if (parcelId) navigate(`/farm-locations/farm-parcel/${parcelId}`, {
+                                    state: { from: location.pathname + location.search }
+                                });
                             }}
                             sx={{ ml: 1, flexShrink: 0 }}
                         >
