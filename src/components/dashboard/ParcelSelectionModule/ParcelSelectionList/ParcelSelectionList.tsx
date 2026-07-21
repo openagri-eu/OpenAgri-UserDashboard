@@ -1,9 +1,11 @@
-import { alpha, Box, IconButton, InputAdornment, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { alpha, Box, IconButton, InputAdornment, TextField, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import LaunchIcon from '@mui/icons-material/Launch';
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import { FarmParcelModel } from "@models/FarmParcel";
 import { ParcelSelectionListProps } from "./ParcelSelectionList.types";
@@ -49,6 +51,7 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
     const [search, setSearch] = useState<string>('');
     const [collapsedFarms, setCollapsedFarms] = useState<Set<string>>(new Set());
     const listRef = useRef<VariableSizeList>(null);
+    const navigate = useNavigate();
 
     const toggleFarm = (id: string) => {
         setCollapsedFarms(prev => {
@@ -180,6 +183,20 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
                             {[p.category, p.inRegion].filter(Boolean).join(' · ') || p["@type"]}
                         </Typography>
                     </Box>
+                    <Tooltip title="Open parcel details">
+                        <IconButton
+                            size="small"
+                            aria-label="Open parcel details"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const parcelId = p["@id"].split(':')[3];
+                                if (parcelId) navigate(`/farm-locations/farm-parcel/${parcelId}`);
+                            }}
+                            sx={{ ml: 1, flexShrink: 0 }}
+                        >
+                            <LaunchIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Box>
         );
