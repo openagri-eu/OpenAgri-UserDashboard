@@ -87,8 +87,9 @@ const WKTPolygonMap: React.FC<WKTPolygonMapProps> = ({
 
     useEffect(() => {
         if (inputFocusedRef.current) return;
-        setInputValue(value ?? '');
-        setInputError(false);
+        const next = value ?? '';
+        setInputValue(next);
+        setInputError(!!next.trim() && readPolygonFeatures(next).length === 0);
     }, [value]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
