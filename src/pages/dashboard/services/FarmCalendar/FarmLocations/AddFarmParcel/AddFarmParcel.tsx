@@ -1,4 +1,6 @@
 import { Box, Button, Checkbox, FormControlLabel, Stack, TextField, Typography } from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
 import { AddFarmParcelProps } from "./AddFarmParcel.types";
 import { useEffect, useState } from "react";
 import { FarmParcelModel } from "@models/FarmParcel";
@@ -133,6 +135,13 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
         });
     };
 
+    const handleValidDateChange = (fieldName: 'validFrom' | 'validTo') => (val: Dayjs | null) => {
+        setFormData(prev => {
+            if (!prev) return undefined;
+            return { ...prev, [fieldName]: val ? val.toISOString() : '' } as FarmParcelModel;
+        });
+    };
+
     const handleGeometryChange = (wkt: string) => {
         setFormData(prev => {
             if (!prev) return undefined;
@@ -181,8 +190,36 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
                     </Stack>
                     <TextField fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={formData?.description ?? ''} onChange={handleChange} />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField fullWidth margin="normal" label="Valid from" name="validFrom" value={formData?.validFrom ?? ''} onChange={handleChange} disabled required={isReq('validFrom')} error={isReq('validFrom') && fieldEmpty('validFrom')} />
-                        <TextField fullWidth margin="normal" label="Valid to" name="validTo" value={formData?.validTo ?? ''} onChange={handleChange} disabled required={isReq('validTo')} error={isReq('validTo') && fieldEmpty('validTo')} />
+                        <Box flex={1} width={'100%'}>
+                            <DateTimePicker
+                                label="Valid from"
+                                value={formData?.validFrom ? dayjs(formData.validFrom) : null}
+                                onChange={handleValidDateChange('validFrom')}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        margin: 'normal',
+                                        required: isReq('validFrom'),
+                                        error: isReq('validFrom') && fieldEmpty('validFrom'),
+                                    },
+                                }}
+                            />
+                        </Box>
+                        <Box flex={1} width={'100%'}>
+                            <DateTimePicker
+                                label="Valid to"
+                                value={formData?.validTo ? dayjs(formData.validTo) : null}
+                                onChange={handleValidDateChange('validTo')}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        margin: 'normal',
+                                        required: isReq('validTo'),
+                                        error: isReq('validTo') && fieldEmpty('validTo'),
+                                    },
+                                }}
+                            />
+                        </Box>
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                         <TextField fullWidth margin="normal" label="Region" name="inRegion" value={formData?.inRegion ?? ''} onChange={handleChange} required={isReq('inRegion')} error={isReq('inRegion') && fieldEmpty('inRegion')} />

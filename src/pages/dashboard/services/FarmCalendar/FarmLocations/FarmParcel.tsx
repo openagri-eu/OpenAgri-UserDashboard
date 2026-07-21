@@ -5,6 +5,8 @@ import useSnackbar from "@hooks/useSnackbar";
 import { FarmModel } from "@models/Farm";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { Box, Button, Card, CardContent, Checkbox, FormControlLabel, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
@@ -157,6 +159,13 @@ const FarmParcelPage = () => {
         });
     };
 
+    const handleValidDateChange = (fieldName: 'validFrom' | 'validTo') => (val: Dayjs | null) => {
+        setParcel(prev => {
+            if (!prev) return undefined;
+            return { ...prev, [fieldName]: val ? val.toISOString() : '' } as FarmParcelModel;
+        });
+    };
+
     const handleGeometryChange = (wkt: string) => {
         setParcel(prev => {
             if (!prev) return undefined;
@@ -211,8 +220,38 @@ const FarmParcelPage = () => {
                                 </Stack>
                                 <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" multiline rows={3} label="Parcel description" name="description" value={parcel?.description ?? ''} onChange={handleChange} />
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid from" name="validFrom" value={parcel?.validFrom ?? ''} onChange={handleChange} disabled required={isReq('validFrom')} error={isReq('validFrom') && fieldEmpty('validFrom')} />
-                                    <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Valid to" name="validTo" value={parcel?.validTo ?? ''} onChange={handleChange} disabled required={isReq('validTo')} error={isReq('validTo') && fieldEmpty('validTo')} />
+                                    <Box flex={1} width={'100%'}>
+                                        <DateTimePicker
+                                            readOnly={!canEdit}
+                                            label="Valid from"
+                                            value={parcel?.validFrom ? dayjs(parcel.validFrom) : null}
+                                            onChange={handleValidDateChange('validFrom')}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    margin: 'normal',
+                                                    required: isReq('validFrom'),
+                                                    error: isReq('validFrom') && fieldEmpty('validFrom'),
+                                                },
+                                            }}
+                                        />
+                                    </Box>
+                                    <Box flex={1} width={'100%'}>
+                                        <DateTimePicker
+                                            readOnly={!canEdit}
+                                            label="Valid to"
+                                            value={parcel?.validTo ? dayjs(parcel.validTo) : null}
+                                            onChange={handleValidDateChange('validTo')}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    margin: 'normal',
+                                                    required: isReq('validTo'),
+                                                    error: isReq('validTo') && fieldEmpty('validTo'),
+                                                },
+                                            }}
+                                        />
+                                    </Box>
                                 </Stack>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Region" name="inRegion" value={parcel?.inRegion ?? ''} onChange={handleChange} required={isReq('inRegion')} error={isReq('inRegion') && fieldEmpty('inRegion')} />
