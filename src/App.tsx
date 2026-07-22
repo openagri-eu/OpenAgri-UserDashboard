@@ -23,10 +23,6 @@ import CrueltyFreeIcon from '@mui/icons-material/CrueltyFree';
 import ReportIcon from '@mui/icons-material/Report';
 import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 import GrassIcon from '@mui/icons-material/Grass';
-import YardIcon from '@mui/icons-material/Yard';
-import TerrainIcon from '@mui/icons-material/Terrain';
-import PetsIcon from '@mui/icons-material/Pets';
-import AgricultureIcon from '@mui/icons-material/Agriculture';
 
 const BRANDING = {
   logo: <img className='' src="/logo-color.png" alt="" />,
@@ -187,6 +183,12 @@ export default function App() {
           icon: <ThermostatIcon />,
         },
       ] : []),
+      {
+        segment: 'ghg',
+        title: 'GHG',
+        icon: <GrassIcon />,
+        disabled: false,
+      },
     ];
 
     return nav as Navigation;

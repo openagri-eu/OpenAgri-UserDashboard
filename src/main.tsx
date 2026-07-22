@@ -48,11 +48,12 @@ import FieldNotebookReportPage from '@pages/dashboard/services/FarmCalendar/Repo
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
 import ThreatModelsPage from '@pages/dashboard/services/PestAndDisease/ThreatModels.tsx';
 import RiskForecastPage from '@pages/dashboard/services/PestAndDisease/RiskForecast.tsx';
+import GHGAnalysisPage from '@pages/dashboard/services/GHG/GHGAnalysis.tsx';
 
 import FarmCalendarLayout from './layouts/services/FarmCalendarLayout.tsx';
 import IrrigationManagementLayout from './layouts/services/IrrigationManagementLayout.tsx';
 import PestAndDiseaseLayout from './layouts/services/PestAndDiseaseLayout.tsx';
-import ReportingLayout from './layouts/services/ReportingLayout.tsx';
+import GHGLayout from './layouts/services/ReportingLayout.tsx';
 import WeatherDataLayout from './layouts/services/WeatherDataLayout.tsx';
 
 const router = createBrowserRouter([
@@ -156,7 +157,25 @@ const router = createBrowserRouter([
           },
           /** End of Farm calendar */
           {
-            Component: ReportingLayout,
+            Component: GHGLayout,
+            children: [
+              {
+                path: 'ghg',
+                Component: GHGAnalysisPage
+              },
+              {
+                path: 'ghg-service',
+                children: [
+                  {
+                    path: 'ghg',
+                    Component: GHGAnalysisPage
+                  },
+                ]
+              },
+            ]
+          },
+          {
+            Component: GHGLayout,
             children: [
               {
                 path: 'reporting-service',
@@ -169,6 +188,10 @@ const router = createBrowserRouter([
                     path: 'compost-operations',
                     Component: CompostOperationsReportPage
                   },
+                      {
+                        path: 'ghg',
+                        Component: GHGAnalysisPage
+                      },
                   {
                     path: 'farm-animals',
                     Component: FarmAnimalsReportPage
