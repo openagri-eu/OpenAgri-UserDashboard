@@ -60,6 +60,13 @@ export default function App() {
       return service ? service.actions.includes('add') : false;
     }
 
+    const canFC = hasAccess('FC');
+    const canRP = hasAccess('RP');
+    const canIRM = hasAccess('IRM');
+    const canIRMUpload = canIRM && hasAccessIrriUploadDataset();
+    const canPDM = hasAccess('PDM');
+    const canWD = hasAccess('WD');
+
     const nav: any[] = [
       {
         kind: 'header',
@@ -70,152 +77,116 @@ export default function App() {
         title: 'OpenAgri Dashboard',
         icon: <HomeIcon />,
       },
-      {
-        kind: 'header',
-        title: 'Farm calendar',
-      },
-      {
-        segment: 'farm-calendar',
-        title: 'Farm calendar',
-        icon: <CalendarMonthIcon />,
-        disabled: !hasAccess('FC'),
-      },
-      {
-        segment: 'farm-locations',
-        title: 'Farm locations',
-        icon: <Folder />,
-        disabled: !hasAccess('FC'),
-        children: [
-          {
-            segment: 'farms',
-            title: 'Farms',
-            icon: <FenceIcon />,
-            disabled: !hasAccess('FC'),
-          },
-          {
-            segment: 'farm-parcels',
-            title: 'Farm parcels',
-            icon: <MapIcon />,
-            disabled: !hasAccess('FC'),
-          }
-        ]
-      },
-      {
-        segment: 'farm-animals',
-        title: 'Farm animals',
-        icon: <PetsIcon />,
-        disabled: !hasAccess('FC'),
-      },
-      {
-        segment: 'agricultural-machines',
-        title: 'Agricultural machines',
-        icon: <AgricultureIcon />,
-        disabled: !hasAccess('FC'),
-      },
-      {
-        segment: 'reporting-service',
-        title: 'Reporting service',
-        icon: <AssessmentIcon />,
-        disabled: !hasAccess('RP'),
-        children: [
-          {
-            segment: 'compost-operations',
-            title: 'Compost operations',
-            icon: <CompostIcon />,
-            disabled: !hasAccess('RP'),
-          },
-          {
-            segment: 'farm-animals',
-            title: 'Farm animals report',
-            icon: <CrueltyFreeIcon />,
-            disabled: !hasAccess('RP'),
-          },
-          {
-            segment: 'irrigation-operations',
-            title: 'Irrigation operations',
-            icon: <WaterDropIcon />,
-            disabled: !hasAccess('RP'),
-          },
-          {
-            segment: 'field-notebook',
-            title: 'Field notebook',
-            icon: <NoteAddIcon />,
-            disabled: !hasAccess('RP'),
-          },
-        ]
-      },
-      {
-        kind: 'header',
-        title: 'Irrigation management',
-      },
-      {
-        segment: 'eto-calculator',
-        title: 'ETo Calculator',
-        icon: <TimelineIcon />,
-        disabled: !hasAccess('IRM'),
-      },
-      {
-        segment: 'upload-dataset',
-        title: 'Upload Dataset',
-        icon: <NoteAddIcon />,
-        disabled: !hasAccess('IRM') || !hasAccessIrriUploadDataset(),
-      },
-      {
-        segment: 'soil-moisture-analysis',
-        title: 'Soil Moisture Analysis',
-        icon: <AnalyticsIcon />,
-        disabled: !hasAccess('IRM'),
-      },
-      {
-        segment: 'crop-types',
-        title: 'Crop types',
-        icon: <YardIcon />,
-        disabled: !hasAccess('IRM'),
-      },
-      {
-        segment: 'soil-types',
-        title: 'Soil types',
-        icon: <TerrainIcon />,
-        disabled: !hasAccess('IRM'),
-      },
-      {
-        kind: 'header',
-        title: 'Pest and disease management',
-      },
-      {
-        segment: 'pests',
-        title: 'Pests',
-        icon: <PestControlIcon />,
-        disabled: !hasAccess('PDM'),
-      },
-      {
-        segment: 'gdd',
-        title: 'Growing degree days',
-        icon: <GrassIcon />,
-        disabled: !hasAccess('PDM'),
-      },
-      {
-        segment: 'threat-models',
-        title: 'Threat models',
-        icon: <CoronavirusIcon />,
-        disabled: !hasAccess('PDM'),
-      },
-      {
-        segment: 'risk-forecast',
-        title: 'Risk forecast',
-        icon: <ReportIcon />,
-        disabled: !hasAccess('PDM'),
-      },
-      {
-        kind: 'header',
-        title: 'Weather data',
-      },
-      {
-        segment: 'weather-data',
-        title: 'Weather data',
-        icon: <ThermostatIcon />,
-        disabled: !hasAccess('WD'),
-      },
+      ...(canFC ? [
+        {
+          kind: 'header',
+          title: 'Farm calendar',
+        },
+        {
+          segment: 'farm-calendar',
+          title: 'Farm calendar',
+          icon: <CalendarMonthIcon />,
+        },
+        {
+          segment: 'farm-locations',
+          title: 'Farm locations',
+          icon: <Folder />,
+          children: [
+            {
+              segment: 'farms',
+              title: 'Farms',
+              icon: <FenceIcon />,
+            },
+            {
+              segment: 'farm-parcels',
+              title: 'Farm parcels',
+              icon: <MapIcon />,
+            }
+          ]
+        },
+      ] : []),
+      ...(canRP ? [
+        {
+          segment: 'reporting-service',
+          title: 'Reporting service',
+          icon: <AssessmentIcon />,
+          children: [
+            {
+              segment: 'compost-operations',
+              title: 'Compost operations',
+              icon: <CompostIcon />,
+            },
+            {
+              segment: 'farm-animals',
+              title: 'Farm animals',
+              icon: <CrueltyFreeIcon />,
+            },
+            {
+              segment: 'irrigation-operations',
+              title: 'Irrigation operations',
+              icon: <WaterDropIcon />,
+            },
+          ]
+        },
+      ] : []),
+      ...(canIRM ? [
+        {
+          kind: 'header',
+          title: 'Irrigation management',
+        },
+        {
+          segment: 'eto-calculator',
+          title: 'ETo Calculator',
+          icon: <TimelineIcon />,
+        },
+        ...(canIRMUpload ? [{
+          segment: 'upload-dataset',
+          title: 'Upload Dataset',
+          icon: <NoteAddIcon />,
+        }] : []),
+        {
+          segment: 'soil-moisture-analysis',
+          title: 'Soil Moisture Analysis',
+          icon: <AnalyticsIcon />,
+        },
+      ] : []),
+      ...(canPDM ? [
+        {
+          kind: 'header',
+          title: 'Pest and disease management',
+        },
+        {
+          segment: 'pests',
+          title: 'Pests',
+          icon: <PestControlIcon />,
+        },
+        {
+          segment: 'gdd',
+          title: 'Growing degree days',
+          icon: <GrassIcon />,
+        },
+        {
+          segment: 'threat-models',
+          title: 'Threat models',
+          icon: <CoronavirusIcon />,
+        },
+        {
+          segment: 'risk-forecast',
+          title: 'Risk forecast',
+          icon: <ReportIcon />,
+        },
+      ] : []),
+      ...(canWD ? [
+        {
+          kind: 'header',
+          title: 'Weather data',
+        },
+        {
+          segment: 'weather-data',
+          title: 'Weather data',
+          icon: <ThermostatIcon />,
+        },
+      ] : []),
     ];
 
     return nav as Navigation;

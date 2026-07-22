@@ -2,6 +2,10 @@
 /// <reference types="vite-plugin-pwa/react" />
 interface ImportMetaEnv {
     readonly VITE_API_URL: string;
+    readonly VITE_PRIMARY_COLOR?: string;
+    readonly VITE_SECONDARY_COLOR?: string;
+    readonly VITE_BACKGROUND_DEFAULT?: string;
+    readonly VITE_BACKGROUND_PAPER?: string;
   }
 
   interface ImportMeta {
