@@ -38,23 +38,19 @@ import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.t
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
 import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
-import CropTypesPage from '@pages/dashboard/services/Irrigation/CropTypes.tsx';
-import EditCropTypePage from '@pages/dashboard/services/Irrigation/EditCropType.tsx';
-import SoilTypesPage from '@pages/dashboard/services/Irrigation/SoilTypes.tsx';
-import EditSoilTypePage from '@pages/dashboard/services/Irrigation/EditSoilType.tsx';
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
 import FarmAnimalsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FarmAnimals.tsx';
-import FieldNotebookReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/FieldNotebook.tsx';
 import PestsPage from '@pages/dashboard/services/PestAndDisease/Pests.tsx';
 import ThreatModelsPage from '@pages/dashboard/services/PestAndDisease/ThreatModels.tsx';
 import RiskForecastPage from '@pages/dashboard/services/PestAndDisease/RiskForecast.tsx';
-import GHGAnalysisPage from '@pages/dashboard/services/GHG/GHGAnalysis.tsx';
+import GHGEmissionsPage from '@pages/dashboard/services/GHG/GHGEmissionsPage.tsx';
 
 import FarmCalendarLayout from './layouts/services/FarmCalendarLayout.tsx';
 import IrrigationManagementLayout from './layouts/services/IrrigationManagementLayout.tsx';
 import PestAndDiseaseLayout from './layouts/services/PestAndDiseaseLayout.tsx';
-import GHGLayout from './layouts/services/ReportingLayout.tsx';
+import ReportingLayout from './layouts/services/ReportingLayout.tsx';
 import WeatherDataLayout from './layouts/services/WeatherDataLayout.tsx';
+import GHGLayout from './layouts/services/GHGLayout.tsx';
 
 const router = createBrowserRouter([
   {
@@ -157,25 +153,7 @@ const router = createBrowserRouter([
           },
           /** End of Farm calendar */
           {
-            Component: GHGLayout,
-            children: [
-              {
-                path: 'ghg',
-                Component: GHGAnalysisPage
-              },
-              {
-                path: 'ghg-service',
-                children: [
-                  {
-                    path: 'ghg',
-                    Component: GHGAnalysisPage
-                  },
-                ]
-              },
-            ]
-          },
-          {
-            Component: GHGLayout,
+            Component: ReportingLayout,
             children: [
               {
                 path: 'reporting-service',
@@ -188,10 +166,6 @@ const router = createBrowserRouter([
                     path: 'compost-operations',
                     Component: CompostOperationsReportPage
                   },
-                      {
-                        path: 'ghg',
-                        Component: GHGAnalysisPage
-                      },
                   {
                     path: 'farm-animals',
                     Component: FarmAnimalsReportPage
@@ -199,10 +173,6 @@ const router = createBrowserRouter([
                   {
                     path: 'irrigation-operations',
                     Component: IrrigationOperationsReportPage
-                  },
-                  {
-                    path: 'field-notebook',
-                    Component: FieldNotebookReportPage
                   },
                 ]
               },
@@ -222,22 +192,6 @@ const router = createBrowserRouter([
               {
                 path: 'soil-moisture-analysis',
                 Component: SoilMoistureAnalysisPage
-              },
-              {
-                path: 'crop-types',
-                Component: CropTypesPage
-              },
-              {
-                path: 'crop-types/:id',
-                Component: EditCropTypePage
-              },
-              {
-                path: 'soil-types',
-                Component: SoilTypesPage
-              },
-              {
-                path: 'soil-types/:id',
-                Component: EditSoilTypePage
               },
             ]
           },
@@ -268,6 +222,24 @@ const router = createBrowserRouter([
               {
                 path: 'weather-data',
                 Component: WeatherDataPage
+              },
+            ]
+          },
+          {
+            Component: GHGLayout,
+            children: [
+              {
+                path: 'ghg-emissions',
+                children: [
+                  {
+                    index: true,
+                    element: <Redirect to='calculate' />,
+                  },
+                  {
+                    path: 'calculate',
+                    Component: GHGEmissionsPage
+                  },
+                ]
               },
             ]
           },

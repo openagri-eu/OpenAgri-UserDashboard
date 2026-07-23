@@ -1,44 +1,49 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Chart } from '@highcharts/react';
 import * as Highcharts from 'highcharts';
+import useFetch from '@hooks/useFetch';
 import { Box, Skeleton, Typography } from '@mui/material';
 
 type Observation = Record<string, any>;
 
-const fakeObservations: Observation[] = [
-  { type: 'Fertilizers', value: 42 },
-  { type: 'Fuel', value: 28 },
-  { type: 'Livestock', value: 18 },
-  { type: 'Residues', value: 7 },
-  { type: 'Irrigation', value: 5 },
-];
+interface EmissionsPieChartProps {
+  groupingField?: string;
+  observations?: Observation[];
+}
 
-const EmissionsPieChart = ({ groupingField = 'type' }: { groupingField?: string }) => {
-  const [response, setResponse] = useState<Observation[] | null>(null);
-  const [loading, setLoading] = useState(true);
+const EmissionsPieChart = ({ groupingField = 'title', observations: externalObservations }: EmissionsPieChartProps) => {
+  const { fetchData, response, loading } = useFetch<any>('proxy/farmcalendar/api/v1/Observations/?format=json');
+
+  // If observations are provided externally, don't fetch
+  const shouldFetch = !externalObservations;
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setResponse(fakeObservations);
-      setLoading(false);
-    }, 300);
-
-    return () => window.clearTimeout(timer);
-  }, []);
+    if (shouldFetch) {
+      fetchData();
+    }
+  }, [shouldFetch]);
 
   const chartData = useMemo(() => {
-    if (!response) return null;
-
     let observations: Observation[] = [];
-    if (Array.isArray(response)) observations = response as Observation[];
-    // else if (response.results) observations = response.results as Observation[];
-    // else if (response.data) observations = response.data as Observation[];
-    // else if (response.observations) observations = response.observations as Observation[];
+
+    // Use external observations if provided, otherwise use fetched response
+    if (externalObservations) {
+      observations = externalObservations;
+    } else if (!response) {
+      return null;
+    } else {
+      if (Array.isArray(response)) observations = response as Observation[];
+      else if (response.results) observations = response.results as Observation[];
+      else if (response.data) observations = response.data as Observation[];
+      else if (response.observations) observations = response.observations as Observation[];
+    }
+
+    console.log('EmissionsPieChart: observations =', observations);
 
     const sums: Record<string, number> = {};
     observations.forEach((o) => {
       const key = o[groupingField] ?? 'Unknown';
-      const value = Number(o.value ?? o.amount ?? 0) || 0;
+      const value = Number(o.hasResult?.hasValue ?? 0) || 0;
       sums[key] = (sums[key] || 0) + value;
     });
 
@@ -49,10 +54,12 @@ const EmissionsPieChart = ({ groupingField = 'type' }: { groupingField?: string 
     const total = top3.reduce((s, [_k, v]) => s + v, 0) || 1;
 
     const data = top3.map(([k, v]) => ({ name: k, y: v }));
+    console.log('EmissionsPieChart: chartData =', { data, total });
     return { data, total };
   }, [response, groupingField]);
 
-  if (loading) return <Skeleton variant="rectangular" width="100%" height={300} />;
+  const isLoading = shouldFetch && loading;
+  if (isLoading) return <Skeleton variant="rectangular" width="100%" height={300} />;
 
   if (!chartData || chartData.data.length === 0) return <Typography variant="caption" color="text.secondary">No GHG observations available.</Typography>;
 
@@ -79,9 +86,12 @@ const EmissionsPieChart = ({ groupingField = 'type' }: { groupingField?: string 
     ]
   };
 
+  console.log('EmissionsPieChart: rendering chart with options =', options);
+
   return (
     <Box>
-      <Chart options={options} highcharts={Highcharts} />
+      {/* <Chart options={options} highcharts={Highcharts} /> */}
+      <Chart options={options} highcharts={{ ...Highcharts }} />
     </Box>
   );
 };
