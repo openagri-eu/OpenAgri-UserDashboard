@@ -1,7 +1,7 @@
 import { Box, Typography, Container } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-import logo from '/logo-white-.png';
+// import logo from '/logo-white-.png';
 
 
 const Footer = () => {
