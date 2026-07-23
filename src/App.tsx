@@ -14,6 +14,7 @@ import SessionContext, { Session } from '@contexts/SessionContext';
 import { Folder } from '@mui/icons-material';
 import FenceIcon from '@mui/icons-material/Fence';
 import MapIcon from '@mui/icons-material/Map';
+import WineBarIcon from '@mui/icons-material/WineBar';
 // import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 // import TimelineIcon from '@mui/icons-material/Timeline';
 // import NoteAddIcon from '@mui/icons-material/NoteAdd';
@@ -92,6 +93,12 @@ export default function App() {
             segment: 'parcels',
             title: 'Parcels',
             icon: <MapIcon />,
+            disabled: false,
+          },
+          {
+            segment: 'wineries',
+            title: 'Wineries',
+            icon: <WineBarIcon />,
             disabled: false,
           }
         ]

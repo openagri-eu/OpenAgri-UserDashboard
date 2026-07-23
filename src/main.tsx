@@ -20,6 +20,8 @@ import FarmParcelPage from '@pages/dashboard/services/FarmCalendar/FarmLocations
 import FarmParcelsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/FarmParcels.tsx';
 import FarmsPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farms.tsx';
 import FarmPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Farm.tsx';
+import WineryPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Winery.tsx';
+import WineriesPage from '@pages/dashboard/services/FarmCalendar/FarmLocations/Wineries.tsx';
 import TokenRefreshPage from '@pages/auth/TokenRefresh/TokenRefresh.tsx';
 import RegisterCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/RegisterActivity.tsx';
 import EditCalendarActivityPage from '@pages/dashboard/services/FarmCalendar/FarmCalendarActivities/EditActivity.tsx';
@@ -146,6 +148,14 @@ const router = createBrowserRouter([
                   {
                     path: 'parcels/:id',
                     Component: FarmParcelPage
+                  },
+                  {
+                    path: 'wineries',
+                    Component: WineriesPage
+                  },
+                  {
+                    path: 'wineries/:id',
+                    Component: WineryPage
                   },
                 ]
               },
