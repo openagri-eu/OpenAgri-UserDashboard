@@ -55,7 +55,8 @@ const FarmParcelsPage = () => {
 
     useEffect(() => {
         if (response && farmsResponse) {
-            const formattedParcels = response.map((p) => {
+            const nonWineryParcels = response.filter((p) => (p.category ?? '').toLowerCase() !== 'winery');
+            const formattedParcels = nonWineryParcels.map((p) => {
                 return {
                     id: p["@id"],
                     farm: farmsResponse.find((f: FarmModel) => { return f["@id"] === p.farm["@id"] })?.name ?? 'N/A',

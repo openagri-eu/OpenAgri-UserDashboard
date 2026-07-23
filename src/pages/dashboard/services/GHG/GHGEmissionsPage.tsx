@@ -157,13 +157,13 @@ const GHGEmissionsPage = () => {
             GHG Emissions Calculator
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Select parcels and time period to calculate GHG emissions
+            Select assets and time period to calculate GHG emissions
           </Typography>
 
           {/* Parcel Selection */}
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Select Parcels (multiple selection)
+              Select Assets (multiple selection)
             </Typography>
             <GenericSelect<FarmParcelModel>
               endpoint="proxy/farmcalendar/api/v1/FarmParcels/?format=json"
@@ -176,21 +176,6 @@ const GHGEmissionsPage = () => {
               data={parcelsData}
             />
           </Box>
-
-          {/* Winery Selection - Commented out for future use */}
-          {/* <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Or Select Winery
-            </Typography>
-            <GenericSelect
-              label="Winery"
-              options={wineriesData || []}
-              value={selectedWinery}
-              onChange={(value) => setSelectedWinery(value as string)}
-              getOptionLabel={(option) => option.name}
-              getOptionValue={(option) => option['@id']}
-            />
-          </Box> */}
 
           {/* Date Range Selection */}
           <Box sx={{ mb: 3 }}>
