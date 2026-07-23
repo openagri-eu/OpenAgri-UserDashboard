@@ -45,20 +45,20 @@ const ImageButtonGrid: React.FC = () => {
       title: 'Calendar',
       f: () => handleNavigate('/calendar')
     },
-    {
-      url: '/irrigation.png',
-      title: 'Irrigation',
-      f: () => handleNavigate('/eto-calculator')
-    },
-    {
-      url: '/pest-and-disease.png',
-      title: 'Pest & disease',
-      f: () => handleNavigate('/gdd')
-    },
+    // {
+    //   url: '/irrigation.png',
+    //   title: 'Irrigation',
+    //   f: () => handleNavigate('/eto-calculator')
+    // },
+    // {
+    //   url: '/pest-and-disease.png',
+    //   title: 'Pest & disease',
+    //   f: () => handleNavigate('/gdd')
+    // },
     {
       url: '/weather-data.png',
-      title: 'Weather data',
-      f: () => handleNavigate('/weather-data')
+      title: 'Greenhouse Gas Emissions',
+      f: () => handleNavigate('/ghg-emissions')
     },
   ];
 
