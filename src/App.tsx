@@ -113,6 +113,18 @@ export default function App() {
         disabled: !hasAccess('FC'),
       },
       {
+        segment: 'fertilizers',
+        title: 'Fertilizers',
+        icon: <YardIcon />,
+        disabled: !hasAccess('FC'),
+      },
+      {
+        segment: 'pesticides',
+        title: 'Pesticides',
+        icon: <PestControlIcon />,
+        disabled: !hasAccess('FC'),
+      },
+      {
         segment: 'reporting-service',
         title: 'Reporting service',
         icon: <AssessmentIcon />,

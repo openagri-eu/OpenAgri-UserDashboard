@@ -30,6 +30,10 @@ import FarmAnimalsPage from '@pages/dashboard/services/FarmCalendar/FarmAnimals/
 import EditFarmAnimalPage from '@pages/dashboard/services/FarmCalendar/FarmAnimals/EditFarmAnimal.tsx';
 import AgriculturalMachinesPage from '@pages/dashboard/services/FarmCalendar/AgriculturalMachines/AgriculturalMachines.tsx';
 import EditAgriculturalMachinePage from '@pages/dashboard/services/FarmCalendar/AgriculturalMachines/EditAgriculturalMachine.tsx';
+import FertilizersPage from '@pages/dashboard/services/FarmCalendar/Fertilizers/Fertilizers.tsx';
+import EditFertilizerPage from '@pages/dashboard/services/FarmCalendar/Fertilizers/EditFertilizer.tsx';
+import PesticidesPage from '@pages/dashboard/services/FarmCalendar/Pesticides/Pesticides.tsx';
+import EditPesticidePage from '@pages/dashboard/services/FarmCalendar/Pesticides/EditPesticide.tsx';
 import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.tsx';
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
@@ -106,6 +110,22 @@ const router = createBrowserRouter([
               {
                 path: 'agricultural-machines/:id',
                 Component: EditAgriculturalMachinePage
+              },
+              {
+                path: 'fertilizers',
+                Component: FertilizersPage
+              },
+              {
+                path: 'fertilizers/:id',
+                Component: EditFertilizerPage
+              },
+              {
+                path: 'pesticides',
+                Component: PesticidesPage
+              },
+              {
+                path: 'pesticides/:id',
+                Component: EditPesticidePage
               },
               {
                 path: 'farm-locations',
