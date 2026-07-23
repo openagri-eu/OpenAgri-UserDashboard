@@ -63,7 +63,7 @@ export default function App() {
       },
       {
         segment: '',
-        title: 'OpenAgri Dashboard',
+        title: 'EcoWine Dashboard',
         icon: <HomeIcon />,
       },
       {

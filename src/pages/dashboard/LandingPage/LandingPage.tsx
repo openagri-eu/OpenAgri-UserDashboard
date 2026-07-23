@@ -8,7 +8,7 @@ const LandingPage = () => {
     const { setPageTitle, setBreadcrumbs } = useOutletContext<DashboardContextType>();
 
     useEffect(() => {
-        setPageTitle('Welcome to the OpenAgri dashboard');
+        setPageTitle('Welcome to the EcoWine dashboard');
         setBreadcrumbs([]);
 
         return () => {

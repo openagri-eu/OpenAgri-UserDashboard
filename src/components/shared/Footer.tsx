@@ -25,11 +25,11 @@ const Footer = () => {
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <img
                                 src={logo}
-                                alt="OpenAgri Logo"
+                                alt="EcoWine Logo"
                                 style={{ width: '168px', height: 'auto' }}
                             />
                             <Typography variant="h6" component="p" sx={{ fontWeight: 'bold' }}>
-                                OpenAgri — Where Inclusive Innovation Meets Agriculture!
+                                EcoWine — Where Inclusive Innovation Meets Agriculture!
                             </Typography>
                         </Box>
                     </Box>
@@ -42,7 +42,7 @@ const Footer = () => {
                                 style={{ width: '168px', height: 'auto', flexShrink: 0 }}
                             />
                             <Typography variant="body2">
-                                OpenAgri has received funding from the EU’s Horizon Europe research and innovation
+                                EcoWine has received funding from the EU’s Horizon Europe research and innovation
                                 programme under Grant Agreement no. 101134083. This output reflects only the
                                 author’s view and the European Commission cannot be held responsible for any use
                                 that may be made of the information contained therein.
@@ -54,7 +54,7 @@ const Footer = () => {
 
                 <Box sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider', textAlign: 'center' }}>
                     <Typography variant="body2">
-                        © {new Date().getFullYear()} OpenAgri Project. All Rights Reserved.
+                        © {new Date().getFullYear()} EcoWine Project. All Rights Reserved.
                     </Typography>
                 </Box>
             </Container>
