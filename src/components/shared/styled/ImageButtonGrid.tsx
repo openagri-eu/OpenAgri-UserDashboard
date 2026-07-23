@@ -42,8 +42,8 @@ const ImageButtonGrid: React.FC = () => {
   const buttonData = [
     {
       url: '/farm-calendar.png',
-      title: 'Farm calendar',
-      f: () => handleNavigate('/farm-calendar')
+      title: 'Calendar',
+      f: () => handleNavigate('/calendar')
     },
     {
       url: '/irrigation.png',

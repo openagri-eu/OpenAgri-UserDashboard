@@ -111,7 +111,7 @@ const FarmParcelPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const returnTo = (location.state as { from?: string } | null)?.from || "/farm-locations/farm-parcels";
+    const returnTo = (location.state as { from?: string } | null)?.from || "/assets/farm-parcels";
 
     useEffect(() => {
         if (editResponse) {

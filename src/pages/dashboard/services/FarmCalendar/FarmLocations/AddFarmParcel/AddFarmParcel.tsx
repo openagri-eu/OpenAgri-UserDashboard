@@ -94,7 +94,7 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
     useEffect(() => {
         if (response) {
             onAction && onAction();
-            showSnackbar('success', "Farm parcel added successfully");
+            showSnackbar('success', "Parcels added successfully");
         }
     }, [response]);
 

@@ -102,7 +102,7 @@ const RegisterCalendarActivityPage = () => {
     useEffect(() => {
         if (response) {
             showSnackbar('success', 'Activity updated successfully.');
-            navigate("/farm-calendar");
+            navigate("/calendar");
         }
     }, [response]);
 

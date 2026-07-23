@@ -970,7 +970,7 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                                 {nestedActivities.map((n: any) => {
                                     return <ListItem key={`nested-activity-${n["@id"]}`} disablePadding>
                                         <ListItemButton onClick={() => {
-                                            navigate(`/farm-calendar/edit-activity/${n["@id"].split(":")[3]}`, { state: { api: n.activity_endpoint, activityTypes: activityTypes } })
+                                            navigate(`/calendar/edit-activity/${n["@id"].split(":")[3]}`, { state: { api: n.activity_endpoint, activityTypes: activityTypes } })
 
                                         }}>
                                             <ListItemText

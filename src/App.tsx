@@ -68,17 +68,17 @@ export default function App() {
       },
       {
         kind: 'header',
-        title: 'Farm calendar',
+        title: 'Calendar',
       },
       {
-        segment: 'farm-calendar',
-        title: 'Farm calendar',
+        segment: 'calendar',
+        title: 'Calendar',
         icon: <CalendarMonthIcon />,
         disabled: false,
       },
       {
-        segment: 'farm-locations',
-        title: 'Farm locations',
+        segment: 'assets',
+        title: 'Assets',
         icon: <Folder />,
         disabled: false,
         children: [
@@ -89,8 +89,8 @@ export default function App() {
             disabled: false,
           },
           {
-            segment: 'farm-parcels',
-            title: 'Farm parcels',
+            segment: 'parcels',
+            title: 'Parcels',
             icon: <MapIcon />,
             disabled: false,
           }

@@ -36,7 +36,7 @@ const AddActivityTypePage = () => {
     useEffect(() => {
         if (response) {
             showSnackbar('success', 'Activity type created');
-            navigate('/farm-calendar/activity-types');
+            navigate('/calendar/activity-types');
         }
     }, [response]);
 

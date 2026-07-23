@@ -64,32 +64,32 @@ const router = createBrowserRouter([
             path: '',
             Component: LandingPage
           },
-          /** Farm calendar */
+          /** Calendar */
           {
             Component: FarmCalendarLayout,
             children: [
               {
-                path: 'farm-calendar',
+                path: 'calendar',
                 Component: FarmCalendarPage,
               },
               {
-                path: 'farm-calendar/register-activity',
+                path: 'calendar/register-activity',
                 Component: RegisterCalendarActivityPage
               },
               {
-                path: 'farm-calendar/edit-activity/:id',
+                path: 'calendar/edit-activity/:id',
                 Component: EditCalendarActivityPage
               },
               {
-                path: 'farm-calendar/activity-types',
+                path: 'calendar/activity-types',
                 Component: ActivityTypesPage
               },
               {
-                path: 'farm-calendar/activity-types/add',
+                path: 'calendar/activity-types/add',
                 Component: AddActivityTypePage
               },
               {
-                path: 'farm-calendar/activity-types/edit/:id',
+                path: 'calendar/activity-types/edit/:id',
                 Component: EditActivityTypePage
               },
               {
@@ -125,11 +125,11 @@ const router = createBrowserRouter([
                 Component: EditPesticidePage
               },
               {
-                path: 'farm-locations',
+                path: 'assets',
                 children: [
                   {
                     index: true,
-                    element: <Redirect to='farm-locations/farms' />,
+                    element: <Redirect to='assets/farms' />,
                   },
                   {
                     path: 'farms',
@@ -140,18 +140,18 @@ const router = createBrowserRouter([
                     Component: FarmPage
                   },
                   {
-                    path: 'farm-parcels',
+                    path: 'parcels',
                     Component: FarmParcelsPage
                   },
                   {
-                    path: 'farm-parcel/:id',
+                    path: 'parcels/:id',
                     Component: FarmParcelPage
                   },
                 ]
               },
             ]
           },
-          /** End of Farm calendar */
+          /** End of Calendar */
           {
             Component: ReportingLayout,
             children: [

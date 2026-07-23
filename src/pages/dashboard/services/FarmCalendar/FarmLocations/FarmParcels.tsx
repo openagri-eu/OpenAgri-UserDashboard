@@ -89,7 +89,7 @@ const FarmParcelsPage = () => {
     const navigate = useNavigate();
 
     const handleRowClick = (parcel: ParcelRow) => {
-        navigate(`../farm-parcel/${parcel.id.split(":")[3]}`);
+        navigate(`../parcels/${parcel.id.split(":")[3]}`);
     };
 
     const onAddNewFarmParcel = () => {
@@ -101,7 +101,7 @@ const FarmParcelsPage = () => {
         <Box display={'flex'} flexDirection={'column'} gap={2}>
             <Accordion disabled={!canAdd} expanded={expanded} onChange={handleAccordionChange}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography component="span">Add new farm parcel</Typography>
+                    <Typography component="span">Add new parcels</Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ maxHeight: 480, overflowY: 'scroll' }}>
                     <AddFarmParcel onAction={onAddNewFarmParcel}></AddFarmParcel>

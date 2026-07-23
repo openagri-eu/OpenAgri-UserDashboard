@@ -86,7 +86,7 @@ const EditCalendarActivityPage = () => {
         if (api) fetchData();
         else {
             showSnackbar('error', 'API path not specified.');
-            navigate('/farm-calendar');
+            navigate('/calendar');
         }
     }, [api]);
 
@@ -106,11 +106,11 @@ const EditCalendarActivityPage = () => {
     useEffect(() => {
         if (editResponse) {
             showSnackbar('success', 'Activity updated successfully.');
-            navigate("/farm-calendar");
+            navigate("/calendar");
         }
         if (deleteResponse) {
             showSnackbar('success', 'Activity deleted successfully.');
-            navigate("/farm-calendar");
+            navigate("/calendar");
         }
     }, [editResponse, deleteResponse]);
 

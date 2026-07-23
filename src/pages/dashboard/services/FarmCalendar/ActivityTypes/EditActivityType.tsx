@@ -64,7 +64,7 @@ const EditActivityTypePage = () => {
     useEffect(() => {
         if (patchResponse) {
             showSnackbar('success', 'Activity type updated');
-            navigate('/farm-calendar/activity-types');
+            navigate('/calendar/activity-types');
         }
     }, [patchResponse]);
 

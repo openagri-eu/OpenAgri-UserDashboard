@@ -102,13 +102,13 @@ const FarmPage = () => {
     const navigate = useNavigate();
     useEffect(() => {
         if (editResponse) {
-            navigate("/farm-locations/farms");
+            navigate("/assets/farms");
         }
     }, [editResponse])
 
     const handleDelete = async () => {
         await deleteFetchData();
-        navigate("/farm-locations/farms");
+        navigate("/assets/farms");
     };
 
     const handleEdit = () => {
@@ -241,7 +241,7 @@ const FarmPage = () => {
                                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={p["@id"]}>
                                             <Card variant="outlined" sx={{ height: '100%' }}>
                                                 <CardActionArea
-                                                    onClick={() => navigate(`/farm-locations/farm-parcel/${parcelId}`)}
+                                                    onClick={() => navigate(`/assets/parcels/${parcelId}`)}
                                                     sx={{ height: '100%' }}
                                                 >
                                                     <CardContent>
