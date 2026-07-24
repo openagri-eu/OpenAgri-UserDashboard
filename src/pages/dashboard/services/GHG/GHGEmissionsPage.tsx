@@ -8,6 +8,7 @@ import {
   Chip,
   CircularProgress,
   Alert,
+  Divider,
 } from '@mui/material';
 import { Dayjs } from 'dayjs';
 import useFetch from '@hooks/useFetch';
@@ -17,30 +18,28 @@ import GenericSelect from '@components/shared/GenericSelect/GenericSelect';
 import GenericSnackbar from '@components/shared/GenericSnackbar/GenericSnackbar';
 import EmissionsPieChart from '@components/dashboard/services/GHG/EmissionsPieChart';
 import { FarmParcelModel } from '@models/FarmParcel';
-import { calculateGHG } from '@utils/calculateGHG';
+import {
+  normalizeGHGDataArray,
+  aggregateGHGByEntity,
+} from '@utils/calculateGHG';
 import { useSession } from '@contexts/SessionContext';
 import CalculateIcon from '@mui/icons-material/Calculate';
-
-type GHGObservation = Record<string, any>;
-
-interface ParcelGHGData {
-  parcelId: string;
-  parcelName: string;
-  observations: GHGObservation[];
-  totalGHG: number;
-}
+import { AggregatedGHGResults, SourceAPI, NormalizedGHGData } from '@/types/GHGData';
 
 const GHGEmissionsPage = () => {
-  // State for selections
+  // State for winery selections
+  const [selectedWineries, setSelectedWineries] = useState<string[]>([]);
+  const [wineryFromDate, setWineryFromDate] = useState<Dayjs | null>(null);
+  const [wineryToDate, setWineryToDate] = useState<Dayjs | null>(null);
+
+  // State for parcel selections
   const [selectedParcels, setSelectedParcels] = useState<string[]>([]);
-  const [fromDate, setFromDate] = useState<Dayjs | null>(null);
-  const [toDate, setToDate] = useState<Dayjs | null>(null);
+  const [parcelFromDate, setParcelFromDate] = useState<Dayjs | null>(null);
+  const [parcelToDate, setParcelToDate] = useState<Dayjs | null>(null);
+
+  // State for results
   const [loadingCalculation, setLoadingCalculation] = useState(false);
-  const [allObservations, setAllObservations] = useState<GHGObservation[]>([]);
-  const [ghgResults, setGhgResults] = useState<{
-    totalGHG: number;
-    parcels: ParcelGHGData[];
-  } | null>(null);
+  const [ghgResults, setGhgResults] = useState<AggregatedGHGResults | null>(null);
 
   const { session } = useSession();
 
@@ -49,39 +48,63 @@ const GHGEmissionsPage = () => {
     FarmParcelModel[]
   >('proxy/farmcalendar/api/v1/FarmParcels/?format=json', { method: 'GET' });
 
+  // Fetch available wineries
+  const { fetchData: fetchWineries, response: wineriesData } = useFetch<
+    FarmParcelModel[]
+  >('proxy/farmcalendar/api/v1/FarmParcels/?parcel_type=Winery&format=json', { method: 'GET' });
+
   const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
   useEffect(() => {
     fetchParcels();
+    fetchWineries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCalculateGHG = async () => {
-    if (selectedParcels.length === 0 || !fromDate || !toDate) {
-      showSnackbar('warning', 'Please select at least one parcel and date range');
+    // Validation
+    const hasWineries = selectedWineries.length > 0 && wineryFromDate && wineryToDate;
+    const hasParcels = selectedParcels.length > 0 && parcelFromDate && parcelToDate;
+
+    if (!hasWineries && !hasParcels) {
+      showSnackbar('warning', 'Please select at least one winery or parcel with date range');
       return;
     }
 
     setLoadingCalculation(true);
     setGhgResults(null);
 
-    try {
-      const observations: GHGObservation[] = [];
-      const parcelResults: ParcelGHGData[] = [];
+    // API endpoints to fetch from
+    const API_ENDPOINTS: Array<{ path: string; sourceAPI: SourceAPI }> = [
+      { path: '/api/v1/Observations/', sourceAPI: 'Observations' },
+      { path: '/api/v1/FertilizationOperations/', sourceAPI: 'FertilizationOperations' },
+      { path: '/api/v1/CropProtectionOperations/', sourceAPI: 'CropProtectionOperations' },
+      { path: '/api/v1/IrrigationOperations/', sourceAPI: 'IrrigationOperations' },
+      { path: '/api/v1/YieldPrediction/', sourceAPI: 'YieldPrediction' },
+      { path: '/api/v1/CropGrowthStageObservations/', sourceAPI: 'CropGrowthStageObservations' },
+      { path: '/api/v1/CropStressIndicatorObservations/', sourceAPI: 'CropStressIndicatorObservations' },
+    ];
 
-      // Fetch observations for each selected parcel
-      for (const parcelId of selectedParcels) {
-        const parcel = parcelsData?.find((p) => p['@id'] === parcelId);
-        const parcelName = parcel?.identifier || parcelId;
-
+    /**
+     * Fetch data from a single API endpoint for a specific entity
+     */
+    const fetchFromAPI = async (
+      endpoint: string,
+      entityId: string,
+      fromDate: Dayjs,
+      toDate: Dayjs
+    ): Promise<NormalizedGHGData['originalData'][]> => {
+      try {
+        const parcelUUID = entityId.split(':')[3] || entityId;
         const params = new URLSearchParams({
           format: 'json',
-          parcel: parcelId.split(':')[3] || parcelId,
+          parcel: parcelUUID,
           from_date: fromDate.format('YYYY-MM-DD'),
           to_date: toDate.format('YYYY-MM-DD'),
         });
 
         const response = await fetch(
-          `${window.env?.VITE_API_URL || import.meta.env.VITE_API_URL}proxy/farmcalendar/api/v1/Observations/?${params}`,
+          `${window.env?.VITE_API_URL || import.meta.env.VITE_API_URL}proxy/farmcalendar${endpoint}?${params}`,
           {
             method: 'GET',
             headers: {
@@ -91,61 +114,105 @@ const GHGEmissionsPage = () => {
           }
         );
 
-        if (!response.ok) continue;
+        if (!response.ok) return [];
 
         const data = await response.json();
 
-        let parcelObservations: GHGObservation[] = [];
-        if (Array.isArray(data)) parcelObservations = data;
-        else if (data.results) parcelObservations = data.results;
-        else if (data.data) parcelObservations = data.data;
-        else if (data.observations) parcelObservations = data.observations;
+        // Handle different response structures
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let items: any[] = [];
+        if (Array.isArray(data)) items = data;
+        else if (data.results) items = data.results;
+        else if (data.data) items = data.data;
+        else if (data.observations) items = data.observations;
 
-        observations.push(...parcelObservations);
+        return items;
+      } catch (error) {
+        console.error(`Error fetching from ${endpoint} for ${entityId}:`, error);
+        return [];
+      }
+    };
 
-        const parcelTotalGHG = calculateGHG(parcelObservations);
-        parcelResults.push({
-          parcelId,
-          parcelName,
-          observations: parcelObservations,
-          totalGHG: parcelTotalGHG,
-        });
+    try {
+      const allNormalizedData: NormalizedGHGData[] = [];
+      const entityNames: Record<string, string> = {};
+
+      // Fetch data for wineries
+      if (hasWineries && wineryFromDate && wineryToDate) {
+        for (const wineryId of selectedWineries) {
+          const winery = wineriesData?.find((w) => w['@id'] === wineryId);
+          const wineryName = winery?.identifier || wineryId;
+          entityNames[wineryId] = wineryName;
+
+          // Fetch from all APIs in parallel for this winery
+          const fetchPromises = API_ENDPOINTS.map((api) =>
+            fetchFromAPI(api.path, wineryId, wineryFromDate, wineryToDate)
+          );
+
+          const results = await Promise.all(fetchPromises);
+
+          // Normalize and add to collection
+          results.forEach((apiData, index) => {
+            const sourceAPI = API_ENDPOINTS[index].sourceAPI;
+            const normalized = normalizeGHGDataArray(apiData, wineryId, 'winery', sourceAPI);
+            allNormalizedData.push(...normalized);
+          });
+        }
       }
 
-      console.log('Fetched Observations:', observations);
-      console.log('Parcel Results:', parcelResults);
+      // Fetch data for parcels
+      if (hasParcels && parcelFromDate && parcelToDate) {
+        for (const parcelId of selectedParcels) {
+          const parcel = parcelsData?.find((p) => p['@id'] === parcelId);
+          const parcelName = parcel?.identifier || parcelId;
+          entityNames[parcelId] = parcelName;
 
-      if (observations.length === 0) {
-        showSnackbar('info', 'No GHG observations found for the selected period and parcels');
+          // Fetch from all APIs in parallel for this parcel
+          const fetchPromises = API_ENDPOINTS.map((api) =>
+            fetchFromAPI(api.path, parcelId, parcelFromDate, parcelToDate)
+          );
+
+          const results = await Promise.all(fetchPromises);
+
+          // Normalize and add to collection
+          results.forEach((apiData, index) => {
+            const sourceAPI = API_ENDPOINTS[index].sourceAPI;
+            const normalized = normalizeGHGDataArray(apiData, parcelId, 'parcel', sourceAPI);
+            allNormalizedData.push(...normalized);
+          });
+        }
+      }
+
+      console.log('All Normalized Data:', allNormalizedData);
+
+      if (allNormalizedData.length === 0) {
+        showSnackbar('info', 'No GHG data found for the selected entities and date ranges');
         setLoadingCalculation(false);
         return;
       }
 
-      const totalGHG = calculateGHG(observations);
-      setAllObservations(observations);
-      setGhgResults({
-        totalGHG,
-        parcels: parcelResults,
-      });
+      // Aggregate results
+      const aggregated = aggregateGHGByEntity(allNormalizedData, entityNames);
+      setGhgResults(aggregated);
 
-      console.log('Total GHG Emissions:', totalGHG);
-
+      console.log('Aggregated GHG Results:', aggregated);
       showSnackbar('success', 'GHG calculation completed');
     } catch (error) {
       console.error('Error calculating GHG:', error);
       showSnackbar('error', 'Error calculating GHG emissions');
     } finally {
       setLoadingCalculation(false);
-      console.log('GHG calculation process completed');
     }
   };
 
   const handleClearResults = () => {
     setGhgResults(null);
-    setAllObservations([]);
+    setSelectedWineries([]);
     setSelectedParcels([]);
-    setFromDate(null);
-    setToDate(null);
+    setWineryFromDate(null);
+    setWineryToDate(null);
+    setParcelFromDate(null);
+    setParcelToDate(null);
   };
 
   return (
@@ -157,37 +224,123 @@ const GHGEmissionsPage = () => {
             GHG Emissions Calculator
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Select assets and time period to calculate GHG emissions
+            Select wineries and/or parcels with their respective date ranges to calculate GHG emissions
           </Typography>
 
-          {/* Parcel Selection */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Select Assets (multiple selection)
+          {/* Winery Selection Section */}
+          <Box sx={{ mb: 3, p: 2, bgcolor: 'primary.light', borderRadius: 1, border: '1px solid', borderColor: 'primary.main' }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Wineries
             </Typography>
-            <GenericSelect<FarmParcelModel>
-              endpoint="proxy/farmcalendar/api/v1/FarmParcels/?format=json"
-              label="Parcels"
-              multiple={true}
-              selectedValue={selectedParcels}
-              setSelectedValue={setSelectedParcels}
-              getOptionLabel={(parcel) => parcel.identifier}
-              getOptionValue={(parcel) => parcel['@id']}
-              data={parcelsData}
-            />
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Select Wineries (multiple selection)
+              </Typography>
+              <GenericSelect<FarmParcelModel>
+                endpoint="proxy/farmcalendar/api/v1/FarmParcels/?parcel_type=Winery&format=json"
+                label="Wineries"
+                multiple={true}
+                selectedValue={selectedWineries}
+                setSelectedValue={setSelectedWineries}
+                getOptionLabel={(winery) => winery.identifier}
+                getOptionValue={(winery) => winery['@id']}
+                data={wineriesData}
+              />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                Winery Time Period
+              </Typography>
+              <DateRangeSelect
+                fromDate={wineryFromDate}
+                setFromDate={setWineryFromDate}
+                toDate={wineryToDate}
+                setToDate={setWineryToDate}
+              />
+            </Box>
+            {selectedWineries.length > 0 && wineryFromDate && wineryToDate && (
+              <Box sx={{ mt: 2, p: 1.5, bgcolor: 'background.paper', borderRadius: 1 }}>
+                <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+                  <strong>Selected Wineries:</strong>
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {selectedWineries.map((wineryId) => {
+                    const winery = wineriesData?.find((w) => w['@id'] === wineryId);
+                    return (
+                      <Chip
+                        key={wineryId}
+                        label={winery?.identifier || wineryId}
+                        size="small"
+                        variant="filled"
+                        color="primary"
+                      />
+                    );
+                  })}
+                </Box>
+                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                  Period: {wineryFromDate.format('DD/MM/YYYY')} to {wineryToDate.format('DD/MM/YYYY')}
+                </Typography>
+              </Box>
+            )}
           </Box>
 
-          {/* Date Range Selection */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Time Period
+          <Divider sx={{ my: 2 }}>AND / OR</Divider>
+
+          {/* Parcel Selection Section */}
+          <Box sx={{ mb: 3, p: 2, bgcolor: 'secondary.light', borderRadius: 1, border: '1px solid', borderColor: 'secondary.main' }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Parcels
             </Typography>
-            <DateRangeSelect
-              fromDate={fromDate}
-              setFromDate={setFromDate}
-              toDate={toDate}
-              setToDate={setToDate}
-            />
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Select Parcels (multiple selection)
+              </Typography>
+              <GenericSelect<FarmParcelModel>
+                endpoint="proxy/farmcalendar/api/v1/FarmParcels/?format=json"
+                label="Parcels"
+                multiple={true}
+                selectedValue={selectedParcels}
+                setSelectedValue={setSelectedParcels}
+                getOptionLabel={(parcel) => parcel.identifier}
+                getOptionValue={(parcel) => parcel['@id']}
+                data={parcelsData}
+              />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                Parcel Time Period
+              </Typography>
+              <DateRangeSelect
+                fromDate={parcelFromDate}
+                setFromDate={setParcelFromDate}
+                toDate={parcelToDate}
+                setToDate={setParcelToDate}
+              />
+            </Box>
+            {selectedParcels.length > 0 && parcelFromDate && parcelToDate && (
+              <Box sx={{ mt: 2, p: 1.5, bgcolor: 'background.paper', borderRadius: 1 }}>
+                <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+                  <strong>Selected Parcels:</strong>
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {selectedParcels.map((parcelId) => {
+                    const parcel = parcelsData?.find((p) => p['@id'] === parcelId);
+                    return (
+                      <Chip
+                        key={parcelId}
+                        label={parcel?.identifier || parcelId}
+                        size="small"
+                        variant="filled"
+                        color="secondary"
+                      />
+                    );
+                  })}
+                </Box>
+                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                  Period: {parcelFromDate.format('DD/MM/YYYY')} to {parcelToDate.format('DD/MM/YYYY')}
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           {/* Calculate Button */}
@@ -196,7 +349,11 @@ const GHGEmissionsPage = () => {
               variant="contained"
               startIcon={loadingCalculation ? <CircularProgress size={20} /> : <CalculateIcon />}
               onClick={handleCalculateGHG}
-              disabled={loadingCalculation || selectedParcels.length === 0 || !fromDate || !toDate}
+              disabled={
+                loadingCalculation ||
+                (selectedWineries.length === 0 || !wineryFromDate || !wineryToDate) &&
+                (selectedParcels.length === 0 || !parcelFromDate || !parcelToDate)
+              }
               fullWidth
             >
               {loadingCalculation ? 'Calculating...' : 'Calculate GHG Emissions'}
@@ -207,81 +364,118 @@ const GHGEmissionsPage = () => {
               </Button>
             )}
           </Box>
-
-          {/* Selection Summary */}
-          {selectedParcels.length > 0 && fromDate && toDate && (
-            <Box sx={{ mt: 3, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
-              <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-                <strong>Selection Summary:</strong>
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {selectedParcels.map((parcelId) => {
-                  const parcel = parcelsData?.find((p) => p['@id'] === parcelId);
-                  return (
-                    <Chip
-                      key={parcelId}
-                      label={parcel?.identifier || parcelId}
-                      size="small"
-                      variant="outlined"
-                    />
-                  );
-                })}
-              </Box>
-              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                Period: {fromDate.format('DD/MM/YYYY')} to {toDate.format('DD/MM/YYYY')}
-              </Typography>
-            </Box>
-          )}
         </CardContent>
       </Card>
 
       {/* Results Section */}
       {ghgResults && (
         <>
-          {/* Total GHG Card */}
+          {/* Grand Total GHG Card */}
           <Card variant="outlined" sx={{ bgcolor: 'success.light' }}>
             <CardContent>
               <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                Total GHG Emissions
+                Total GHG Emissions (All Entities)
               </Typography>
               <Typography variant="h4" sx={{ color: 'success.dark', fontWeight: 'bold' }}>
-                {ghgResults.totalGHG.toFixed(2)} kg CO₂e
+                {ghgResults.grandTotal.toFixed(2)} kg CO₂e
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                From {selectedParcels.length} parcel{selectedParcels.length !== 1 ? 's' : ''} over{' '}
-                {fromDate?.diff(toDate, 'day') || 0} days
+                {ghgResults.wineries.length > 0 && `${ghgResults.wineries.length} winery(ies) | `}
+                {ghgResults.parcels.length > 0 && `${ghgResults.parcels.length} parcel(s)`}
               </Typography>
             </CardContent>
           </Card>
 
-          {/* Parcel Breakdown */}
-          {ghgResults.parcels.length > 1 && (
+          {/* Winery Results Section */}
+          {ghgResults.wineries.length > 0 && (
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Emissions by Parcel
+                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main' }}>
+                  Winery Emissions
+                </Typography>
+                <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+                  {ghgResults.wineryTotal.toFixed(2)} kg CO₂e
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {ghgResults.wineries.map((wineryData) => (
+                    <Box
+                      key={wineryData.entityId}
+                      sx={{
+                        p: 2,
+                        bgcolor: 'primary.light',
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'primary.main',
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                          {wineryData.entityName}
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                          {wineryData.totalGHG.toFixed(2)} kg CO₂e
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                        {Object.entries(wineryData.sourceBreakdown).map(([source, value]) => (
+                          value > 0 && (
+                            <Chip
+                              key={source}
+                              label={`${source}: ${value.toFixed(2)} kg CO₂e`}
+                              size="small"
+                              variant="outlined"
+                            />
+                          )
+                        ))}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Parcel Results Section */}
+          {ghgResults.parcels.length > 0 && (
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ color: 'secondary.main' }}>
+                  Parcel Emissions
+                </Typography>
+                <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+                  {ghgResults.parcelTotal.toFixed(2)} kg CO₂e
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {ghgResults.parcels.map((parcelData) => (
                     <Box
-                      key={parcelData.parcelId}
+                      key={parcelData.entityId}
                       sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        p: 1.5,
-                        bgcolor: 'background.default',
+                        p: 2,
+                        bgcolor: 'secondary.light',
                         borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'secondary.main',
                       }}
                     >
-                      <Typography variant="body2">{parcelData.parcelName}</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="body2" sx={{ minWidth: 100, textAlign: 'right' }}>
-                          <strong>{parcelData.totalGHG.toFixed(2)} kg CO₂e</strong>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                          {parcelData.entityName}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ minWidth: 50 }}>
-                          {((parcelData.totalGHG / ghgResults.totalGHG) * 100).toFixed(1)}%
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                          {parcelData.totalGHG.toFixed(2)} kg CO₂e
                         </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                        {Object.entries(parcelData.sourceBreakdown).map(([source, value]) => (
+                          value > 0 && (
+                            <Chip
+                              key={source}
+                              label={`${source}: ${value.toFixed(2)} kg CO₂e`}
+                              size="small"
+                              variant="outlined"
+                            />
+                          )
+                        ))}
                       </Box>
                     </Box>
                   ))}
@@ -294,18 +488,21 @@ const GHGEmissionsPage = () => {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Emissions Sources (Top 3)
+                Emissions Sources Distribution
               </Typography>
-              <EmissionsPieChart observations={allObservations} groupingField="title" />
+              <EmissionsPieChart 
+                observations={ghgResults.allNormalizedData} 
+                groupingField="@type" 
+              />
             </CardContent>
           </Card>
 
-          {/* Observations Table */}
-          {allObservations.length > 0 && (
+          {/* Data Items Table */}
+          {ghgResults.allNormalizedData.length > 0 && (
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Observations Used ({allObservations.length})
+                  All Data Items ({ghgResults.allNormalizedData.length})
                 </Typography>
                 <Box
                   sx={{
@@ -316,7 +513,7 @@ const GHGEmissionsPage = () => {
                     gap: 1,
                   }}
                 >
-                  {allObservations.map((obs, idx) => (
+                  {ghgResults.allNormalizedData.map((item, idx) => (
                     <Box
                       key={idx}
                       sx={{
@@ -324,27 +521,54 @@ const GHGEmissionsPage = () => {
                         bgcolor: 'background.default',
                         borderRadius: 1,
                         borderLeft: '4px solid',
-                        borderColor: 'info.main',
+                        borderColor: item.entityType === 'winery' ? 'primary.main' : 'secondary.main',
                       }}
                     >
                       <Box
                         sx={{
                           display: 'flex',
                           justifyContent: 'space-between',
-                          alignItems: 'center',
+                          alignItems: 'flex-start',
                         }}
                       >
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {obs.title || obs.name || 'Unknown'}
+                            {item.title || item['@type'] || 'Unknown'}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {obs.phenomenonTime || obs.timestamp || 'N/A'}
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {item.phenomenonTime || item.timestamp || 'N/A'}
                           </Typography>
+                          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                            <Chip
+                              label={item.entityType}
+                              size="small"
+                              color={item.entityType === 'winery' ? 'primary' : 'secondary'}
+                              sx={{ height: 18, fontSize: '0.65rem' }}
+                            />
+                            <Chip
+                              label={item.dataType}
+                              size="small"
+                              variant="outlined"
+                              sx={{ height: 18, fontSize: '0.65rem' }}
+                            />
+                            <Chip
+                              label={item.sourceAPI}
+                              size="small"
+                              variant="outlined"
+                              sx={{ height: 18, fontSize: '0.65rem' }}
+                            />
+                          </Box>
                         </Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {(Number(obs.hasResult?.hasValue ?? 0) || 0).toFixed(2)} kg CO₂e
-                        </Typography>
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                            {item.ghgValue.toFixed(2)} kg CO₂e
+                          </Typography>
+                          {item.emissionFactor !== 1 && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              ({item.rawValue.toFixed(2)} × {item.emissionFactor})
+                            </Typography>
+                          )}
+                        </Box>
                       </Box>
                     </Box>
                   ))}
@@ -356,9 +580,9 @@ const GHGEmissionsPage = () => {
       )}
 
       {/* Empty State */}
-      {!ghgResults && selectedParcels.length === 0 && (
+      {!ghgResults && selectedWineries.length === 0 && selectedParcels.length === 0 && (
         <Alert severity="info">
-          Select parcels and a date range, then click "Calculate GHG Emissions" to get started.
+          Select wineries and/or parcels with their respective date ranges, then click "Calculate GHG Emissions" to get started.
         </Alert>
       )}
 

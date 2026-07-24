@@ -43,7 +43,8 @@ const EmissionsPieChart = ({ groupingField = 'title', observations: externalObse
     const sums: Record<string, number> = {};
     observations.forEach((o) => {
       const key = o[groupingField] ?? 'Unknown';
-      const value = Number(o.hasResult?.hasValue ?? 0) || 0;
+      // Support both normalized data (ghgValue) and raw observations (hasResult.hasValue)
+      const value = o.ghgValue ?? (Number(o.hasResult?.hasValue ?? 0) || 0);
       sums[key] = (sums[key] || 0) + value;
     });
 
@@ -56,7 +57,7 @@ const EmissionsPieChart = ({ groupingField = 'title', observations: externalObse
     const data = top3.map(([k, v]) => ({ name: k, y: v }));
     console.log('EmissionsPieChart: chartData =', { data, total });
     return { data, total };
-  }, [response, groupingField]);
+  }, [response, groupingField, externalObservations]);
 
   const isLoading = shouldFetch && loading;
   if (isLoading) return <Skeleton variant="rectangular" width="100%" height={300} />;
