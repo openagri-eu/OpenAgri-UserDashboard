@@ -6,7 +6,7 @@ import { theme } from '@theme/theme';
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 // import WaterDropIcon from '@mui/icons-material/WaterDrop';
-// import PestControlIcon from '@mui/icons-material/PestControl';
+import PestControlIcon from '@mui/icons-material/PestControl';
 // import AssessmentIcon from '@mui/icons-material/Assessment'; // TODO: possibly change to something else
 // import ThermostatIcon from '@mui/icons-material/Thermostat';
 import { useEffect, useState, useMemo } from 'react';
@@ -24,6 +24,8 @@ import CompostIcon from '@mui/icons-material/Compost';
 // import ReportIcon from '@mui/icons-material/Report';
 // import CoronavirusIcon from '@mui/icons-material/Coronavirus';
 // import GrassIcon from '@mui/icons-material/Grass';
+import YardIcon from '@mui/icons-material/Yard';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
 
 const BRANDING = {
   logo: <img className='' src="/logo-color.png" alt="" />,
@@ -100,7 +102,25 @@ export default function App() {
             title: 'Wineries',
             icon: <WineBarIcon />,
             disabled: false,
-          }
+          },
+          {
+            segment: 'agricultural-machines',
+            title: 'Agricultural machines',
+            icon: <AgricultureIcon />,
+            disabled: false,
+          },
+          {
+            segment: 'fertilizers',
+            title: 'Fertilizers',
+            icon: <YardIcon />,
+            disabled: false,
+          },
+          {
+            segment: 'pesticides',
+            title: 'Pesticides',
+            icon: <PestControlIcon />,
+            disabled: false,
+          },
         ]
       },
       {

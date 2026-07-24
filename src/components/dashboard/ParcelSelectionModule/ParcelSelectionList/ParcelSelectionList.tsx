@@ -188,7 +188,7 @@ const ParcelSelectionList: React.FC<ParcelSelectionListProps> = ({ parcels, sele
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const parcelId = p["@id"].split(':')[3];
-                                if (parcelId) navigate(`/farm-locations/farm-parcel/${parcelId}`, {
+                                if (parcelId) navigate(`/assets/parcels/${parcelId}`, {
                                     state: { from: location.pathname + location.search }
                                 });
                             }}

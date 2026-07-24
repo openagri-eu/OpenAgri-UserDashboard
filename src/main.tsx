@@ -103,30 +103,6 @@ const router = createBrowserRouter([
                 Component: EditFarmAnimalPage
               },
               {
-                path: 'agricultural-machines',
-                Component: AgriculturalMachinesPage
-              },
-              {
-                path: 'agricultural-machines/:id',
-                Component: EditAgriculturalMachinePage
-              },
-              {
-                path: 'fertilizers',
-                Component: FertilizersPage
-              },
-              {
-                path: 'fertilizers/:id',
-                Component: EditFertilizerPage
-              },
-              {
-                path: 'pesticides',
-                Component: PesticidesPage
-              },
-              {
-                path: 'pesticides/:id',
-                Component: EditPesticidePage
-              },
-              {
                 path: 'assets',
                 children: [
                   {
@@ -157,6 +133,30 @@ const router = createBrowserRouter([
                     path: 'wineries/:id',
                     Component: WineryPage
                   },
+                   {
+                      path: 'agricultural-machines',
+                      Component: AgriculturalMachinesPage
+                    },
+                    {
+                      path: 'agricultural-machines/:id',
+                      Component: EditAgriculturalMachinePage
+                    },
+                    {
+                      path: 'fertilizers',
+                      Component: FertilizersPage
+                    },
+                    {
+                      path: 'fertilizers/:id',
+                      Component: EditFertilizerPage
+                    },
+                    {
+                      path: 'pesticides',
+                      Component: PesticidesPage
+                    },
+                    {
+                      path: 'pesticides/:id',
+                      Component: EditPesticidePage
+                    },
                 ]
               },
             ]
