@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Button,
@@ -24,6 +24,7 @@ import {
 } from '@utils/calculateGHG';
 import { useSession } from '@contexts/SessionContext';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import PrintIcon from '@mui/icons-material/Print';
 import { AggregatedGHGResults, SourceAPI, NormalizedGHGData } from '@/types/GHGData';
 
 const GHGEmissionsPage = () => {
@@ -39,7 +40,9 @@ const GHGEmissionsPage = () => {
 
   // State for results
   const [loadingCalculation, setLoadingCalculation] = useState(false);
+  const [loadingPdf, setLoadingPdf] = useState(false);
   const [ghgResults, setGhgResults] = useState<AggregatedGHGResults | null>(null);
+  const summaryPrintRef = useRef<HTMLDivElement | null>(null);
 
   const { session } = useSession();
 
@@ -215,6 +218,56 @@ const GHGEmissionsPage = () => {
     setParcelToDate(null);
   };
 
+  const handleExportPdf = async () => {
+    if (!ghgResults || !summaryPrintRef.current) {
+      return;
+    }
+
+    setLoadingPdf(true);
+
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+
+      const canvas = await html2canvas(summaryPrintRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth - 20;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let remainingHeight = imgHeight;
+      let position = 10;
+
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      remainingHeight -= pdfHeight - 20;
+
+      while (remainingHeight > 0) {
+        position = remainingHeight - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        remainingHeight -= pdfHeight - 20;
+      }
+
+      const dateStamp = new Date().toISOString().replace(/[:T]/g, '-').split('.')[0];
+      pdf.save(`ghg-summary-${dateStamp}.pdf`);
+      showSnackbar('success', 'GHG summary PDF generated');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      showSnackbar('error', 'Error generating summary PDF');
+    } finally {
+      setLoadingPdf(false);
+    }
+  };
+
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       {/* Input Card */}
@@ -359,9 +412,20 @@ const GHGEmissionsPage = () => {
               {loadingCalculation ? 'Calculating...' : 'Calculate GHG Emissions'}
             </Button>
             {ghgResults && (
-              <Button variant="outlined" onClick={handleClearResults} sx={{ minWidth: 120 }}>
-                Clear
-              </Button>
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={loadingPdf ? <CircularProgress size={16} /> : <PrintIcon />}
+                  onClick={handleExportPdf}
+                  disabled={loadingPdf}
+                  sx={{ minWidth: 140 }}
+                >
+                  {loadingPdf ? 'Exporting...' : 'Print PDF'}
+                </Button>
+                <Button variant="outlined" onClick={handleClearResults} sx={{ minWidth: 120 }}>
+                  Clear
+                </Button>
+              </>
             )}
           </Box>
         </CardContent>
@@ -370,132 +434,152 @@ const GHGEmissionsPage = () => {
       {/* Results Section */}
       {ghgResults && (
         <>
-          {/* Grand Total GHG Card */}
-          <Card variant="outlined" sx={{ bgcolor: 'success.light' }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Total GHG Emissions (All Entities)
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {ghgResults.grandTotal.toFixed(2)} kg CO₂e
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {ghgResults.wineries.length > 0 && `${ghgResults.wineries.length} winery(ies) | `}
-                {ghgResults.parcels.length > 0 && `${ghgResults.parcels.length} parcel(s)`}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Winery Results Section */}
-          {ghgResults.wineries.length > 0 && (
-            <Card variant="outlined">
-              <CardContent>
-                <Typography variant="h6" gutterBottom >
-                  Winery Emissions
-                </Typography>
-                <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-                  {ghgResults.wineryTotal.toFixed(2)} kg CO₂e
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {ghgResults.wineries.map((wineryData) => (
-                    <Box
-                      key={wineryData.entityId}
-                      sx={{
-                        p: 2,
-                        bgcolor: 'primary.light',
-                        borderRadius: 1,
-                        border: '1px solid',
-                        borderColor: 'primary.main',
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                          {wineryData.entityName}
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                          {wineryData.totalGHG.toFixed(2)} kg CO₂e
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                        {Object.entries(wineryData.sourceBreakdown).map(([source, value]) => (
-                          value > 0 && (
-                            <Chip
-                              key={source}
-                              label={`${source}: ${value.toFixed(2)} kg CO₂e`}
-                              size="small"
-                              variant="outlined"
-                            />
-                          )
-                        ))}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Parcel Results Section */}
-          {ghgResults.parcels.length > 0 && (
+          <Box ref={summaryPrintRef} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Parcel Emissions
+                  Selected Date Ranges
                 </Typography>
-                <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-                  {ghgResults.parcelTotal.toFixed(2)} kg CO₂e
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {ghgResults.parcels.map((parcelData) => (
-                    <Box
-                      key={parcelData.entityId}
-                      sx={{
-                        p: 2,
-                        bgcolor: 'primary.light',
-                        borderRadius: 1,
-                        border: '1px solid',
-                        borderColor: 'primary.main',
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                          {parcelData.entityName}
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                          {parcelData.totalGHG.toFixed(2)} kg CO₂e
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                        {Object.entries(parcelData.sourceBreakdown).map(([source, value]) => (
-                          value > 0 && (
-                            <Chip
-                              key={source}
-                              label={`${source}: ${value.toFixed(2)} kg CO₂e`}
-                              size="small"
-                              variant="outlined"
-                            />
-                          )
-                        ))}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
+                {selectedWineries.length > 0 && wineryFromDate && wineryToDate && (
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    Wineries: {wineryFromDate.format('DD/MM/YYYY')} to {wineryToDate.format('DD/MM/YYYY')}
+                  </Typography>
+                )}
+                {selectedParcels.length > 0 && parcelFromDate && parcelToDate && (
+                  <Typography variant="body2">
+                    Parcels: {parcelFromDate.format('DD/MM/YYYY')} to {parcelToDate.format('DD/MM/YYYY')}
+                  </Typography>
+                )}
               </CardContent>
             </Card>
-          )}
 
-          {/* Pie Chart */}
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Emissions Sources Distribution
-              </Typography>
-              <EmissionsPieChart 
-                observations={ghgResults.allNormalizedData} 
-                groupingField="@type" 
-              />
-            </CardContent>
-          </Card>
+            {/* Grand Total GHG Card */}
+            <Card variant="outlined" sx={{ bgcolor: 'success.light' }}>
+              <CardContent>
+                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  Total GHG Emissions (All Entities)
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                  {ghgResults.grandTotal.toFixed(2)} kg CO₂e
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {ghgResults.wineries.length > 0 && `${ghgResults.wineries.length} winery(ies) | `}
+                  {ghgResults.parcels.length > 0 && `${ghgResults.parcels.length} parcel(s)`}
+                </Typography>
+              </CardContent>
+            </Card>
+
+            {/* Winery Results Section */}
+            {ghgResults.wineries.length > 0 && (
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h6" gutterBottom >
+                    Winery Emissions
+                  </Typography>
+                  <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+                    {ghgResults.wineryTotal.toFixed(2)} kg CO₂e
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {ghgResults.wineries.map((wineryData) => (
+                      <Box
+                        key={wineryData.entityId}
+                        sx={{
+                          p: 2,
+                          bgcolor: 'primary.light',
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'primary.main',
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            {wineryData.entityName}
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            {wineryData.totalGHG.toFixed(2)} kg CO₂e
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                          {Object.entries(wineryData.sourceBreakdown).map(([source, value]) => (
+                            value > 0 && (
+                              <Chip
+                                key={source}
+                                label={`${source}: ${value.toFixed(2)} kg CO₂e`}
+                                size="small"
+                                variant="outlined"
+                              />
+                            )
+                          ))}
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Parcel Results Section */}
+            {ghgResults.parcels.length > 0 && (
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Parcel Emissions
+                  </Typography>
+                  <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+                    {ghgResults.parcelTotal.toFixed(2)} kg CO₂e
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {ghgResults.parcels.map((parcelData) => (
+                      <Box
+                        key={parcelData.entityId}
+                        sx={{
+                          p: 2,
+                          bgcolor: 'primary.light',
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'primary.main',
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            {parcelData.entityName}
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            {parcelData.totalGHG.toFixed(2)} kg CO₂e
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                          {Object.entries(parcelData.sourceBreakdown).map(([source, value]) => (
+                            value > 0 && (
+                              <Chip
+                                key={source}
+                                label={`${source}: ${value.toFixed(2)} kg CO₂e`}
+                                size="small"
+                                variant="outlined"
+                              />
+                            )
+                          ))}
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Pie Chart */}
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Emissions Sources Distribution
+                </Typography>
+                <EmissionsPieChart
+                  observations={ghgResults.allNormalizedData}
+                  groupingField="@type"
+                />
+              </CardContent>
+            </Card>
+          </Box>
 
           {/* Data Items Table */}
           {ghgResults.allNormalizedData.length > 0 && (

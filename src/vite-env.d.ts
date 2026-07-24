@@ -19,3 +19,6 @@ interface ImportMetaEnv {
         VITE_API_URL: string;
     }
 }
+
+  // declare module 'html2canvas';
+  // declare module 'jspdf';
