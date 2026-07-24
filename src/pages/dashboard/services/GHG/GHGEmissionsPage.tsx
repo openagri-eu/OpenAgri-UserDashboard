@@ -579,87 +579,87 @@ const GHGEmissionsPage = () => {
                 />
               </CardContent>
             </Card>
-          </Box>
 
-          {/* Data Items Table */}
-          {ghgResults.allNormalizedData.length > 0 && (
-            <Card variant="outlined">
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  All Data Items ({ghgResults.allNormalizedData.length})
-                </Typography>
-                <Box
-                  sx={{
-                    maxHeight: 400,
-                    overflowY: 'auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                  }}
-                >
-                  {ghgResults.allNormalizedData.map((item, idx) => (
-                    <Box
-                      key={idx}
-                      sx={{
-                        p: 1.5,
-                        bgcolor: 'background.default',
-                        borderRadius: 1,
-                        borderLeft: '4px solid',
-                        borderColor: item.entityType === 'winery' ? 'primary.main' : 'secondary.main',
-                      }}
-                    >
+            {/* Data Items Table */}
+            {ghgResults.allNormalizedData.length > 0 && (
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    All Data Items ({ghgResults.allNormalizedData.length})
+                  </Typography>
+                  <Box
+                    sx={{
+                      maxHeight: loadingPdf ? 'none' : 400,
+                      overflowY: loadingPdf ? 'visible' : 'auto',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                    }}
+                  >
+                    {ghgResults.allNormalizedData.map((item, idx) => (
                       <Box
+                        key={idx}
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
+                          p: 1.5,
+                          bgcolor: 'background.default',
+                          borderRadius: 1,
+                          borderLeft: '4px solid',
+                          borderColor: item.entityType === 'winery' ? 'primary.main' : 'secondary.main',
                         }}
                       >
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {item.title || item['@type'] || 'Unknown'}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary" display="block">
-                            {item.phenomenonTime || item.timestamp || 'N/A'}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                            <Chip
-                              label={item.entityType}
-                              size="small"
-                              color={item.entityType === 'winery' ? 'primary' : 'secondary'}
-                              sx={{ height: 18, fontSize: '0.65rem' }}
-                            />
-                            <Chip
-                              label={item.dataType}
-                              size="small"
-                              variant="outlined"
-                              sx={{ height: 18, fontSize: '0.65rem' }}
-                            />
-                            <Chip
-                              label={item.sourceAPI}
-                              size="small"
-                              variant="outlined"
-                              sx={{ height: 18, fontSize: '0.65rem' }}
-                            />
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              {item.title || item['@type'] || 'Unknown'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              {item.phenomenonTime || item.timestamp || 'N/A'}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                              <Chip
+                                label={item.entityType}
+                                size="small"
+                                color={item.entityType === 'winery' ? 'primary' : 'secondary'}
+                                sx={{ height: 18, fontSize: '0.65rem' }}
+                              />
+                              <Chip
+                                label={item.dataType}
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 18, fontSize: '0.65rem' }}
+                              />
+                              <Chip
+                                label={item.sourceAPI}
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 18, fontSize: '0.65rem' }}
+                              />
+                            </Box>
+                          </Box>
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              {item.ghgValue.toFixed(2)} kg CO₂e
+                            </Typography>
+                            {item.emissionFactor !== 1 && (
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                ({item.rawValue.toFixed(2)} × {item.emissionFactor})
+                              </Typography>
+                            )}
                           </Box>
                         </Box>
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {item.ghgValue.toFixed(2)} kg CO₂e
-                          </Typography>
-                          {item.emissionFactor !== 1 && (
-                            <Typography variant="caption" color="text.secondary" display="block">
-                              ({item.rawValue.toFixed(2)} × {item.emissionFactor})
-                            </Typography>
-                          )}
-                        </Box>
                       </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </CardContent>
-            </Card>
-          )}
+                    ))}
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
+          </Box>
         </>
       )}
 
