@@ -228,7 +228,7 @@ const GHGEmissionsPage = () => {
           </Typography>
 
           {/* Winery Selection Section */}
-          <Box sx={{ mb: 3, p: 2, bgcolor: 'primary.light', borderRadius: 1, border: '1px solid', borderColor: 'primary.main' }}>
+          <Box sx={{ mb: 3, p: 2, bgcolor: 'secondary.light', borderRadius: 1, border: '1px solid', borderColor: 'primary.main' }}>
             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
               Wineries
             </Typography>
@@ -331,7 +331,7 @@ const GHGEmissionsPage = () => {
                         label={parcel?.identifier || parcelId}
                         size="small"
                         variant="filled"
-                        color="secondary"
+                        color="primary"
                       />
                     );
                   })}
@@ -373,10 +373,10 @@ const GHGEmissionsPage = () => {
           {/* Grand Total GHG Card */}
           <Card variant="outlined" sx={{ bgcolor: 'success.light' }}>
             <CardContent>
-              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Total GHG Emissions (All Entities)
               </Typography>
-              <Typography variant="h4" sx={{ color: 'success.dark', fontWeight: 'bold' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {ghgResults.grandTotal.toFixed(2)} kg CO₂e
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -390,7 +390,7 @@ const GHGEmissionsPage = () => {
           {ghgResults.wineries.length > 0 && (
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main' }}>
+                <Typography variant="h6" gutterBottom >
                   Winery Emissions
                 </Typography>
                 <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
@@ -439,7 +439,7 @@ const GHGEmissionsPage = () => {
           {ghgResults.parcels.length > 0 && (
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="h6" gutterBottom sx={{ color: 'secondary.main' }}>
+                <Typography variant="h6" gutterBottom>
                   Parcel Emissions
                 </Typography>
                 <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
@@ -451,10 +451,10 @@ const GHGEmissionsPage = () => {
                       key={parcelData.entityId}
                       sx={{
                         p: 2,
-                        bgcolor: 'secondary.light',
+                        bgcolor: 'primary.light',
                         borderRadius: 1,
                         border: '1px solid',
-                        borderColor: 'secondary.main',
+                        borderColor: 'primary.main',
                       }}
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
