@@ -9,6 +9,7 @@ import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar"
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { AddAgriculturalMachineProps } from "./AddAgriculturalMachine.types";
+import { useSession } from "@contexts/SessionContext";
 
 interface MachineChoice { value: number; display_name: string }
 interface MachineOptionsResponse {
@@ -32,9 +33,12 @@ const emptyForm: MachineCreate = {
 };
 
 const AddAgriculturalMachine: React.FC<AddAgriculturalMachineProps> = ({ onAction }) => {
+    const { session } = useSession();
+    const preselectedParcelId = session?.farm_parcel?.["@id"].split(':').pop() ?? '';
+
     const [formData, setFormData] = useState<MachineCreate>({ ...emptyForm });
     const [purchaseDate, setPurchaseDate] = useState<Dayjs | null>(dayjs());
-    const [selectedParcel, setSelectedParcel] = useState<string>('');
+    const [selectedParcel, setSelectedParcel] = useState<string>(preselectedParcelId);
     const [statusStr, setStatusStr] = useState<string>('1');
 
     const { fetchData, response, error, loading } = useFetch<any>(
@@ -49,7 +53,7 @@ const AddAgriculturalMachine: React.FC<AddAgriculturalMachineProps> = ({ onActio
             showSnackbar('success', 'Machine added successfully');
             setFormData({ ...emptyForm });
             setPurchaseDate(dayjs());
-            setSelectedParcel('');
+            setSelectedParcel(preselectedParcelId);
             setStatusStr('1');
             onAction && onAction();
         }

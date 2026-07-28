@@ -22,6 +22,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { FarmCalendarActivityModel } from "@models/FarmCalendarActivity";
 import useFetch from "@hooks/useFetch";
 import { useNavigate } from "react-router-dom";
+import { useSession } from "@contexts/SessionContext";
 
 const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
     AddRawMaterialOperation: new Set([
@@ -98,11 +99,13 @@ const REQUIRED_KEYS_BY_TYPE: Record<string, Set<string>> = {
 
 const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, activityTypes, onAdd, onDelete, onSave, loading, canEdit, canDelete }: ActivityDynamicCRUDActionsProps<T>) => {
     const navigate = useNavigate();
+    const { session } = useSession();
+    const preselectedParcelId = session?.farm_parcel?.["@id"].split(':').pop() ?? '';
 
     const [formData, setFormData] = useState<T>(activity);
     const requiredKeys = REQUIRED_KEYS_BY_TYPE[formData['@type']] ?? new Set<string>();
     const isReq = (key: string) => requiredKeys.has(key);
-    const [selectedParcel, setSelectedParcel] = useState<string>('');
+    const [selectedParcel, setSelectedParcel] = useState<string>(preselectedParcelId);
     const [selectedAgriCrop, setSelectedAgriCrop] = useState<string>('');
     const [selectedAgriMachines, setSelectedAgriMachines] = useState<string[]>([]);
     const [operatedOnCompostPile, setOperatedOnCompostPile] = useState<string>('');
@@ -830,14 +833,13 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
     }
 
     const renderPesticide = () => {
-        // NTH: filter if parcel is selected
         return (
             <>
                 {'usesPesticide' in formData && (
                     <GenericSelect<PesticideModel>
-                        canEdit={canEdit}
+                        canEdit={canEdit && !!selectedParcel}
                         endpoint='proxy/farmcalendar/api/v1/Pesticides/?format=json'
-                        label='Pesticide'
+                        label={selectedParcel ? 'Pesticide' : 'Pesticide (select a parcel first)'}
                         selectedValue={selectedPesticide}
                         setSelectedValue={setSelectedPesticide}
                         getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasPreharvestInterval}`}
@@ -851,14 +853,13 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
     }
 
     const renderFertilizer = () => {
-        // NTH: filter if parcel is selected
         return (
             <>
                 {'usesFertilizer' in formData && (
                     <GenericSelect<FertilizerModel>
-                        canEdit={canEdit}
+                        canEdit={canEdit && !!selectedParcel}
                         endpoint='proxy/farmcalendar/api/v1/Fertilizers/?format=json'
-                        label='Fertilizer'
+                        label={selectedParcel ? 'Fertilizer' : 'Fertilizer (select a parcel first)'}
                         selectedValue={selectedFertilizer}
                         setSelectedValue={setSelectedFertilizer}
                         getOptionLabel={item => `${item.hasCommercialName} - ${item.hasActiveSubstance} - ${item.hasNutrientConcentration}`}

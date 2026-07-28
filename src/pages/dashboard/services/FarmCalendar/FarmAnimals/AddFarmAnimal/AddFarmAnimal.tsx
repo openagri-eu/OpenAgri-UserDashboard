@@ -9,6 +9,7 @@ import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar"
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
 import { FarmParcelModel } from "@models/FarmParcel";
 import { AddFarmAnimalProps } from "./AddFarmAnimal.types";
+import { useSession } from "@contexts/SessionContext";
 
 interface AnimalChoice { value: number; display_name: string }
 interface AnimalOptionsResponse {
@@ -40,9 +41,12 @@ const emptyForm: AnimalCreate = {
 };
 
 const AddFarmAnimal: React.FC<AddFarmAnimalProps> = ({ onAction }) => {
+    const { session } = useSession();
+    const preselectedParcelId = session?.farm_parcel?.["@id"].split(':').pop() ?? '';
+
     const [formData, setFormData] = useState<AnimalCreate>({ ...emptyForm });
     const [birthdate, setBirthdate] = useState<Dayjs | null>(dayjs());
-    const [selectedParcel, setSelectedParcel] = useState<string>('');
+    const [selectedParcel, setSelectedParcel] = useState<string>(preselectedParcelId);
     const [sexStr, setSexStr] = useState<string>('0');
     const [statusStr, setStatusStr] = useState<string>('1');
 
@@ -58,7 +62,7 @@ const AddFarmAnimal: React.FC<AddFarmAnimalProps> = ({ onAction }) => {
             showSnackbar('success', 'Animal added successfully');
             setFormData({ ...emptyForm });
             setBirthdate(dayjs());
-            setSelectedParcel('');
+            setSelectedParcel(preselectedParcelId);
             setSexStr('0');
             setStatusStr('1');
             onAction && onAction();
