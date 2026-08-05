@@ -1,4 +1,4 @@
-import { getEmissionFactor, isActivity } from './emissionFactors';
+import { getEmissionFactor, getObservationEmissionFactor, isActivity } from './emissionFactors';
 import {
   NormalizedGHGData,
   EntityGHGResult,
@@ -104,14 +104,25 @@ export const normalizeGHGDataItem = (
   sourceAPI: SourceAPI
 ): NormalizedGHGData => {
   const type = data['@type'] || 'Unknown';
+  const title = data.title || data.name;
   const rawValue = extractRawValue(data);
-  const emissionFactor = getEmissionFactor(type);
+  
+  // Determine emission factor
+  let emissionFactor: number;
+  if (isActivity(data)) {
+    // For activities, use the type-based emission factor
+    emissionFactor = getEmissionFactor(type);
+  } else {
+    // For observations, use observation-specific emission factor based on title
+    emissionFactor = getObservationEmissionFactor(title);
+  }
+  
   const ghgValue = rawValue * emissionFactor;
 
   return {
     '@type': type,
     '@id': data['@id'],
-    title: data.title || data.name,
+    title,
     phenomenonTime: data.phenomenonTime || data.timestamp,
     timestamp: data.timestamp || data.phenomenonTime,
     rawValue,

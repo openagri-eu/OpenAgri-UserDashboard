@@ -77,15 +77,9 @@ const GHGEmissionsPage = () => {
     setLoadingCalculation(true);
     setGhgResults(null);
 
-    // API endpoints to fetch from
+    // API endpoints to fetch from - only Observations
     const API_ENDPOINTS: Array<{ path: string; sourceAPI: SourceAPI }> = [
       { path: '/api/v1/Observations/', sourceAPI: 'Observations' },
-      { path: '/api/v1/FertilizationOperations/', sourceAPI: 'FertilizationOperations' },
-      { path: '/api/v1/CropProtectionOperations/', sourceAPI: 'CropProtectionOperations' },
-      { path: '/api/v1/IrrigationOperations/', sourceAPI: 'IrrigationOperations' },
-      { path: '/api/v1/YieldPrediction/', sourceAPI: 'YieldPrediction' },
-      { path: '/api/v1/CropGrowthStageObservations/', sourceAPI: 'CropGrowthStageObservations' },
-      { path: '/api/v1/CropStressIndicatorObservations/', sourceAPI: 'CropStressIndicatorObservations' },
     ];
 
     /**
@@ -102,8 +96,8 @@ const GHGEmissionsPage = () => {
         const params = new URLSearchParams({
           format: 'json',
           parcel: parcelUUID,
-          from_date: fromDate.format('YYYY-MM-DD'),
-          to_date: toDate.format('YYYY-MM-DD'),
+          fromDate: fromDate.format('YYYY-MM-DD'),
+          toDate: toDate.format('YYYY-MM-DD'),
         });
 
         const response = await fetch(
