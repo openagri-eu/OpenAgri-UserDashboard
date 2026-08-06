@@ -1,26 +1,4 @@
 /**
- * Emission factors for converting activity amounts to CO₂e
- * Units: kg CO₂e per unit of activity
- */
-
-export const EMISSION_FACTORS: Record<string, number> = {
-  // Activities - convert applied amounts to CO₂e
-  FertilizationOperation: 2.5, // kg CO₂e per kg fertilizer
-  CropProtectionOperation: 1.2, // kg CO₂e per liter pesticide
-  IrrigationOperation: 0.3, // kg CO₂e per liter water
-
-  // Observations - direct CO₂e values (factor = 1.0)
-  Observation: 1.0,
-  CropStressIndicatorObservation: 1.0,
-  CropGrowthStageObservation: 1.0,
-  YieldPredictionObservation: 1.0,
-  YieldPrediction: 1.0,
-
-  // Default fallback
-  Unknown: 1.0,
-};
-
-/**
  * Observation-specific emission factors
  * Maps observation titles/names to their specific emission factors (kg CO₂e per unit)
  * Source: GHG calculation methodology for winery operations
@@ -33,7 +11,7 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
 
   // Redundant / previous aliases
   // 'Winemaking - Sulphur (SO₂)': 0.000400,
-  // 'Terracota Amphorae': 0.4000,
+  'Terracota Amphorae': 0.4000,
 
   // Resource consumption
   'Water consumption': 0.000344,
@@ -42,7 +20,7 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
   'Diesel': 2.6600,
 
   // Redundant aliases: the API has one consolidated "Diesel" activity type.
-  // 'Transport (vehicle/distance)': 0.2500,
+  'Transport (vehicle/distance)': 0.2500,
   // 'Diesel - Foliar spray ': 2.6600,
   // 'Diesel - Soil amendment': 2.6600,
   // 'Diesel - Plant protection': 2.6600,
@@ -59,7 +37,7 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
 
   // Redundant / previous aliases
   // 'Manure - Compost': 4.2860,
-  // 'Manure-Compost / Soil nitrogen': 4.2860,
+  'Manure-Compost / Soil nitrogen': 4.2860,
 
   // Infrastructure — 25-year lifecycle
   // Exact API name contains two spaces after the first hyphen.
@@ -68,7 +46,7 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
   'Infrastracture_Vineyard posts_Steel': 1.3000,
 
   // Redundant alias
-  // 'Vineyard Wire': 1.3000,
+  'Vineyard Wire': 1.3000,
 
   // Equipment
   'Forklift electric': 0.3370,
@@ -77,14 +55,15 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
   'Disease Control - Sulphur S': 1.3900,
 
   // Not present in the activity-type API response
-  // 'Disease Control - Copper Oxide': 1.9400,
+  'Disease Control - Copper Oxide': 1.9400,
+  'Disease Detection Observation': 1.9400, // Not present in the activity-type API response
 
   // Carbon sequestration
   // Negative values indicate CO₂ removal.
   'Cover crop - mulching': -0.412500,
 
   // Previous alias
-  // 'Cover crop / mulching': -0.412500,
+  'Cover crop / mulching': -0.412500,
 
   // Composting — on-site waste management
   'Composted on-site_Wine lees': 0.1940,
@@ -95,7 +74,7 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
   // 'Prunings': 0.1940,
 
   // Previous names that do not exactly match the API
-  // 'Composted on site - Wine lees': 0.1940,
+  'Composted on site - Wine lees': 0.1940,
   // 'Composted on site - Grape marc': 0.1940,
 
   // Bottling materials
@@ -103,28 +82,31 @@ export const OBSERVATION_EMISSION_FACTORS: Record<string, number> = {
   'Bottling parameters - Paper label': 1.5000,
   'Bottling parameters - glass bottle': 0.5340,
   'Bottling parameters - Carton case': 0.8000,
+
+  // Unknown / fallback
+  'Unknown': 0.0,
 };
 /**
  * Get emission factor for a given activity/observation type
- * @param type - The @type field from the data object
+ * @param key - The @type field from the data object
  * @returns Emission factor to apply
  */
-export const getEmissionFactor = (type: string | undefined): number => {
-  if (!type) return EMISSION_FACTORS.Unknown;
+export const getEmissionFactor = (key: string | undefined): number => {
+  if (!key) return OBSERVATION_EMISSION_FACTORS['Unknown'];
 
   // Direct match
-  if (EMISSION_FACTORS[type]) {
-    return EMISSION_FACTORS[type];
+  if (OBSERVATION_EMISSION_FACTORS[key]) {
+    return OBSERVATION_EMISSION_FACTORS[key];
   }
 
   // Partial match for flexibility
-  for (const [key, factor] of Object.entries(EMISSION_FACTORS)) {
-    if (type.includes(key)) {
+  for (const [k, factor] of Object.entries(OBSERVATION_EMISSION_FACTORS)) {
+    if (k.includes(key)) {
       return factor;
     }
   }
 
-  return EMISSION_FACTORS.Unknown;
+  return OBSERVATION_EMISSION_FACTORS['Unknown'];
 };
 
 /**

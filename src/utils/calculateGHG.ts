@@ -1,4 +1,9 @@
-import { getEmissionFactor, getObservationEmissionFactor, isActivity } from './emissionFactors';
+import {
+  OBSERVATION_EMISSION_FACTORS,
+  getEmissionFactor,
+  getObservationEmissionFactor,
+  isActivity,
+} from './emissionFactors';
 import {
   NormalizedGHGData,
   EntityGHGResult,
@@ -16,6 +21,19 @@ export interface GHGObservation {
   value?: number;
   amount?: number;
   type?: string;
+}
+
+interface RawGHGData {
+  [key: string]: unknown;
+  '@type'?: string;
+  '@id'?: string;
+  title?: string;
+  name?: string;
+  phenomenonTime?: string;
+  timestamp?: string;
+  activityType?: { '@id'?: string; id?: string } | string;
+  hasAppliedAmount?: { numericValue?: number; unit?: string };
+  hasResult?: { hasValue?: number; unit?: string };
 }
 
 /**
@@ -77,8 +95,7 @@ export const getTopEmissionSources = (
  * @param data - Raw data object (observation or activity)
  * @returns Numeric value extracted from appropriate field
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const extractRawValue = (data: any): number => {
+export const extractRawValue = (data: RawGHGData): number => {
   if (isActivity(data)) {
     // Activities: hasAppliedAmount.numericValue
     return Number(data.hasAppliedAmount?.numericValue ?? 0) || 0;
@@ -86,6 +103,102 @@ export const extractRawValue = (data: any): number => {
     // Observations: hasResult.hasValue
     return Number(data.hasResult?.hasValue ?? 0) || 0;
   }
+};
+
+const getApiUrl = (): string => {
+  const globalWindow = window as Window & { env?: { VITE_API_URL?: string } };
+  return globalWindow.env?.VITE_API_URL ? globalWindow.env.VITE_API_URL : import.meta.env.VITE_API_URL;
+};
+
+const extractActivityTypeId = (data: RawGHGData): string | undefined => {
+  const activityType = data.activityType;
+
+  if (typeof activityType === 'string') {
+    return activityType.split(':').pop();
+  }
+
+  if (!activityType || typeof activityType !== 'object') {
+    return undefined;
+  }
+
+  const activityTypeReference = activityType['@id'] ?? activityType.id;
+
+  if (typeof activityTypeReference !== 'string' || !activityTypeReference) {
+    return undefined;
+  }
+
+  return activityTypeReference.split(':').pop();
+};
+
+const fetchActivityTypeName = async (
+  data: RawGHGData,
+  accessToken?: string
+): Promise<string | undefined> => {
+  const activityTypeId = extractActivityTypeId(data);
+
+  if (!activityTypeId) {
+    return undefined;
+  }
+
+  try {
+    const response = await fetch(
+      `${getApiUrl()}proxy/farmcalendar/api/v1/FarmCalendarActivityTypes/${encodeURIComponent(activityTypeId)}/`,
+      {
+        method: 'GET',
+        headers: accessToken
+          ? {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            }
+          : undefined,
+      }
+    );
+
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const activityTypeResponse = await response.json();
+    const graphItem = Array.isArray(activityTypeResponse?.['@graph'])
+      ? activityTypeResponse['@graph'][0]
+      : undefined;
+
+    if (typeof graphItem?.name === 'string' && graphItem.name) {
+      return graphItem.name;
+    }
+
+    if (typeof activityTypeResponse?.name === 'string' && activityTypeResponse.name) {
+      return activityTypeResponse.name;
+    }
+
+    return undefined;
+  } catch (error) {
+    console.error('Error fetching FarmCalendar activity type:', error);
+    return undefined;
+  }
+};
+
+const getActivityEmissionFactor = (
+  activityTypeName: string | undefined,
+  fallbackTitle: string | undefined,
+  fallbackType: string | undefined
+): number => {
+  console.log('getActivityEmissionFactor called with activityTypeName:', activityTypeName, 'fallbackTitle:', fallbackTitle, 'fallbackType:', fallbackType);
+  if (
+    activityTypeName &&
+    Object.prototype.hasOwnProperty.call(OBSERVATION_EMISSION_FACTORS, activityTypeName)
+  ) {
+    console.log(`Emission factor found for activityTypeName "${activityTypeName}":`, OBSERVATION_EMISSION_FACTORS[activityTypeName]);
+    return OBSERVATION_EMISSION_FACTORS[activityTypeName];
+  }
+
+  if (fallbackTitle && Object.prototype.hasOwnProperty.call(OBSERVATION_EMISSION_FACTORS, fallbackTitle)) {
+    console.log(`Emission factor found for fallbackTitle "${fallbackTitle}":`, OBSERVATION_EMISSION_FACTORS[fallbackTitle]);
+    return OBSERVATION_EMISSION_FACTORS[fallbackTitle];
+  }
+
+  console.log(`No emission factor found for activityTypeName "${activityTypeName}" or fallbackTitle "${fallbackTitle}". EF: ${getEmissionFactor(fallbackTitle)}`);
+  return getEmissionFactor(fallbackTitle);
 };
 
 /**
@@ -96,27 +209,27 @@ export const extractRawValue = (data: any): number => {
  * @param sourceAPI - Source API endpoint
  * @returns Normalized GHG data item
  */
-export const normalizeGHGDataItem = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any,
+export const normalizeGHGDataItem = async (
+  data: RawGHGData,
   entityId: string,
   entityType: EntityType,
-  sourceAPI: SourceAPI
-): NormalizedGHGData => {
-  const type = data['@type'] || 'Unknown';
-  const title = data.title || data.name;
+  sourceAPI: SourceAPI,
+  accessToken?: string
+): Promise<NormalizedGHGData> => {
+  const type = (data['@type'] as string | undefined) || 'Unknown';
+  const title = (data.title as string | undefined) || (data.name as string | undefined);
   const rawValue = extractRawValue(data);
-  
+
   // Determine emission factor
   let emissionFactor: number;
-  if (isActivity(data)) {
-    // For activities, use the type-based emission factor
-    emissionFactor = getEmissionFactor(type);
+  if (!isActivity(data)) {
+    const activityTypeName = await fetchActivityTypeName(data, accessToken);
+    emissionFactor = getActivityEmissionFactor(activityTypeName, title, type);
   } else {
-    // For observations, use observation-specific emission factor based on title
+    // For activities, use activity-specific emission factor based on title
     emissionFactor = getObservationEmissionFactor(title);
   }
-  
+
   const ghgValue = rawValue * emissionFactor;
 
   return {
@@ -146,18 +259,20 @@ export const normalizeGHGDataItem = (
  * @returns Array of normalized GHG data
  */
 export const normalizeGHGDataArray = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dataItems: any[],
+  dataItems: RawGHGData[],
   entityId: string,
   entityType: EntityType,
-  sourceAPI: SourceAPI
-): NormalizedGHGData[] => {
+  sourceAPI: SourceAPI,
+  accessToken?: string
+): Promise<NormalizedGHGData[]> => {
   if (!Array.isArray(dataItems)) {
-    return [];
+    return Promise.resolve([]);
   }
 
-  return dataItems.map((item) =>
-    normalizeGHGDataItem(item, entityId, entityType, sourceAPI)
+  return Promise.all(
+    dataItems.map((item) =>
+      normalizeGHGDataItem(item, entityId, entityType, sourceAPI, accessToken)
+    )
   );
 };
 

@@ -149,11 +149,17 @@ const GHGEmissionsPage = () => {
           const results = await Promise.all(fetchPromises);
 
           // Normalize and add to collection
-          results.forEach((apiData, index) => {
+          for (const [index, apiData] of results.entries()) {
             const sourceAPI = API_ENDPOINTS[index].sourceAPI;
-            const normalized = normalizeGHGDataArray(apiData, wineryId, 'winery', sourceAPI);
+            const normalized = await normalizeGHGDataArray(
+              apiData,
+              wineryId,
+              'winery',
+              sourceAPI,
+              session?.user?.token
+            );
             allNormalizedData.push(...normalized);
-          });
+          }
         }
       }
 
@@ -172,11 +178,17 @@ const GHGEmissionsPage = () => {
           const results = await Promise.all(fetchPromises);
 
           // Normalize and add to collection
-          results.forEach((apiData, index) => {
+          for (const [index, apiData] of results.entries()) {
             const sourceAPI = API_ENDPOINTS[index].sourceAPI;
-            const normalized = normalizeGHGDataArray(apiData, parcelId, 'parcel', sourceAPI);
+            const normalized = await normalizeGHGDataArray(
+              apiData,
+              parcelId,
+              'parcel',
+              sourceAPI,
+              session?.user?.token
+            );
             allNormalizedData.push(...normalized);
-          });
+          }
         }
       }
 
