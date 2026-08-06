@@ -49,12 +49,12 @@ const EmissionsPieChart = ({ groupingField = 'title', observations: externalObse
     });
 
     const entries = Object.entries(sums).sort((a, b) => b[1] - a[1]);
-    const top3 = entries.slice(0, 3);
-    if (top3.length === 0) return { data: [] };
+    const top5 = entries.slice(0, 5);
+    if (top5.length === 0) return { data: [] };
 
-    const total = top3.reduce((s, [_k, v]) => s + v, 0) || 1;
+    const total = top5.reduce((s, [_k, v]) => s + v, 0) || 1;
 
-    const data = top3.map(([k, v]) => ({ name: k, y: v }));
+    const data = top5.map(([k, v]) => ({ name: k, y: v }));
     console.log('EmissionsPieChart: chartData =', { data, total });
     return { data, total };
   }, [response, groupingField, externalObservations]);

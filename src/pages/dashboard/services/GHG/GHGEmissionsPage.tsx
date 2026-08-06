@@ -565,7 +565,7 @@ const GHGEmissionsPage = () => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Emissions by Observation Title
+                  Emissions by Observation Title (TOP 5)
                 </Typography>
                 <EmissionsPieChart
                   observations={ghgResults.allNormalizedData}
