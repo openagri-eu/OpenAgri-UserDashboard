@@ -12,7 +12,7 @@ import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 
 const SignUpPage = () => {
-    const [credentials, setCredentials] = useState({ username: "", email: "", password: "", confirmPassword: "" });
+    const [credentials, setCredentials] = useState({ username: "", email: "", password: "", confirmPassword: "", firstName: "", lastName: "" });
     const [errors, setErrors] = useState({ username: "", email: "", password: "", confirmPassword: "" });
     const [showPassword, setShowPassword] = useState(false);
 
@@ -62,6 +62,8 @@ const SignUpPage = () => {
                 username: credentials.username,
                 email: credentials.email,
                 password: credentials.password,
+                ...(credentials.firstName && { first_name: credentials.firstName }),
+                ...(credentials.lastName && { last_name: credentials.lastName }),
             },
         }
     );
@@ -109,6 +111,22 @@ const SignUpPage = () => {
                         onChange={handleChange}
                         error={!!errors.username}
                         helperText={errors.username}
+                        variant="outlined"
+                    />
+                    <TextField
+                        fullWidth
+                        label="First Name"
+                        name="firstName"
+                        value={credentials.firstName}
+                        onChange={handleChange}
+                        variant="outlined"
+                    />
+                    <TextField
+                        fullWidth
+                        label="Last Name"
+                        name="lastName"
+                        value={credentials.lastName}
+                        onChange={handleChange}
                         variant="outlined"
                     />
                     <TextField
