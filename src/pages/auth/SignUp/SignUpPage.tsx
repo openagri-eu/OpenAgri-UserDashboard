@@ -12,8 +12,8 @@ import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 
 const SignUpPage = () => {
-    const [credentials, setCredentials] = useState({ username: "", email: "", password: "", confirmPassword: "", firstName: "", lastName: "" });
-    const [errors, setErrors] = useState({ username: "", email: "", password: "", confirmPassword: "" });
+    const [credentials, setCredentials] = useState({ username: "", email: "", password: "", confirm_password: "", firstName: "", lastName: "" });
+    const [errors, setErrors] = useState({ username: "", email: "", password: "", confirm_password: "" });
     const [showPassword, setShowPassword] = useState(false);
 
     const validateUsername = (username: string) => {
@@ -44,7 +44,7 @@ const SignUpPage = () => {
         if (name === "username") error = validateUsername(value);
         if (name === "email") error = validateEmail(value);
         if (name === "password") error = validatePassword(value);
-        if (name === "confirmPassword") error = validateConfirmPassword(value);
+        if (name === "confirm_password") error = validateConfirmPassword(value);
         setErrors((prev) => ({ ...prev, [name]: error }));
     };
 
@@ -72,9 +72,9 @@ const SignUpPage = () => {
         const usernameError = validateUsername(credentials.username);
         const emailError = validateEmail(credentials.email);
         const passwordError = validatePassword(credentials.password);
-        const confirmPasswordError = validateConfirmPassword(credentials.confirmPassword);
+        const confirmPasswordError = validateConfirmPassword(credentials.confirm_password);
 
-        setErrors({ username: usernameError, email: emailError, password: passwordError, confirmPassword: confirmPasswordError });
+        setErrors({ username: usernameError, email: emailError, password: passwordError, confirm_password: confirmPasswordError });
 
         if (usernameError || emailError || passwordError || confirmPasswordError) return;
 
@@ -169,12 +169,12 @@ const SignUpPage = () => {
                     <TextField
                         fullWidth
                         label="Confirm Password"
-                        name="confirmPassword"
+                        name="confirm_password"
                         type={showPassword ? "text" : "password"}
-                        value={credentials.confirmPassword}
+                        value={credentials.confirm_password}
                         onChange={handleChange}
-                        error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword}
+                        error={!!errors.confirm_password}
+                        helperText={errors.confirm_password}
                         variant="outlined"
                         slotProps={{
                             input: {
