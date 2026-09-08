@@ -101,10 +101,12 @@ export default defineConfig({
           urlPattern: ({ request }) =>
             request.method === 'GET' &&
             /\/proxy\/(weather_data\/api\/data\/(forecast5|flight-forecast5|spray-forecast)\/?|pdm\/api\/v1\/risk-forecast)/.test(request.url),
-          handler: 'CacheFirst',
+          handler: 'NetworkFirst',
           options: {
-            cacheName: 'oa-forecast',
-            expiration: { maxEntries: 50, maxAgeSeconds: 30 * 60 },
+            cacheName: 'oa-forecast-v2',
+            networkTimeoutSeconds: 5,
+            // long maxAge: cache is offline fallback only, online always refetches
+            expiration: { maxEntries: 50, maxAgeSeconds: 7 * 24 * 60 * 60 },
           },
         },
       ],
