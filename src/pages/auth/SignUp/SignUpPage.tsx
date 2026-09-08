@@ -62,6 +62,7 @@ const SignUpPage = () => {
                 username: credentials.username,
                 email: credentials.email,
                 password: credentials.password,
+                confirm_password: credentials.confirm_password,
                 ...(credentials.firstName && { first_name: credentials.firstName }),
                 ...(credentials.lastName && { last_name: credentials.lastName }),
             },
