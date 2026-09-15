@@ -11,6 +11,7 @@ import useFetch from "@hooks/useFetch";
 import useSnackbar from "@hooks/useSnackbar";
 import GenericSnackbar from "@components/shared/GenericSnackbar/GenericSnackbar";
 import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
+import { wktFirstLatLong } from "@utils/wktPolygon";
 
 const REQUIRED_KEYS = new Set<string>([
     'identifier',
@@ -143,9 +144,14 @@ const AddFarmParcel: React.FC<AddFarmParcelProps> = ({ onAction }) => {
     };
 
     const handleGeometryChange = (wkt: string) => {
+        const coord = wktFirstLatLong(wkt);
         setFormData(prev => {
             if (!prev) return undefined;
-            return { ...prev, hasGeometry: { ...prev.hasGeometry, asWKT: wkt } };
+            return {
+                ...prev,
+                hasGeometry: { ...prev.hasGeometry, asWKT: wkt },
+                location: coord ? { ...prev.location, lat: coord.lat, long: coord.long } : prev.location,
+            };
         });
     };
 

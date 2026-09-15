@@ -17,6 +17,7 @@ import GenericDialog from "@components/shared/GenericDialog/GenericDialog";
 import useDialog from "@hooks/useDialog";
 import { ServiceContextType } from "@layouts/services/FarmCalendarLayout";
 import WKTPolygonMap from "@components/shared/WKTPolygonMap/WKTPolygonMap";
+import { wktFirstLatLong } from "@utils/wktPolygon";
 import { useSession } from "@contexts/SessionContext";
 import { generateFieldNotebook } from "@utils/generateReport";
 
@@ -170,9 +171,14 @@ const FarmParcelPage = () => {
     };
 
     const handleGeometryChange = (wkt: string) => {
+        const coord = wktFirstLatLong(wkt);
         setParcel(prev => {
             if (!prev) return undefined;
-            return { ...prev, hasGeometry: { ...prev.hasGeometry, asWKT: wkt } };
+            return {
+                ...prev,
+                hasGeometry: { ...prev.hasGeometry, asWKT: wkt },
+                location: coord ? { ...prev.location, lat: coord.lat, long: coord.long } : prev.location,
+            };
         });
     };
 
