@@ -1,6 +1,6 @@
 import { AddRawMaterialOperationModel, BaseActivityModel, GenericAlertOptions, IrrigationOperationOptions } from "@models/FarmCalendarActivities";
 import { ActivityDynamicCRUDActionsProps } from "./ActivityDynamicCRUDActions.types";
-import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemButton, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, IconButton, List, ListItem, ListItemButton, ListItemText, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { DateTimePicker } from "@mui/x-date-pickers";
@@ -818,14 +818,31 @@ const ActivityDynamicCRUDActions = <T extends BaseActivityModel>({ activity, act
                                 '' : (formData.hasAppliedAmount as AppliedAmountShape)["numericValue"]}
                             onChange={handleChange}
                             error={isReq('hasAppliedAmount.numericValue') && isNaN((formData.hasAppliedAmount as AppliedAmountShape)['numericValue'])} />
-                        <TextField
-                            slotProps={{ input: { readOnly: !canEdit } }}
-                            fullWidth margin="normal" label="Applied amount unit"
-                            name="hasAppliedAmount.unit"
-                            required={isReq('hasAppliedAmount.unit')}
-                            value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
-                            onChange={handleChange}
-                            error={isReq('hasAppliedAmount.unit') && !(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()} />
+                        {formData['@type'] === 'IrrigationOperation' ? (
+                            // FE-only convention: irrigation applied-amount unit is restricted to
+                            // a fixed set (not enforced by BE). Labels use superscript m³.
+                            <TextField
+                                select
+                                slotProps={{ input: { readOnly: !canEdit } }}
+                                fullWidth margin="normal" label="Applied amount unit"
+                                name="hasAppliedAmount.unit"
+                                required={isReq('hasAppliedAmount.unit')}
+                                value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
+                                onChange={handleChange}
+                                error={isReq('hasAppliedAmount.unit') && !(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()}>
+                                <MenuItem value="m3">m³</MenuItem>
+                                <MenuItem value="m3/hectare">m³/hectare</MenuItem>
+                            </TextField>
+                        ) : (
+                            <TextField
+                                slotProps={{ input: { readOnly: !canEdit } }}
+                                fullWidth margin="normal" label="Applied amount unit"
+                                name="hasAppliedAmount.unit"
+                                required={isReq('hasAppliedAmount.unit')}
+                                value={(formData.hasAppliedAmount as AppliedAmountShape).unit ?? ''}
+                                onChange={handleChange}
+                                error={isReq('hasAppliedAmount.unit') && !(formData.hasAppliedAmount as AppliedAmountShape).unit?.trim()} />
+                        )}
                     </Stack>
                 )}
             </>
