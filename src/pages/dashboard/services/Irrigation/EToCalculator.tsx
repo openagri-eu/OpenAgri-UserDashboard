@@ -15,7 +15,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import ParcelSelectionModule from "@components/dashboard/ParcelSelectionModule/ParcelSelectionModule";
 import { useSession } from "@contexts/SessionContext";
 import GenericSelect from "@components/shared/GenericSelect/GenericSelect";
-import { CropTypeModel } from "@models/CropType";
+import { FarmCropModel } from "@models/FarmCrop";
 
 
 const EToCalculatorPage = () => {
@@ -80,14 +80,14 @@ const EToCalculatorPage = () => {
                         <Typography variant="body1">
                             Select a location and a time frame to view its ETo calculation. Additionally select the crop type and growth stage for finer tuning.
                         </Typography>
-                        <GenericSelect<CropTypeModel, CropTypeModel[]>
-                            endpoint='proxy/irrigation/api/v1/eto/option-types/'
+                        <GenericSelect<FarmCropModel, FarmCropModel[]>
+                            endpoint={`proxy/farmcalendar/api/v1/FarmCrops/?format=json&parcel=${session?.farm_parcel?.["@id"].split(":")[3]}`}
                             method="GET"
-                            label='Crop type'
+                            label='Crop'
                             selectedValue={selectedCropType}
                             setSelectedValue={setSelectedCropType}
-                            getOptionLabel={item => item.crop}
-                            getOptionValue={item => item.id}
+                            getOptionLabel={item => `${item.name} - ${item.cropSpecies.name} - ${item.growth_stage ?? ''}`}
+                            getOptionValue={item => item["@id"].split(':').pop() ?? ''}
                         />
                         <GenericSelect<{ value: string; label: string }, { value: string; label: string }[]>
                             endpoint=''

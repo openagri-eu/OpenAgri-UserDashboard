@@ -13,7 +13,7 @@ const GLOBAL_ENDPOINTS = [
     'proxy/pdm/api/v1/disease/',
     'proxy/pdm/api/v1/threat-model/',
     'proxy/irrigation/api/v1/dataset/soil-types/',
-    'proxy/irrigation/api/v1/eto/option-types/',
+    'proxy/farmcalendar/api/v1/FarmCrops/?format=json',
     'me/',
 ];
 
@@ -47,6 +47,7 @@ export const buildPrefetchURLs = (
                 `proxy/farmcalendar/api/v1/FarmCalendarActivities/?parcel=${p.id}&format=json&fromDate=${range.from}&toDate=${range.to}`,
             );
         }
+        urls.push(`proxy/farmcalendar/api/v1/FarmCrops/?format=json&parcel=${p.id}`);
         if (p.lat !== null && p.lon !== null) {
             urls.push(
                 `proxy/weather_data/api/data/forecast5/?lat=${p.lat}&lon=${p.lon}`,

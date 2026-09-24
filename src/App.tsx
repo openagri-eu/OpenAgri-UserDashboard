@@ -113,6 +113,12 @@ export default function App() {
         disabled: !hasAccess('FC'),
       },
       {
+        segment: 'farm-crops',
+        title: 'Crops',
+        icon: <GrassIcon />,
+        disabled: !hasAccess('FC'),
+      },
+      {
         segment: 'fertilizers',
         title: 'Fertilizers',
         icon: <YardIcon />,
@@ -176,12 +182,6 @@ export default function App() {
         segment: 'soil-moisture-analysis',
         title: 'Soil Moisture Analysis',
         icon: <AnalyticsIcon />,
-        disabled: !hasAccess('IRM'),
-      },
-      {
-        segment: 'crop-types',
-        title: 'Crop types',
-        icon: <YardIcon />,
         disabled: !hasAccess('IRM'),
       },
       {

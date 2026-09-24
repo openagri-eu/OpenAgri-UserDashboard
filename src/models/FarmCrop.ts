@@ -8,14 +8,17 @@ export interface FarmCropModel {
         "variety": string;
     };
     status: number;
-    invalidatedAtTime: string;
+    invalidatedAtTime: string | null;
     dateCreated: string;
     dateModified: string;
     name: string;
-    description: string;
+    description: string | null;
     hasAgriParcel: {
         "@id": string;
         "@type": string;
     };
-    growth_stage: string;
+    growth_stage: string | null;
+    kc_init: string | null;
+    kc_mid: string | null;
+    kc_end: string | null;
 }

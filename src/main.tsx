@@ -31,6 +31,8 @@ import FarmAnimalsPage from '@pages/dashboard/services/FarmCalendar/FarmAnimals/
 import EditFarmAnimalPage from '@pages/dashboard/services/FarmCalendar/FarmAnimals/EditFarmAnimal.tsx';
 import AgriculturalMachinesPage from '@pages/dashboard/services/FarmCalendar/AgriculturalMachines/AgriculturalMachines.tsx';
 import EditAgriculturalMachinePage from '@pages/dashboard/services/FarmCalendar/AgriculturalMachines/EditAgriculturalMachine.tsx';
+import FarmCropsPage from '@pages/dashboard/services/FarmCalendar/FarmCrops/FarmCrops.tsx';
+import EditFarmCropPage from '@pages/dashboard/services/FarmCalendar/FarmCrops/EditFarmCrop.tsx';
 import FertilizersPage from '@pages/dashboard/services/FarmCalendar/Fertilizers/Fertilizers.tsx';
 import EditFertilizerPage from '@pages/dashboard/services/FarmCalendar/Fertilizers/EditFertilizer.tsx';
 import PesticidesPage from '@pages/dashboard/services/FarmCalendar/Pesticides/Pesticides.tsx';
@@ -39,8 +41,6 @@ import WeatherDataPage from '@pages/dashboard/services/WeatherData/WeatherData.t
 import EToCalculatorPage from '@pages/dashboard/services/Irrigation/EToCalculator.tsx';
 import UploadDatasetPage from '@pages/dashboard/services/Irrigation/UploadDataset.tsx';
 import SoilMoistureAnalysisPage from '@pages/dashboard/services/Irrigation/SoilMoistureAnalysis.tsx';
-import CropTypesPage from '@pages/dashboard/services/Irrigation/CropTypes.tsx';
-import EditCropTypePage from '@pages/dashboard/services/Irrigation/EditCropType.tsx';
 import SoilTypesPage from '@pages/dashboard/services/Irrigation/SoilTypes.tsx';
 import EditSoilTypePage from '@pages/dashboard/services/Irrigation/EditSoilType.tsx';
 import IrrigationOperationsReportPage from '@pages/dashboard/services/FarmCalendar/ReportingService/IrrigationOperations.tsx';
@@ -111,6 +111,14 @@ const router = createBrowserRouter([
               {
                 path: 'agricultural-machines/:id',
                 Component: EditAgriculturalMachinePage
+              },
+              {
+                path: 'farm-crops',
+                Component: FarmCropsPage
+              },
+              {
+                path: 'farm-crops/:id',
+                Component: EditFarmCropPage
               },
               {
                 path: 'fertilizers',
@@ -200,14 +208,6 @@ const router = createBrowserRouter([
               {
                 path: 'soil-moisture-analysis',
                 Component: SoilMoistureAnalysisPage
-              },
-              {
-                path: 'crop-types',
-                Component: CropTypesPage
-              },
-              {
-                path: 'crop-types/:id',
-                Component: EditCropTypePage
               },
               {
                 path: 'soil-types',
