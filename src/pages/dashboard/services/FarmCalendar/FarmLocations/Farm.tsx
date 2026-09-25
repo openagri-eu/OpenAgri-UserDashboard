@@ -267,7 +267,7 @@ const FarmPage = () => {
                                                         </Stack>
                                                         <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 0.5 }}>
                                                             {p.category && <Chip size="small" label={p.category} />}
-                                                            {p.area && <Chip size="small" variant="outlined" label={`${p.area} ha`} />}
+                                                            {p.area && <Chip size="small" variant="outlined" label={`${p.area} m2`} />}
                                                         </Stack>
                                                         <Stack spacing={0.5} sx={{ mt: 1.5 }}>
                                                             {p.inRegion && (
