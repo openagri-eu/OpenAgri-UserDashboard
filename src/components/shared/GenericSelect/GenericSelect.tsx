@@ -28,7 +28,7 @@ const GenericSelect = <T, R = T[]>({
 
     useEffect(() => {
         if (!data) fetchData();
-    }, []);
+    }, [endpoint, method]);
 
     const items = useMemo(() => {
         const dataToUse = data ? data : response;
