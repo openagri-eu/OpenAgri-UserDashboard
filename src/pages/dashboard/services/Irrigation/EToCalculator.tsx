@@ -128,6 +128,11 @@ const EToCalculatorPage = () => {
                                             valueFormatter: (value) => value.toLocaleDateString(),
                                         }
                                     ]}
+                                    yAxis={[
+                                        {
+                                            label: 'ET0 (mm)',
+                                        }
+                                    ]}
                                     series={[
                                         {
                                             dataKey: 'y',
