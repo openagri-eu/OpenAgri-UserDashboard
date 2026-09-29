@@ -283,6 +283,7 @@ const FarmParcelPage = () => {
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Latitude" name="location.lat" value={parcel?.location.lat ?? ''} type="number" onChange={handleChange} required={isReq('location.lat')} error={isReq('location.lat') && fieldEmpty('location.lat')} />
                                     <TextField slotProps={{ input: { readOnly: !canEdit } }} fullWidth margin="normal" label="Longitude" name="location.long" value={parcel?.location.long ?? ''} type="number" onChange={handleChange} required={isReq('location.long')} error={isReq('location.long') && fieldEmpty('location.long')} />
                                 </Stack>
+                                <TextField disabled slotProps={{ input: { readOnly: true } }} fullWidth margin="normal" label="Geo ID" value={parcel?.hasGeometry?.['@id']?.split('urn:farmcalendar:Geometry:')[1] ?? ''} />
                                 <Stack direction={'column'} spacing={1}>
                                     <Typography variant="subtitle2" color={isReq('hasGeometry.asWKT') && fieldEmpty('hasGeometry.asWKT') ? 'error' : undefined}>
                                         Parcel boundary{isReq('hasGeometry.asWKT') ? ' *' : ''}
