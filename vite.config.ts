@@ -53,7 +53,7 @@ export default defineConfig({
       clientsClaim: true,
       // also make sure it's not pre-cached
       globIgnores: ['**/env-config.js'],
-      navigateFallbackDenylist: [/^\/examples\//],
+      navigateFallbackDenylist: [/^\/examples\//, /\.pdf$/],
       // NEVER cache the runtime env file
       runtimeCaching: [
         {
