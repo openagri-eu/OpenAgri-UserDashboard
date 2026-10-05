@@ -76,9 +76,8 @@ const SignInPage = () => {
                     <Typography variant="h6">Sign In</Typography>
                     <TextField
                         fullWidth
-                        label="Email"
+                        label="Username"
                         name="username"
-                        type="email"
                         value={credentials.username}
                         onChange={handleChange}
                         variant="outlined"
